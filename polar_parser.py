@@ -1,0 +1,352 @@
+"""
+polar_parser.py - Universal Polar Parser & Spline Interpolator
+Supports:
+1. Official ORC JSON Speed Guides (Digital Twin format, e.g. TRUE GRIT GER 7447)
+   Includes Beat/Run VMG, Heel (Krängung), AWA/AWS, Reef, Flat, and Sail Crossover.
+2. Standard ORC CSV tables (e.g. GER7447_polars.csv)
+"""
+
+import csv
+import json
+import math
+import cmath
+from pathlib import Path
+from typing import Dict, List, Tuple, Any, Optional
+
+
+def catmull_rom_spline(points: List[complex], num_points: int = 12) -> List[complex]:
+    """Smooth spline interpolation through a series of complex points."""
+    if len(points) < 4:
+        return points
+    curve = []
+    pts = [points[0]] + points + [points[-1]]
+    for i in range(len(pts) - 3):
+        p0, p1, p2, p3 = pts[i], pts[i+1], pts[i+2], pts[i+3]
+        for t_step in range(num_points):
+            t = t_step / num_points
+            q0 = -t**3 + 2*t**2 - t
+            q1 = 3*t**3 - 5*t**2 + 2
+            q2 = -3*t**3 + 4*t**2 + t
+            q3 = t**3 - t**2
+            x = 0.5 * (p0.real*q0 + p1.real*q1 + p2.real*q2 + p3.real*q3)
+            y = 0.5 * (p0.imag*q0 + p1.imag*q1 + p2.imag*q2 + p3.imag*q3)
+            curve.append(complex(x, y))
+    curve.append(points[-1])
+    return curve
+
+
+class PolarData:
+    def __init__(self, data_path: Path):
+        self.data_path = Path(data_path)
+        self.boat_name = "TRUE GRIT"
+        self.sail_number = "GER 7447"
+        self.boat_class = "JPK 10.80"
+
+        self.tws_list: List[float] = []
+        self.curves_raw: List[List[Dict[str, float]]] = [] # List of points per TWS
+        self.vmg_targets: List[Dict[str, Any]] = []        # Beat/Run targets per TWS
+        self.crossover_angles: Dict[float, float] = {}     # TWS -> TWA crossover Jib/Spi
+        self.max_ratio: float = 1.0                        # max(BSP / TWS)
+        self.is_json: bool = False
+        self.is_slk: bool = False
+        self.sail_polars: Dict[str, Dict[float, List[Dict[str, float]]]] = {}
+
+        self._load()
+
+    def _load(self):
+        if not self.data_path.exists():
+            raise FileNotFoundError(f"Polardatei nicht gefunden: {self.data_path}")
+
+        ext = self.data_path.suffix.lower()
+        if ext == ".json":
+            self._load_json()
+        elif ext == ".slk":
+            self._load_slk()
+        else:
+            self._load_csv()
+
+    def _load_slk(self):
+        """Loads official ORC SYLK (.slk) VPP tables (e.g. 249116.slk)."""
+        self.is_slk = True
+        rows = {}
+        with open(self.data_path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if line.startswith("C;"):
+                    parts = line.strip().split(";")
+                    y, x, val = None, None, None
+                    for p in parts[1:]:
+                        if p.startswith("Y"):
+                            y = int(p[1:])
+                        elif p.startswith("X"):
+                            x = int(p[1:])
+                        elif p.startswith("K"):
+                            val = p[1:].strip("\"")
+                            try:
+                                val = float(val) if "." in val else int(val)
+                            except ValueError:
+                                pass
+                    if y and x:
+                        if y not in rows:
+                            rows[y] = {}
+                        rows[y][x] = val
+
+        headers = [rows[1].get(i, f"Col{i}") for i in range(1, 13)]
+
+        # Group by sail category and TWS
+        by_sail: Dict[str, Dict[float, List[Dict[str, float]]]] = {}
+        for y in range(2, max(rows.keys()) + 1):
+            r = rows.get(y, {})
+            if not r:
+                continue
+            rec = {headers[i - 1]: r.get(i) for i in range(1, len(headers) + 1)}
+            sail = rec.get("Sail")
+            tws = float(rec.get("TWS", 0))
+            if not sail or tws <= 0:
+                continue
+            if sail not in by_sail:
+                by_sail[sail] = {}
+            if tws not in by_sail[sail]:
+                by_sail[sail][tws] = []
+
+            pt = {
+                "twa": float(rec.get("TWA", 0)),
+                "bsp": float(rec.get("BTV", 0)),
+                "vmg": float(rec.get("VMG", 0)),
+                "aws": float(rec.get("AWS", 0)),
+                "awa": float(rec.get("AWA", 0)),
+                "heel": float(rec.get("Heel", 0)),
+                "reef": float(rec.get("Reef", 1.0)),
+                "flat": float(rec.get("Flat", 1.0)),
+                "sail": rec.get("Id", "")
+            }
+            by_sail[sail][tws].append(pt)
+
+        self.sail_polars = by_sail
+        best_data = by_sail.get("BestPerf", {})
+        self.tws_list = sorted(list(best_data.keys()))
+        max_ratio = 0.0
+
+        for tws in self.tws_list:
+            curve_sorted = sorted(best_data[tws], key=lambda p: p["twa"])
+            self.curves_raw.append(curve_sorted)
+
+            beat_pt = curve_sorted[0]
+            downwind_pts = [p for p in curve_sorted if p["twa"] >= 130]
+            run_pt = max(downwind_pts, key=lambda p: p["vmg"]) if downwind_pts else curve_sorted[-1]
+
+            for pt in curve_sorted:
+                ratio = pt["bsp"] / tws
+                if ratio > max_ratio:
+                    max_ratio = ratio
+
+            self.vmg_targets.append({
+                "tws": tws,
+                "beat_twa": beat_pt["twa"],
+                "beat_angle": beat_pt["twa"],
+                "beat_sog": beat_pt["bsp"],
+                "beat_vmg": beat_pt["vmg"],
+                "beat_heel": beat_pt.get("heel", 0.0),
+                "beat_awa": beat_pt.get("awa", 0.0),
+                "run_twa": run_pt["twa"],
+                "gybe_angle": run_pt["twa"],
+                "run_sog": run_pt["bsp"],
+                "run_vmg": run_pt["vmg"],
+                "run_heel": run_pt.get("heel", 0.0),
+                "run_awa": run_pt.get("awa", 0.0),
+            })
+
+            # Calculate Sail Crossover Jib vs AsymCL
+            jib_curve = by_sail.get("Jib", {}).get(tws, [])
+            asym_curve = by_sail.get("AsymCL", {}).get(tws, [])
+            if jib_curve and asym_curve:
+                jib_dict = {round(p["twa"]): p["bsp"] for p in jib_curve}
+                for ap in sorted(asym_curve, key=lambda p: p["twa"]):
+                    ang = round(ap["twa"])
+                    if ang in jib_dict and ap["bsp"] > jib_dict[ang]:
+                        self.crossover_angles[tws] = ap["twa"]
+                        break
+
+        self.max_ratio = max(max_ratio, 1.2)
+
+    def _load_json(self):
+        self.is_json = True
+        with open(self.data_path, "r", encoding="utf-8") as f:
+            full_data = json.load(f)
+
+        meta = full_data.get("meta", {})
+        self.boat_name = meta.get("boat_name", self.boat_name)
+        self.sail_number = meta.get("sail_number", self.sail_number)
+        self.boat_class = meta.get("type", self.boat_class)
+
+        configs = full_data.get("polars", {}).get("configurations", {})
+        opt_config = configs.get("optimal", {})
+        headsail_config = configs.get("headsail", {})
+        asym_config = configs.get("asymmetric", {}) or configs.get("asymmetric_1", {})
+
+        opt_data = opt_config.get("data", [])
+        max_ratio = 0.0
+
+        for tws_entry in opt_data:
+            tws = float(tws_entry["tws"])
+            self.tws_list.append(tws)
+            curve = tws_entry["curve"]
+
+            # Sort by TWA
+            curve_sorted = sorted(curve, key=lambda p: p["twa"])
+            self.curves_raw.append(curve_sorted)
+
+            # Find Beat VMG (lowest TWA with optimal VMG)
+            beat_pt = curve_sorted[0]
+
+            # Find Run VMG (best downwind VMG, typically > 130°)
+            downwind_pts = [p for p in curve_sorted if p["twa"] >= 130]
+            run_pt = max(downwind_pts, key=lambda p: p["vmg"]) if downwind_pts else curve_sorted[-1]
+
+            for pt in curve_sorted:
+                ratio = pt["bsp"] / tws
+                if ratio > max_ratio:
+                    max_ratio = ratio
+
+            self.vmg_targets.append({
+                "tws": tws,
+                "beat_twa": beat_pt["twa"],
+                "beat_angle": beat_pt["twa"],
+                "beat_sog": beat_pt["bsp"],
+                "beat_vmg": beat_pt["vmg"],
+                "beat_heel": beat_pt.get("heel", 0.0),
+                "beat_awa": beat_pt.get("awa", 0.0),
+                "run_twa": run_pt["twa"],
+                "gybe_angle": run_pt["twa"],
+                "run_sog": run_pt["bsp"],
+                "run_vmg": run_pt["vmg"],
+                "run_heel": run_pt.get("heel", 0.0),
+                "run_awa": run_pt.get("awa", 0.0),
+            })
+
+            # Calculate Sail Crossover (where Asymmetric becomes faster than Headsail)
+            if headsail_config and asym_config:
+                hs_curve = next((d["curve"] for d in headsail_config.get("data", []) if d["tws"] == tws), None)
+                as_curve = next((d["curve"] for d in asym_config.get("data", []) if d["tws"] == tws), None)
+                if hs_curve and as_curve:
+                    hs_dict = {round(p["twa"]): p["bsp"] for p in hs_curve}
+                    for ap in sorted(as_curve, key=lambda p: p["twa"]):
+                        ang = round(ap["twa"])
+                        if ang in hs_dict and ap["bsp"] > hs_dict[ang]:
+                            self.crossover_angles[tws] = ap["twa"]
+                            break
+
+        self.max_ratio = max(max_ratio, 1.2)
+
+    def _load_csv(self):
+        with open(self.data_path, "r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            rows = [r for r in reader if r and any(cell.strip() for cell in r)]
+
+        header = rows[0][1:]
+        self.tws_list = [float(h) for h in header]
+        row_dict = {r[0].strip(): [float(x) for x in r[1:]] for r in rows[1:]}
+
+        fixed_angles = []
+        for r in rows[1:]:
+            try:
+                fixed_angles.append(float(r[0].strip()))
+            except ValueError:
+                pass
+        fixed_angles.sort()
+
+        max_ratio = 0.0
+
+        for col_idx, tws in enumerate(self.tws_list):
+            pts = []
+
+            # 1. Beat VMG
+            beat_angle = row_dict["Beat Angle"][col_idx]
+            beat_vmg = row_dict["Beat VMG"][col_idx]
+            beat_sog = beat_vmg / math.cos(math.radians(beat_angle))
+            pts.append({"twa": beat_angle, "bsp": beat_sog, "vmg": beat_vmg, "heel": 0.0})
+
+            # 2. Fixed angle speeds
+            for ang in fixed_angles:
+                val = row_dict[str(int(ang))][col_idx]
+                if val > 0:
+                    pts.append({"twa": ang, "bsp": val, "vmg": val * math.cos(math.radians(ang)), "heel": 0.0})
+
+            # 3. Run VMG
+            gybe_angle = row_dict["Gybe Angle"][col_idx]
+            run_vmg = row_dict["Run VMG"][col_idx]
+            run_sog = run_vmg / abs(math.cos(math.radians(gybe_angle)))
+            pts.append({"twa": gybe_angle, "bsp": run_sog, "vmg": run_vmg, "heel": 0.0})
+
+            pts.sort(key=lambda p: p["twa"])
+            self.curves_raw.append(pts)
+
+            for p in pts:
+                ratio = p["bsp"] / tws
+                if ratio > max_ratio:
+                    max_ratio = ratio
+
+            self.vmg_targets.append({
+                "tws": tws,
+                "beat_twa": beat_angle,
+                "beat_sog": beat_sog,
+                "beat_vmg": beat_vmg,
+                "beat_heel": 0.0,
+                "beat_awa": 0.0,
+                "run_twa": gybe_angle,
+                "run_sog": run_sog,
+                "run_vmg": run_vmg,
+                "run_heel": 0.0,
+                "run_awa": 0.0,
+            })
+
+        self.max_ratio = max(max_ratio, 1.2)
+
+    def get_spline_curves(self, scale_factor: float) -> List[Dict[str, Any]]:
+        """
+        Returns Catmull-Rom smoothed spline curves scaled for the Rechenscheibe:
+        radius = (bsp / tws) * scale_factor
+        """
+        results = []
+        for col_idx, tws in enumerate(self.tws_list):
+            raw_pts = self.curves_raw[col_idx]
+            complex_pts = []
+            for p in raw_pts:
+                r = (p["bsp"] / tws) * scale_factor
+                complex_pts.append(cmath.rect(r, math.radians(p["twa"])))
+
+            smooth = catmull_rom_spline(complex_pts, num_points=12)
+            port_side = [complex(pt.real, -pt.imag) for pt in smooth]
+
+            results.append({
+                "tws": tws,
+                "starboard": smooth,
+                "port": port_side,
+                "targets": self.vmg_targets[col_idx]
+            })
+        return results
+
+    def get_sail_spline_curves(self, sail_name: str, scale_factor: float) -> List[Dict[str, Any]]:
+        """
+        Returns Catmull-Rom smoothed spline curves for a specific sail (e.g. 'Jib', 'AsymCL', 'Sym').
+        """
+        if not self.sail_polars or sail_name not in self.sail_polars:
+            return []
+        results = []
+        sail_data = self.sail_polars[sail_name]
+        for tws in self.tws_list:
+            if tws not in sail_data:
+                continue
+            raw_pts = sorted(sail_data[tws], key=lambda p: p["twa"])
+            complex_pts = []
+            for p in raw_pts:
+                r = (p["bsp"] / tws) * scale_factor
+                complex_pts.append(cmath.rect(r, math.radians(p["twa"])))
+
+            smooth = catmull_rom_spline(complex_pts, num_points=10)
+            port_side = [complex(pt.real, -pt.imag) for pt in smooth]
+            results.append({
+                "tws": tws,
+                "starboard": smooth,
+                "port": port_side
+            })
+        return results

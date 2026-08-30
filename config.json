@@ -1,0 +1,65 @@
+{
+  "project": {
+    "title": "Nautical Rechenscheibe - JPK 1080 (GER 7447 - TRUE GRIT)",
+    "polar_file": "data/249116.slk",
+    "output_dir": "output"
+  },
+  "dimensions": {
+    "outer_radius_mm": 57.5,
+    "true_wind_scale_factor": 1.0,
+    "rotor_clearance_mm": 0.25,
+    "pocket_clearance_mm": 0.15,
+    "pin_clearance_mm": 0.1,
+    "center_hole_radius_mm": 1.6,
+    "awa_hole_radius_mm": 1.3
+  },
+  "thicknesses": {
+    "stator_floor_mm": 1.6,
+    "stator_rim_height_mm": 1.8,
+    "rotor_disc_mm": 1.8,
+    "ruler_arm_mm": 1.2,
+    "center_pin_head_thickness_mm": 0.7,
+    "awa_pin_head_thickness_mm": 0.6
+  },
+  "ruler": {
+    "width_mm": 6.0,
+    "hub_radius_mm": 4.0,
+    "thumb_tab_extension_mm": 5.38,
+    "reading_edge_step": 0.1
+  },
+  "scales_and_typography": {
+    "text_height_mm": 3.8,
+    "polar_label_height_mm": 4.5,
+    "grid_label_height_mm": 4.0,
+    "awa_ray_label_size_mm": 3.5,
+    "vmg_label_size_mm": 3.0,
+    "tick_len_major_mm": 1.4,
+    "tick_len_minor_mm": 0.7,
+    "text_gap_mm": -0.5,
+    "grid_label_gap_mm": 1.0
+  },
+  "log_zones": [
+    {
+      "min": 100,
+      "max": 300,
+      "step": 1
+    },
+    {
+      "min": 300,
+      "max": 600,
+      "step": 2
+    },
+    {
+      "min": 600,
+      "max": 1001,
+      "step": 5
+    }
+  ],
+  "preview": {
+    "ruler_awa_angle_deg": 28.0,
+    "dpi": 300
+  },
+  "display": {
+    "render_sail_layers": false
+  }
+}

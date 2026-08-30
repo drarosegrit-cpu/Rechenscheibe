@@ -1,0 +1,658 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="" ?>
+<ROOT>
+	<DATA>
+		<uDatId>249116</uDatId>
+		<Status>2</Status>
+		<dxtName>TRUE GRIT (GER 7447)</dxtName>
+		<dxtDate>2025-12-27T14:55:28.000Z</dxtDate>
+		<Family>1</Family>
+		<CertType>3</CertType>
+		<CertName>Club</CertName>
+		<VPPVer>2025 1.00</VPPVer>
+		<VPPDate>2025-12-27T15:27:05.000Z</VPPDate>
+		<VPPYear/>
+		<GPH>604.7134</GPH>
+		<APHD>540.5745</APHD>
+		<Rank>0</Rank>
+		<CountryId>GER</CountryId>
+		<Provisional>False</Provisional>
+		<LOA>10.877</LOA>
+		<TCPrice>10</TCPrice>
+		<SGPrice>40</SGPrice>
+		<SG_Item_Number>SG</SG_Item_Number>
+		<TC_Item_Number>TC</TC_Item_Number>
+		<secs>145645</secs>
+	</DATA>
+	<ERRORS/>
+	<USER>
+		<EMail>drarosegrit@gmail.com</EMail>
+		<Fullname>Andreas Rose / draro</Fullname>
+		<Status>0</Status>
+		<Balance>50</Balance>
+		<TempBalance>50</TempBalance>
+		<TestCertPrice>10</TestCertPrice>
+		<CustId>49982</CustId>
+		<PPPrice>50</PPPrice>
+		<DataCount>204590</DataCount>
+		<TSRPrice>20</TSRPrice>
+		<TSTPrice>10</TSTPrice>
+		<IsSY>False</IsSY>
+		<TestSYCertPrice>200</TestSYCertPrice>
+		<ChampCount>0</ChampCount>
+		<IsCMeasurer>False</IsCMeasurer>
+		<isMeasurer>False</isMeasurer>
+		<isORC>False</isORC>
+		<SYAppCount>0</SYAppCount>
+		<SYSGPrice>500</SYSGPrice>
+		<SYPPPrice>500</SYPPPrice>
+		<SGPrice>40</SGPrice>
+		<isLight>False</isLight>
+	</USER>
+	<INPUT version="2025" uDatId="249116" dxtName="TRUE GRIT (GER 7447)">
+		<FIELD fieldname="CertNo" value="166753"/>
+		<FIELD fieldname="RefNo"/>
+		<FIELD fieldname="RevalAuth" value="D.S.V."/>
+		<FIELD fieldname="Measurer" value="CLUB"/>
+		<FIELD fieldname="MeasurerEmail"/>
+		<FIELD fieldname="MeasDate" value="2017-04-19T00:00:00.000Z"/>
+		<FIELD fieldname="Metric" value="1"/>
+		<FIELD fieldname="Override" value="CLUB"/>
+		<FIELD fieldname="Crew_Type" value="-4"/>
+		<FIELD fieldname="CREW" value="380"/>
+		<FIELD fieldname="PowerWinch" value="0"/>
+		<FIELD fieldname="YachtName" value="TRUE GRIT"/>
+		<FIELD fieldname="SailNo" value="GER 7447"/>
+		<FIELD fieldname="SailNo_IRC" value="GER&#xA;7447"/>
+		<FIELD fieldname="Class" value="JPK 10.80"/>
+		<FIELD fieldname="Designer" value="VALER JACQUES"/>
+		<FIELD fieldname="Builder" value="JPK COMPOSITES"/>
+		<FIELD fieldname="AgeDt" value="2017-01-01T00:00:00.000Z"/>
+		<FIELD fieldname="SeriesDt" value="2013-05-04T00:00:00.000Z"/>
+		<FIELD fieldname="CIN" value="FR JPK JOC20C714"/>
+		<FIELD fieldname="AISMMSI"/>
+		<FIELD fieldname="FileOff" value="JPK-1080.off"/>
+		<FIELD fieldname="Owner"/>
+		<FIELD fieldname="Address1"/>
+		<FIELD fieldname="Address2"/>
+		<FIELD fieldname="Address3"/>
+		<FIELD fieldname="OEMail"/>
+		<FIELD fieldname="Comment1"/>
+		<FIELD fieldname="Comment2"/>
+		<FIELD fieldname="Comment3"/>
+		<FIELD fieldname="Comment4"/>
+		<FIELD fieldname="Propeller" value="3"/>
+		<FIELD fieldname="PI" value="2"/>
+		<FIELD fieldname="PRD" value="0.405"/>
+		<FIELD fieldname="PBW" value="0.125"/>
+		<FIELD fieldname="PIPAe"/>
+		<FIELD fieldname="TWSC"/>
+		<FIELD fieldname="PIPACalc" value="0.00386065846440935"/>
+		<FIELD fieldname="PIPAadd"/>
+		<FIELD fieldname="PSA"/>
+		<FIELD fieldname="PSD"/>
+		<FIELD fieldname="PHD"/>
+		<FIELD fieldname="PHL"/>
+		<FIELD fieldname="ST1"/>
+		<FIELD fieldname="ST2"/>
+		<FIELD fieldname="ST3"/>
+		<FIELD fieldname="ST4"/>
+		<FIELD fieldname="ST5"/>
+		<FIELD fieldname="ESL"/>
+		<FIELD fieldname="APH"/>
+		<FIELD fieldname="APT"/>
+		<FIELD fieldname="APB"/>
+		<FIELD fieldname="sdST1" value="0.065"/>
+		<FIELD fieldname="sdST2" value="0.18"/>
+		<FIELD fieldname="sdST3" value="0.18"/>
+		<FIELD fieldname="sdST4" value="0.11"/>
+		<FIELD fieldname="sdST5" value="0.29"/>
+		<FIELD fieldname="EDL" value="2.03"/>
+		<FIELD fieldname="p3PSA"/>
+		<FIELD fieldname="p3PSD"/>
+		<FIELD fieldname="p3PHD"/>
+		<FIELD fieldname="p3PHL"/>
+		<FIELD fieldname="p3ESL"/>
+		<FIELD fieldname="p5PSA"/>
+		<FIELD fieldname="p5PSD"/>
+		<FIELD fieldname="p5PHD"/>
+		<FIELD fieldname="p5PHL"/>
+		<FIELD fieldname="p5ST1"/>
+		<FIELD fieldname="p5ST2"/>
+		<FIELD fieldname="p5ST3"/>
+		<FIELD fieldname="p5ST4"/>
+		<FIELD fieldname="p5ST5"/>
+		<FIELD fieldname="p5ESL"/>
+		<FIELD fieldname="p6PSA"/>
+		<FIELD fieldname="p6PSD"/>
+		<FIELD fieldname="PHD1"/>
+		<FIELD fieldname="p6PHL"/>
+		<FIELD fieldname="PSL"/>
+		<FIELD fieldname="SHD"/>
+		<FIELD fieldname="SHL"/>
+		<FIELD fieldname="SDT"/>
+		<FIELD fieldname="SDL"/>
+		<FIELD fieldname="DHD"/>
+		<FIELD fieldname="p8PSA"/>
+		<FIELD fieldname="p8PSD"/>
+		<FIELD fieldname="p8PHD"/>
+		<FIELD fieldname="p8PHL"/>
+		<FIELD fieldname="p8ST5"/>
+		<FIELD fieldname="p8ESL"/>
+		<FIELD fieldname="SPS"/>
+		<FIELD fieldname="BAL"/>
+		<FIELD fieldname="BWT"/>
+		<FIELD fieldname="P" value="13.7"/>
+		<FIELD fieldname="IG" value="14.22"/>
+		<FIELD fieldname="ISP" value="15.52"/>
+		<FIELD fieldname="ISPAlt" value="14.37"/>
+		<FIELD fieldname="E" value="4.58"/>
+		<FIELD fieldname="BD" value="0.18"/>
+		<FIELD fieldname="MWT"/>
+		<FIELD fieldname="MCG"/>
+		<FIELD fieldname="MDT1" value="0.11"/>
+		<FIELD fieldname="MDL1" value="0.177"/>
+		<FIELD fieldname="MDT2"/>
+		<FIELD fieldname="MDL2"/>
+		<FIELD fieldname="BAS" value="1.57"/>
+		<FIELD fieldname="GO" value="0.198"/>
+		<FIELD fieldname="MW" value="0.177"/>
+		<FIELD fieldname="TL" value="-3"/>
+		<FIELD fieldname="J" value="4.32"/>
+		<FIELD fieldname="TPS" value="4.7"/>
+		<FIELD fieldname="SPL" value="4.763"/>
+		<FIELD fieldname="WPL"/>
+		<FIELD fieldname="SFJ" value="0"/>
+		<FIELD fieldname="FSP"/>
+		<FIELD fieldname="FSD" value="-2"/>
+		<FIELD fieldname="INF" value="2"/>
+		<FIELD fieldname="FSTA" value="0"/>
+		<FIELD fieldname="NOBS" value="0"/>
+		<FIELD fieldname="SPR" value="2"/>
+		<FIELD fieldname="IB" value="0"/>
+		<FIELD fieldname="IC"/>
+		<FIELD fieldname="RotMast" value="0"/>
+		<FIELD fieldname="TH" value="0"/>
+		<FIELD fieldname="Furl" value="0"/>
+		<FIELD fieldname="MFRL" value="0"/>
+		<FIELD fieldname="CMast" value="1"/>
+		<FIELD fieldname="bowspritmat"/>
+		<FIELD fieldname="ArtSprit" value="0"/>
+		<FIELD fieldname="FiberRig" value="0"/>
+		<FIELD fieldname="LentRig" value="0"/>
+		<FIELD fieldname="MastFoot" value="0"/>
+		<FIELD fieldname="SPN" value="2"/>
+		<FIELD fieldname="Dcrn" value="0"/>
+		<FIELD fieldname="AsymCLOnly" value="0"/>
+		<FIELD fieldname="JL"/>
+		<FIELD fieldname="LPG"/>
+		<FIELD fieldname="JR"/>
+		<FIELD fieldname="SL"/>
+		<FIELD fieldname="SMW"/>
+		<FIELD fieldname="SF"/>
+		<FIELD fieldname="ASL"/>
+		<FIELD fieldname="AMG"/>
+		<FIELD fieldname="ASF"/>
+		<FIELD fieldname="HB"/>
+		<FIELD fieldname="MGT"/>
+		<FIELD fieldname="MGU"/>
+		<FIELD fieldname="MGM"/>
+		<FIELD fieldname="MGL"/>
+		<FIELD fieldname="MSW"/>
+		<FIELD fieldname="PY"/>
+		<FIELD fieldname="IY"/>
+		<FIELD fieldname="EY"/>
+		<FIELD fieldname="BDY"/>
+		<FIELD fieldname="MDT1Y"/>
+		<FIELD fieldname="MDL1Y"/>
+		<FIELD fieldname="MDT2Y"/>
+		<FIELD fieldname="MDL2Y"/>
+		<FIELD fieldname="BASY"/>
+		<FIELD fieldname="TLY"/>
+		<FIELD fieldname="EB"/>
+		<FIELD fieldname="BALY"/>
+		<FIELD fieldname="YSD"/>
+		<FIELD fieldname="YSMG"/>
+		<FIELD fieldname="YSF"/>
+		<FIELD fieldname="HBY"/>
+		<FIELD fieldname="MGTY"/>
+		<FIELD fieldname="MGUY"/>
+		<FIELD fieldname="MGMY"/>
+		<FIELD fieldname="MGLY"/>
+		<FIELD fieldname="FFM" value="1.213"/>
+		<FIELD fieldname="FAM" value="0.73"/>
+		<FIELD fieldname="SG"/>
+		<FIELD fieldname="FGO" value="0"/>
+		<FIELD fieldname="LBG" value="0"/>
+		<FIELD fieldname="PL" value="-999"/>
+		<FIELD fieldname="Zero" value="0"/>
+		<FIELD fieldname="IncTestType" value="1"/>
+		<FIELD fieldname="FlotDate" value="2016-10-20T00:00:00.000Z"/>
+		<FIELD fieldname="VCGDe" value="-999"/>
+		<FIELD fieldname="RMCe" value="135"/>
+		<FIELD fieldname="PLM" value="-999"/>
+		<FIELD fieldname="LCFD"/>
+		<FIELD fieldname="W1"/>
+		<FIELD fieldname="W2"/>
+		<FIELD fieldname="W3"/>
+		<FIELD fieldname="W4"/>
+		<FIELD fieldname="PD1"/>
+		<FIELD fieldname="PD2"/>
+		<FIELD fieldname="PD3"/>
+		<FIELD fieldname="PD4"/>
+		<FIELD fieldname="WD"/>
+		<FIELD fieldname="GSA" value="0"/>
+		<FIELD fieldname="RSA"/>
+		<FIELD fieldname="RMCcalc" value="0"/>
+		<FIELD fieldname="SW1"/>
+		<FIELD fieldname="ECM"/>
+		<FIELD fieldname="KCDA"/>
+		<FIELD fieldname="CBRC"/>
+		<FIELD fieldname="CBMC"/>
+		<FIELD fieldname="CBTC"/>
+		<FIELD fieldname="WCBA"/>
+		<FIELD fieldname="CBDA"/>
+		<FIELD fieldname="WCBB"/>
+		<FIELD fieldname="CBDB"/>
+		<FIELD fieldname="DSS_Active" value="0"/>
+		<FIELD fieldname="DSSS"/>
+		<FIELD fieldname="DSSC"/>
+		<FIELD fieldname="DSST"/>
+		<FIELD fieldname="DSSA"/>
+		<FIELD fieldname="DSSD"/>
+		<FIELD fieldname="Cnr_Active" value="0"/>
+		<FIELD fieldname="Cnr_Span"/>
+		<FIELD fieldname="Cnr_Fraction"/>
+		<FIELD fieldname="Cnr_Chord"/>
+		<FIELD fieldname="Cnr_Thickness"/>
+		<FIELD fieldname="Cnr_XOffset"/>
+		<FIELD fieldname="Cnr_YOffset"/>
+		<FIELD fieldname="Cnr_Angle"/>
+		<FIELD fieldname="KB_Active" value="0"/>
+		<FIELD fieldname="KBW"/>
+		<FIELD fieldname="KBL"/>
+		<FIELD fieldname="KBH"/>
+		<FIELD fieldname="CANT"/>
+		<FIELD fieldname="LIST"/>
+		<FIELD fieldname="WBV"/>
+		<FIELD fieldname="ZEROW"/>
+		<FIELD fieldname="RUD" value="0"/>
+		<FIELD fieldname="TT" value="0"/>
+		<FIELD fieldname="ACC" value="1"/>
+		<FIELD fieldname="LightStn" value="0"/>
+		<FIELD fieldname="PRDocNo"/>
+		<FIELD fieldname="LOA" value="10.82"/>
+		<FIELD fieldname="REG" value="2"/>
+		<FIELD fieldname="HCN" value="1"/>
+		<FIELD fieldname="CEXT"/>
+		<FIELD fieldname="Trnsm" value="3"/>
+		<FIELD fieldname="MeasFB" value="0"/>
+		<FIELD fieldname="ClubDsp"/>
+		<FIELD fieldname="ClRM"/>
+		<FIELD fieldname="WLS"/>
+		<FIELD fieldname="GEN"/>
+		<FIELD fieldname="LIF"/>
+		<FIELD fieldname="BOW"/>
+		<FIELD fieldname="RDR"/>
+		<FIELD fieldname="TKD"/>
+		<FIELD fieldname="CEI"/>
+		<FIELD fieldname="SUP"/>
+		<FIELD fieldname="WHeater"/>
+		<FIELD fieldname="AirCond"/>
+		<FIELD fieldname="Desalinator"/>
+		<FIELD fieldname="AC"/>
+		<FIELD fieldname="YR_VALID"/>
+		<FIELD fieldname="Ratyp"/>
+		<FIELD fieldname="IPR"/>
+		<FIELD fieldname="TIV"/>
+		<FIELD fieldname="MemberId"/>
+		<FIELD fieldname="OfficeComment"/>
+		<FIELD fieldname="SYComment"/>
+		<FIELD fieldname="SecAddress"/>
+		<FIELD fieldname="Filename_for_PDF"/>
+		<FIELD fieldname="Phone1"/>
+		<FIELD fieldname="Phone2"/>
+		<FIELD fieldname="Expiry"/>
+		<FIELD fieldname="RigType"/>
+		<FIELD fieldname="FFurlers"/>
+		<FIELD fieldname="CPW"/>
+		<FIELD fieldname="FXIF"/>
+		<FIELD fieldname="TUS"/>
+		<FIELD fieldname="JMP" value="1"/>
+		<FIELD fieldname="SA_Upwind" value="68.7"/>
+		<FIELD fieldname="SA_Downwind" value="153.05"/>
+		<FIELD fieldname="SA_Unc_Up" value="0"/>
+		<FIELD fieldname="SA_Unc_Dn" value="0"/>
+		<FIELD fieldname="SY_SA_Main"/>
+		<FIELD fieldname="SY_SA_Sym"/>
+		<FIELD fieldname="SY_SA_Asym"/>
+		<FIELD fieldname="SY_SA_Mizzen"/>
+		<FIELD fieldname="SY_SA_Mizss"/>
+		<FIELD fieldname="SY_SA_Mizzen_Rc"/>
+		<FIELD fieldname="Headsail_Count"/>
+		<FIELD fieldname="HSF_Count"/>
+		<FIELD fieldname="Spinnaker_Count"/>
+		<FIELD fieldname="Multiple_Headsails"/>
+		<FIELD fieldname="GAF_FL"/>
+		<FIELD fieldname="GAF_FM"/>
+		<FIELD fieldname="Area_Front"/>
+		<FIELD fieldname="Area_Side"/>
+		<FIELD fieldname="FBR_Height"/>
+		<FIELD fieldname="Domes"/>
+		<FIELD fieldname="DomeAreas"/>
+		<FIELD fieldname="BTH_Diam"/>
+		<FIELD fieldname="CrewNumber"/>
+		<FIELD fieldname="MCA_Cert"/>
+		<FIELD fieldname="CB_Down"/>
+		<FIELD fieldname="Skeg"/>
+		<FIELD fieldname="ARMD" value="0"/>
+		<FIELD fieldname="Owner_Driver"/>
+		<FIELD fieldname="CS_Certificate"/>
+		<FIELD fieldname="SY_Winch_HY_KW"/>
+		<FIELD fieldname="SY_Winch_HY_LS"/>
+		<FIELD fieldname="SY_Winch_SH_KW"/>
+		<FIELD fieldname="SY_Winch_SH_LS"/>
+		<FIELD fieldname="SY_Winch_SP_LS"/>
+		<FIELD fieldname="First_Certificate"/>
+		<FIELD fieldname="Data_Source"/>
+		<FIELD fieldname="SY_Image"/>
+		<FIELD fieldname="Mast_Rake"/>
+		<FIELD fieldname="Mast_Cant"/>
+		<FIELD fieldname="JZ"/>
+		<FIELD fieldname="WIZ"/>
+		<FIELD fieldname="MHSuperstructure_Frontal"/>
+		<FIELD fieldname="MHSuperstructure_Lateral"/>
+		<FIELD fieldname="MOCRA_TCF"/>
+		<FIELD fieldname="Area_Storm_Jib" value="10.21"/>
+		<FIELD fieldname="Storm_Jib_JL" value="9.29"/>
+		<FIELD fieldname="Area_Heavy_Jib" value="27.57"/>
+		<FIELD fieldname="Area_Trysail" value="10.99"/>
+		<FIELD fieldname="Comments"/>
+		<FIELD fieldname="OwnerData"/>
+		<FIELD fieldname="Address"/>
+		<FIELD fieldname="BLP"/>
+		<FIELD fieldname="BL1"/>
+		<FIELD fieldname="BL2"/>
+		<FIELD fieldname="BL3"/>
+		<FIELD fieldname="BL4"/>
+		<FIELD fieldname="BL5"/>
+		<FIELD fieldname="BLPY"/>
+		<FIELD fieldname="BY1"/>
+		<FIELD fieldname="BY2"/>
+		<FIELD fieldname="BY3"/>
+		<FIELD fieldname="BY4"/>
+		<FIELD fieldname="BY5"/>
+		<FIELD fieldname="IS"/>
+		<FIELD fieldname="BM"/>
+		<FIELD fieldname="NORig"/>
+		<FIELD fieldname="RIG"/>
+		<FIELD fieldname="ABS"/>
+		<FIELD fieldname="AGE"/>
+		<FIELD fieldname="MOD"/>
+		<FIELD fieldname="ClubProp" value="0"/>
+		<FIELD fieldname="ClOf"/>
+		<FIELD fieldname="ClDt"/>
+		<FIELD fieldname="DG"/>
+		<FIELD fieldname="ANCHWT"/>
+		<FIELD fieldname="ANCLCG"/>
+		<FIELD fieldname="Inv_Meas_Code"/>
+		<FIELD fieldname="Inv_Meas_Name"/>
+		<FIELD fieldname="Inv_Meas_Date"/>
+		<FIELD fieldname="Inv_Meas_Comment"/>
+		<FIELD fieldname="InvDeducWeight" value="0"/>
+		<FIELD fieldname="InvDeducLCG"/>
+		<FIELD fieldname="InvDeducVCG"/>
+		<FIELD fieldname="BallastWeightTotal" value="0"/>
+		<SAILS>
+			<SAIL SailCode="main">
+				<RECORD>
+					<FIELD fieldname="SailId" value="#55938"/>
+					<FIELD fieldname="Active" value="0"/>
+					<FIELD fieldname="HB" value="0.3"/>
+					<FIELD fieldname="MGT" value="0.99"/>
+					<FIELD fieldname="MGU" value="1.71"/>
+					<FIELD fieldname="MGM" value="3.02"/>
+					<FIELD fieldname="MGL" value="3.94"/>
+					<FIELD fieldname="MSW"/>
+					<FIELD fieldname="SailArea" value="38.0260625"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2017-03-20T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="destroyed"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#60274"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="HB" value="0.3"/>
+					<FIELD fieldname="MGT" value="1.01"/>
+					<FIELD fieldname="MGU" value="1.72"/>
+					<FIELD fieldname="MGM" value="2.88"/>
+					<FIELD fieldname="MGL" value="3.77"/>
+					<FIELD fieldname="MSW"/>
+					<FIELD fieldname="SailArea" value="37.02425"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="27.02.2019 Main Black 37.02sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#62012"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="HB" value="0.3"/>
+					<FIELD fieldname="MGT" value="1.02"/>
+					<FIELD fieldname="MGU" value="1.71"/>
+					<FIELD fieldname="MGM" value="2.87"/>
+					<FIELD fieldname="MGL" value="3.77"/>
+					<FIELD fieldname="MSW"/>
+					<FIELD fieldname="SailArea" value="36.9814375"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2000-02-25T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="25.03.2020 Main White Hvy 36.98sqm"/>
+				</RECORD>
+			</SAIL>
+			<SAIL SailCode="jib">
+				<RECORD>
+					<FIELD fieldname="SailId" value="#55940"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="JH" value="0.1"/>
+					<FIELD fieldname="JGT" value="0.64"/>
+					<FIELD fieldname="JGU" value="1.19"/>
+					<FIELD fieldname="JGM" value="2.29"/>
+					<FIELD fieldname="JGL" value="3.38"/>
+					<FIELD fieldname="LPG" value="4.38"/>
+					<FIELD fieldname="JIBLUFF" value="13.98"/>
+					<FIELD fieldname="Battens" value="1"/>
+					<FIELD fieldname="Flying" value="0"/>
+					<FIELD fieldname="Overlap" value="101"/>
+					<FIELD fieldname="Furler" value="0"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="31.677805943838"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2017-03-24T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="24.03.2017 Blk-J1-NoZip-31.68sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#60273"/>
+					<FIELD fieldname="Active" value="0"/>
+					<FIELD fieldname="JH" value="0.08"/>
+					<FIELD fieldname="JGT" value="0.57"/>
+					<FIELD fieldname="JGU" value="1.08"/>
+					<FIELD fieldname="JGM" value="2.22"/>
+					<FIELD fieldname="JGL" value="3.17"/>
+					<FIELD fieldname="LPG" value="4.22"/>
+					<FIELD fieldname="JIBLUFF" value="13.65"/>
+					<FIELD fieldname="Battens" value="1"/>
+					<FIELD fieldname="Flying" value="0"/>
+					<FIELD fieldname="Overlap" value="98"/>
+					<FIELD fieldname="Furler" value="0"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="29.338968461985"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="27.4.2019 Blk-J2-Zip:1.25-29.34 sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#62013"/>
+					<FIELD fieldname="Active" value="0"/>
+					<FIELD fieldname="JH" value="0.57"/>
+					<FIELD fieldname="JGT" value="0.97"/>
+					<FIELD fieldname="JGU" value="1.47"/>
+					<FIELD fieldname="JGM" value="2.44"/>
+					<FIELD fieldname="JGL" value="3.39"/>
+					<FIELD fieldname="LPG" value="4.28"/>
+					<FIELD fieldname="JIBLUFF" value="11.51"/>
+					<FIELD fieldname="Battens" value="1"/>
+					<FIELD fieldname="Flying" value="0"/>
+					<FIELD fieldname="Overlap" value="99"/>
+					<FIELD fieldname="Furler" value="0"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="27.583714753686"/>
+					<FIELD fieldname="Measurer"/>
+					<FIELD fieldname="MeasDate"/>
+					<FIELD fieldname="Manufacturer"/>
+					<FIELD fieldname="MaterialCode" value="carbon"/>
+					<FIELD fieldname="Comment" value="25.03.2020 Hvy-J3-Zip:1.06-27.58sqm"/>
+				</RECORD>
+			</SAIL>
+			<SAIL SailCode="sym_spin">
+				<RECORD>
+					<FIELD fieldname="SailId" value="#55937"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="SLU" value="14.14"/>
+					<FIELD fieldname="SLE" value="14.14"/>
+					<FIELD fieldname="SL" value="14.14"/>
+					<FIELD fieldname="SMG" value="7.38"/>
+					<FIELD fieldname="SF" value="8.18"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="88.8463333333334"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2017-03-18T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="nylon"/>
+					<FIELD fieldname="Comment" value="18.03.2017 - White - 88.85sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#60272"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="SLU" value="15.6"/>
+					<FIELD fieldname="SLE" value="15.6"/>
+					<FIELD fieldname="SL" value="15.6"/>
+					<FIELD fieldname="SMG" value="8.93"/>
+					<FIELD fieldname="SF" value="8.38"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="114.66"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="nylon"/>
+					<FIELD fieldname="Comment" value="26.04.2019 Blue - 114.66sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#62068"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="SLU" value="15.65"/>
+					<FIELD fieldname="SLE" value="15.65"/>
+					<FIELD fieldname="SL" value="15.65"/>
+					<FIELD fieldname="SMG" value="8.96"/>
+					<FIELD fieldname="SF" value="8.25"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="SailArea" value="115.001416666667"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2020-03-24T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK SAILS"/>
+					<FIELD fieldname="MaterialCode" value="nylon"/>
+					<FIELD fieldname="Comment" value="24.03.2020 Blue - 115.00sqm"/>
+				</RECORD>
+			</SAIL>
+			<SAIL SailCode="asym_spin">
+				<RECORD>
+					<FIELD fieldname="SailId" value="#180387"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="SLU" value="17.37"/>
+					<FIELD fieldname="SLE" value="14.75"/>
+					<FIELD fieldname="ASL" value="16.06"/>
+					<FIELD fieldname="AMG" value="8.67"/>
+					<FIELD fieldname="ASF" value="8.67"/>
+					<FIELD fieldname="ASKind" value="asym"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="Y14" value="1"/>
+					<FIELD fieldname="SailArea" value="116.0335"/>
+					<FIELD fieldname="Measurer" value="HK 37"/>
+					<FIELD fieldname="MeasDate" value="2017-07-13T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK"/>
+					<FIELD fieldname="MaterialCode" value="nylon"/>
+					<FIELD fieldname="Comment" value="20.11.2025 A2 - 116.03sqm"/>
+				</RECORD>
+				<RECORD>
+					<FIELD fieldname="SailId" value="#62037"/>
+					<FIELD fieldname="Active" value="1"/>
+					<FIELD fieldname="SLU" value="16.47"/>
+					<FIELD fieldname="SLE" value="13.95"/>
+					<FIELD fieldname="ASL" value="15.21"/>
+					<FIELD fieldname="AMG" value="6.7"/>
+					<FIELD fieldname="ASF" value="7.62"/>
+					<FIELD fieldname="ASKind" value="asym"/>
+					<FIELD fieldname="FTId" value="0"/>
+					<FIELD fieldname="Y14" value="1"/>
+					<FIELD fieldname="SailArea" value="87.2547"/>
+					<FIELD fieldname="Measurer" value="HK-37"/>
+					<FIELD fieldname="MeasDate" value="2020-04-24T00:00:00.000Z"/>
+					<FIELD fieldname="Manufacturer" value="UK"/>
+					<FIELD fieldname="MaterialCode" value="nylon"/>
+					<FIELD fieldname="Comment" value="24.03.2020 A3-5 Red - 87.25sqm"/>
+				</RECORD>
+			</SAIL>
+			<SAIL SailCode="quad"/>
+			<SAIL SailCode="mizzen"/>
+			<SAIL SailCode="mizss"/>
+		</SAILS>
+		<INVENTORY>
+			<INVITEM InvCode="_ballast">
+				<aggregate fieldname="TotalF" value=""/>
+				<aggregate fieldname="TotalM" value=""/>
+				<aggregate fieldname="TotalN" value=""/>
+			</INVITEM>
+			<INVITEM InvCode="_tank">
+				<aggregate fieldname="WeightM" value=""/>
+				<aggregate fieldname="WeightS" value=""/>
+				<aggregate fieldname="tLCGm" value=""/>
+				<aggregate fieldname="tVCGm" value=""/>
+				<aggregate fieldname="LevelSF" value=""/>
+			</INVITEM>
+			<INVITEM InvCode="_solid">
+				<aggregate fieldname="TotalM" value=""/>
+				<aggregate fieldname="TotalS" value=""/>
+				<aggregate fieldname="tLCGm" value=""/>
+				<aggregate fieldname="tVCGm" value=""/>
+				<aggregate fieldname="tLCGs" value=""/>
+				<aggregate fieldname="tVCGs" value=""/>
+				<RECORD deductible="True">
+					<FIELD fieldname="InvItemId" value="new"/>
+					<FIELD fieldname="Kind" value="8"/>
+					<FIELD fieldname="Deductible" value="1"/>
+					<FIELD fieldname="WeightM"/>
+					<FIELD fieldname="WeightS"/>
+					<FIELD fieldname="LCG"/>
+					<FIELD fieldname="VCG"/>
+					<FIELD fieldname="add_to_gyrad" value="0"/>
+					<FIELD fieldname="Description"/>
+				</RECORD>
+			</INVITEM>
+			<INVITEM InvCode="syinf"/>
+			<INVITEM InvCode="syusails"/>
+			<INVITEM InvCode="mhft"/>
+		</INVENTORY>
+		<JCLASS tmult="0">
+			<rtmult rows="0" cols=""/>
+			<hdragmult rows="0" cols=""/>
+		</JCLASS>
+	</INPUT>
+</ROOT>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="GeminiAI">
+  <rte>
+    <name>Race Course Extended</name>
+    <rtept lat="54.4000" lon="10.4000"><name>START</name></rtept>
+    <rtept lat="54.4500" lon="10.3500"><name>WP1 (Upwind)</name></rtept>
+    <rtept lat="54.4500" lon="10.5000"><name>WP2 (Reach)</name></rtept>
+    <rtept lat="54.4200" lon="10.5500"><name>WP3 (Deep Reach)</name></rtept>
+    <rtept lat="54.3800" lon="10.5500"><name>ZIEL (Run)</name></rtept>
+  </rte>
+</gpx>

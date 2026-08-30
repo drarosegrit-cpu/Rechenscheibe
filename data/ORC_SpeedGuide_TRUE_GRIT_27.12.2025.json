@@ -1,0 +1,5527 @@
+{
+  "meta": {
+    "boat_name": "TRUE GRIT",
+    "sail_number": "GER 7447",
+    "type": "JPK 10.80",
+    "gph": 0.0
+  },
+  "data_section": {
+    "uDatId": "249116",
+    "Status": "2",
+    "dxtName": "TRUE GRIT (GER 7447)",
+    "dxtDate": "2025-12-27T14:55:28.000Z",
+    "Family": "1",
+    "CertType": "3",
+    "CertName": "Club",
+    "VPPVer": "2025 1.00",
+    "VPPDate": "2025-12-27T15:27:05.000Z",
+    "VPPYear": "",
+    "GPH": "604.7134",
+    "APHD": "540.5745",
+    "Rank": "0",
+    "CountryId": "GER",
+    "Provisional": "False",
+    "LOA": "10.877",
+    "TCPrice": "10",
+    "SGPrice": "40",
+    "SG_Item_Number": "SG",
+    "TC_Item_Number": "TC",
+    "secs": "145645"
+  },
+  "user_section": {
+    "EMail": "drarosegrit@gmail.com",
+    "Fullname": "Andreas Rose / draro",
+    "Status": "0",
+    "Balance": "50",
+    "TempBalance": "50",
+    "TestCertPrice": "10",
+    "CustId": "49982",
+    "PPPrice": "50",
+    "DataCount": "204590",
+    "TSRPrice": "20",
+    "TSTPrice": "10",
+    "IsSY": "False",
+    "TestSYCertPrice": "200",
+    "ChampCount": "0",
+    "IsCMeasurer": "False",
+    "isMeasurer": "False",
+    "isORC": "False",
+    "SYAppCount": "0",
+    "SYSGPrice": "500",
+    "SYPPPrice": "500",
+    "SGPrice": "40",
+    "isLight": "False"
+  },
+  "rig_configuration": {
+    "p": {
+      "value": 13.7,
+      "unit": "m",
+      "description": "Mainsail hoist"
+    },
+    "e": {
+      "value": 4.58,
+      "unit": "m",
+      "description": "Mainsail outer point distance"
+    },
+    "i": {
+      "value": 14.22,
+      "unit": "m",
+      "description": "Height of foretriangle (IG used as I)"
+    },
+    "j": {
+      "value": 4.32,
+      "unit": "m",
+      "description": "Base of foretriangle"
+    },
+    "spl": {
+      "value": 4.763,
+      "unit": "m",
+      "description": "Spinnaker Pole Length"
+    },
+    "tps": {
+      "value": 4.7,
+      "unit": "m",
+      "description": "Tack Point Sprit"
+    },
+    "isp": {
+      "value": 15.52,
+      "unit": "m",
+      "description": "Height of spinnaker hoist"
+    },
+    "rm_default": {
+      "value": 135.0,
+      "unit": "kgm",
+      "description": "Righting Moment (Default)"
+    }
+  },
+  "sail_inventory": [
+    {
+      "internal_id": "MAIN_1",
+      "orc_sail_id": "#55938",
+      "type": "MAIN",
+      "name": "destroyed",
+      "area": 38.0260625,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#55938",
+        "Active": "0",
+        "HB": "0.3",
+        "MGT": "0.99",
+        "MGU": "1.71",
+        "MGM": "3.02",
+        "MGL": "3.94",
+        "MSW": null,
+        "SailArea": "38.0260625",
+        "Measurer": "HK-37",
+        "MeasDate": "2017-03-20T00:00:00.000Z",
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "carbon",
+        "Comment": "destroyed"
+      },
+      "measurements": {
+        "mgt": 0.99,
+        "mgu": 1.71,
+        "mgm": 3.02,
+        "mgl": 3.94
+      }
+    },
+    {
+      "internal_id": "MAIN_2",
+      "orc_sail_id": "#60274",
+      "type": "MAIN",
+      "name": "27.02.2019 Main Black 37.02sqm",
+      "area": 37.02425,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#60274",
+        "Active": "1",
+        "HB": "0.3",
+        "MGT": "1.01",
+        "MGU": "1.72",
+        "MGM": "2.88",
+        "MGL": "3.77",
+        "MSW": null,
+        "SailArea": "37.02425",
+        "Measurer": "HK-37",
+        "MeasDate": null,
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "carbon",
+        "Comment": "27.02.2019 Main Black 37.02sqm"
+      },
+      "measurements": {
+        "mgt": 1.01,
+        "mgu": 1.72,
+        "mgm": 2.88,
+        "mgl": 3.77
+      }
+    },
+    {
+      "internal_id": "MAIN_3",
+      "orc_sail_id": "#62012",
+      "type": "MAIN",
+      "name": "25.03.2020 Main White Hvy 36.98sqm",
+      "area": 36.9814375,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#62012",
+        "Active": "1",
+        "HB": "0.3",
+        "MGT": "1.02",
+        "MGU": "1.71",
+        "MGM": "2.87",
+        "MGL": "3.77",
+        "MSW": null,
+        "SailArea": "36.9814375",
+        "Measurer": "HK-37",
+        "MeasDate": "2000-02-25T00:00:00.000Z",
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "carbon",
+        "Comment": "25.03.2020 Main White Hvy 36.98sqm"
+      },
+      "measurements": {
+        "mgt": 1.02,
+        "mgu": 1.71,
+        "mgm": 2.87,
+        "mgl": 3.77
+      }
+    },
+    {
+      "internal_id": "HEAD_4",
+      "orc_sail_id": "#55940",
+      "type": "HEAD",
+      "name": "24.03.2017 Blk-J1-NoZip-31.68sqm",
+      "area": 31.677805943838,
+      "used_in_polars": true,
+      "attributes": {
+        "SailId": "#55940",
+        "Active": "1",
+        "JH": "0.1",
+        "JGT": "0.64",
+        "JGU": "1.19",
+        "JGM": "2.29",
+        "JGL": "3.38",
+        "LPG": "4.38",
+        "JIBLUFF": "13.98",
+        "Battens": "1",
+        "Flying": "0",
+        "Overlap": "101",
+        "Furler": "0",
+        "FTId": "0",
+        "SailArea": "31.677805943838",
+        "Measurer": "HK-37",
+        "MeasDate": "2017-03-24T00:00:00.000Z",
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "carbon",
+        "Comment": "24.03.2017 Blk-J1-NoZip-31.68sqm"
+      },
+      "measurements": {
+        "lpg": 4.38,
+        "jh": 0.1
+      }
+    },
+    {
+      "internal_id": "HEAD_5",
+      "orc_sail_id": "#60273",
+      "type": "HEAD",
+      "name": "27.4.2019 Blk-J2-Zip:1.25-29.34 sqm",
+      "area": 29.338968461985,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#60273",
+        "Active": "0",
+        "JH": "0.08",
+        "JGT": "0.57",
+        "JGU": "1.08",
+        "JGM": "2.22",
+        "JGL": "3.17",
+        "LPG": "4.22",
+        "JIBLUFF": "13.65",
+        "Battens": "1",
+        "Flying": "0",
+        "Overlap": "98",
+        "Furler": "0",
+        "FTId": "0",
+        "SailArea": "29.338968461985",
+        "Measurer": "HK-37",
+        "MeasDate": null,
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "carbon",
+        "Comment": "27.4.2019 Blk-J2-Zip:1.25-29.34 sqm"
+      },
+      "measurements": {
+        "lpg": 4.22,
+        "jh": 0.08
+      }
+    },
+    {
+      "internal_id": "HEAD_6",
+      "orc_sail_id": "#62013",
+      "type": "HEAD",
+      "name": "25.03.2020 Hvy-J3-Zip:1.06-27.58sqm",
+      "area": 27.583714753686,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#62013",
+        "Active": "0",
+        "JH": "0.57",
+        "JGT": "0.97",
+        "JGU": "1.47",
+        "JGM": "2.44",
+        "JGL": "3.39",
+        "LPG": "4.28",
+        "JIBLUFF": "11.51",
+        "Battens": "1",
+        "Flying": "0",
+        "Overlap": "99",
+        "Furler": "0",
+        "FTId": "0",
+        "SailArea": "27.583714753686",
+        "Measurer": null,
+        "MeasDate": null,
+        "Manufacturer": null,
+        "MaterialCode": "carbon",
+        "Comment": "25.03.2020 Hvy-J3-Zip:1.06-27.58sqm"
+      },
+      "measurements": {
+        "lpg": 4.28,
+        "jh": 0.57
+      }
+    },
+    {
+      "internal_id": "SYM_7",
+      "orc_sail_id": "#55937",
+      "type": "SYM",
+      "name": "18.03.2017 - White - 88.85sqm",
+      "area": 88.8463333333334,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#55937",
+        "Active": "1",
+        "SLU": "14.14",
+        "SLE": "14.14",
+        "SL": "14.14",
+        "SMG": "7.38",
+        "SF": "8.18",
+        "FTId": "0",
+        "SailArea": "88.8463333333334",
+        "Measurer": "HK-37",
+        "MeasDate": "2017-03-18T00:00:00.000Z",
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "nylon",
+        "Comment": "18.03.2017 - White - 88.85sqm"
+      },
+      "measurements": {
+        "slu": 14.14,
+        "sle": 14.14,
+        "shw": 7.38
+      }
+    },
+    {
+      "internal_id": "SYM_8",
+      "orc_sail_id": "#60272",
+      "type": "SYM",
+      "name": "26.04.2019 Blue - 114.66sqm",
+      "area": 114.66,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#60272",
+        "Active": "1",
+        "SLU": "15.6",
+        "SLE": "15.6",
+        "SL": "15.6",
+        "SMG": "8.93",
+        "SF": "8.38",
+        "FTId": "0",
+        "SailArea": "114.66",
+        "Measurer": "HK-37",
+        "MeasDate": null,
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "nylon",
+        "Comment": "26.04.2019 Blue - 114.66sqm"
+      },
+      "measurements": {
+        "slu": 15.6,
+        "sle": 15.6,
+        "shw": 8.93
+      }
+    },
+    {
+      "internal_id": "SYM_9",
+      "orc_sail_id": "#62068",
+      "type": "SYM",
+      "name": "24.03.2020 Blue - 115.00sqm",
+      "area": 115.001416666667,
+      "used_in_polars": true,
+      "attributes": {
+        "SailId": "#62068",
+        "Active": "1",
+        "SLU": "15.65",
+        "SLE": "15.65",
+        "SL": "15.65",
+        "SMG": "8.96",
+        "SF": "8.25",
+        "FTId": "0",
+        "SailArea": "115.001416666667",
+        "Measurer": "HK-37",
+        "MeasDate": "2020-03-24T00:00:00.000Z",
+        "Manufacturer": "UK SAILS",
+        "MaterialCode": "nylon",
+        "Comment": "24.03.2020 Blue - 115.00sqm"
+      },
+      "measurements": {
+        "slu": 15.65,
+        "sle": 15.65,
+        "shw": 8.96
+      }
+    },
+    {
+      "internal_id": "ASYM_10",
+      "orc_sail_id": "#180387",
+      "type": "ASYM",
+      "name": "20.11.2025 A2 - 116.03sqm",
+      "area": 116.0335,
+      "used_in_polars": true,
+      "attributes": {
+        "SailId": "#180387",
+        "Active": "1",
+        "SLU": "17.37",
+        "SLE": "14.75",
+        "ASL": "16.06",
+        "AMG": "8.67",
+        "ASF": "8.67",
+        "ASKind": "asym",
+        "FTId": "0",
+        "Y14": "1",
+        "SailArea": "116.0335",
+        "Measurer": "HK 37",
+        "MeasDate": "2017-07-13T00:00:00.000Z",
+        "Manufacturer": "UK",
+        "MaterialCode": "nylon",
+        "Comment": "20.11.2025 A2 - 116.03sqm"
+      },
+      "measurements": {
+        "slu": 17.37,
+        "sle": 14.75
+      }
+    },
+    {
+      "internal_id": "ASYM_11",
+      "orc_sail_id": "#62037",
+      "type": "ASYM",
+      "name": "24.03.2020 A3-5 Red - 87.25sqm",
+      "area": 87.2547,
+      "used_in_polars": false,
+      "attributes": {
+        "SailId": "#62037",
+        "Active": "1",
+        "SLU": "16.47",
+        "SLE": "13.95",
+        "ASL": "15.21",
+        "AMG": "6.7",
+        "ASF": "7.62",
+        "ASKind": "asym",
+        "FTId": "0",
+        "Y14": "1",
+        "SailArea": "87.2547",
+        "Measurer": "HK-37",
+        "MeasDate": "2020-04-24T00:00:00.000Z",
+        "Manufacturer": "UK",
+        "MaterialCode": "nylon",
+        "Comment": "24.03.2020 A3-5 Red - 87.25sqm"
+      },
+      "measurements": {
+        "slu": 16.47,
+        "sle": 13.95
+      }
+    }
+  ],
+  "polars": {
+    "configurations": {
+      "optimal": {
+        "description": "TRUE GRIT GER 7447 JPK 10.80 Best Performance",
+        "is_composite": true,
+        "linked_sail_internal_id": null,
+        "data": [
+          {
+            "tws": 6,
+            "curve": [
+              {
+                "twa": 42.3,
+                "bsp": 4.84,
+                "vmg": 3.58,
+                "aws": 10.12,
+                "awa": 23.5,
+                "heel": 5.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 52.0,
+                "bsp": 5.4,
+                "vmg": 3.32,
+                "aws": 10.24,
+                "awa": 27.4,
+                "heel": 5.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 60.0,
+                "bsp": 5.65,
+                "vmg": 2.83,
+                "aws": 10.08,
+                "awa": 30.9,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 5.8,
+                "vmg": 1.98,
+                "aws": 9.66,
+                "awa": 35.6,
+                "heel": 3.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 5.82,
+                "vmg": 1.51,
+                "aws": 9.37,
+                "awa": 38.1,
+                "heel": 3.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 5.8,
+                "vmg": 1.01,
+                "aws": 9.04,
+                "awa": 40.8,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 5.91,
+                "vmg": 0.0,
+                "aws": 8.37,
+                "awa": 45.0,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 110.0,
+                "bsp": 6.08,
+                "vmg": 2.08,
+                "aws": 6.91,
+                "awa": 54.3,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 5.95,
+                "vmg": 2.98,
+                "aws": 5.97,
+                "awa": 60.3,
+                "heel": 2.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 5.32,
+                "vmg": 3.76,
+                "aws": 4.37,
+                "awa": 75.8,
+                "heel": 2.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 142.2,
+                "bsp": 4.94,
+                "vmg": 3.9,
+                "aws": 3.68,
+                "awa": 87.0,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 4.43,
+                "vmg": 3.83,
+                "aws": 3.09,
+                "awa": 104.4,
+                "heel": 2.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 3.65,
+                "vmg": 3.53,
+                "aws": 2.64,
+                "awa": 144.1,
+                "heel": 4.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 3.33,
+                "vmg": 3.33,
+                "aws": 2.67,
+                "awa": 180.0,
+                "heel": 5.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 8,
+            "curve": [
+              {
+                "twa": 40.5,
+                "bsp": 5.74,
+                "vmg": 4.36,
+                "aws": 12.87,
+                "awa": 23.3,
+                "heel": 12.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 52.0,
+                "bsp": 6.4,
+                "vmg": 3.94,
+                "aws": 12.89,
+                "awa": 28.6,
+                "heel": 12.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 60.0,
+                "bsp": 6.62,
+                "vmg": 3.31,
+                "aws": 12.61,
+                "awa": 32.6,
+                "heel": 11.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.74,
+                "vmg": 2.31,
+                "aws": 12.04,
+                "awa": 38.0,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.76,
+                "vmg": 1.75,
+                "aws": 11.68,
+                "awa": 40.9,
+                "heel": 8.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.75,
+                "vmg": 1.17,
+                "aws": 11.29,
+                "awa": 43.8,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 6.95,
+                "vmg": 0.0,
+                "aws": 10.28,
+                "awa": 47.5,
+                "heel": 18.8,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.18,
+                "vmg": 2.46,
+                "aws": 8.58,
+                "awa": 58.8,
+                "heel": 12.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.1,
+                "vmg": 3.55,
+                "aws": 7.53,
+                "awa": 65.7,
+                "heel": 8.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 6.57,
+                "vmg": 4.64,
+                "aws": 5.72,
+                "awa": 80.8,
+                "heel": 4.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 146.7,
+                "bsp": 5.85,
+                "vmg": 4.89,
+                "aws": 4.46,
+                "awa": 100.8,
+                "heel": 5.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 5.63,
+                "vmg": 4.87,
+                "aws": 4.19,
+                "awa": 108.1,
+                "heel": 4.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.79,
+                "vmg": 4.62,
+                "aws": 3.59,
+                "awa": 145.0,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 4.4,
+                "vmg": 4.4,
+                "aws": 3.6,
+                "awa": 180.0,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 10,
+            "curve": [
+              {
+                "twa": 39.0,
+                "bsp": 6.25,
+                "vmg": 4.85,
+                "aws": 15.23,
+                "awa": 23.0,
+                "heel": 18.9,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 52.0,
+                "bsp": 6.98,
+                "vmg": 4.3,
+                "aws": 15.08,
+                "awa": 29.4,
+                "heel": 19.9,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.18,
+                "vmg": 3.59,
+                "aws": 14.7,
+                "awa": 34.0,
+                "heel": 18.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.3,
+                "vmg": 2.5,
+                "aws": 14.03,
+                "awa": 40.2,
+                "heel": 15.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.32,
+                "vmg": 1.89,
+                "aws": 13.64,
+                "awa": 43.4,
+                "heel": 13.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.32,
+                "vmg": 1.27,
+                "aws": 13.22,
+                "awa": 46.8,
+                "heel": 12.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.36,
+                "vmg": 0.0,
+                "aws": 11.84,
+                "awa": 51.6,
+                "heel": 21.9,
+                "reef": 0.94,
+                "flat": 0.93
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.76,
+                "vmg": 2.66,
+                "aws": 9.87,
+                "awa": 63.9,
+                "heel": 19.5,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.73,
+                "vmg": 3.87,
+                "aws": 8.88,
+                "awa": 72.1,
+                "heel": 12.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.38,
+                "vmg": 5.22,
+                "aws": 7.05,
+                "awa": 87.5,
+                "heel": 5.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 149.8,
+                "bsp": 6.64,
+                "vmg": 5.74,
+                "aws": 5.39,
+                "awa": 111.9,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.63,
+                "vmg": 5.74,
+                "aws": 5.37,
+                "awa": 112.2,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 5.79,
+                "vmg": 5.59,
+                "aws": 4.65,
+                "awa": 146.4,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 5.38,
+                "vmg": 5.38,
+                "aws": 4.62,
+                "awa": 180.0,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 12,
+            "curve": [
+              {
+                "twa": 38.2,
+                "bsp": 6.44,
+                "vmg": 5.06,
+                "aws": 17.31,
+                "awa": 23.5,
+                "heel": 21.4,
+                "reef": 1.0,
+                "flat": 0.85
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.22,
+                "vmg": 4.45,
+                "aws": 16.97,
+                "awa": 30.6,
+                "heel": 24.0,
+                "reef": 1.0,
+                "flat": 0.92
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.44,
+                "vmg": 3.72,
+                "aws": 16.48,
+                "awa": 35.3,
+                "heel": 23.5,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.6,
+                "vmg": 2.6,
+                "aws": 15.72,
+                "awa": 41.9,
+                "heel": 21.4,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.65,
+                "vmg": 1.98,
+                "aws": 15.31,
+                "awa": 45.4,
+                "heel": 19.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.67,
+                "vmg": 1.33,
+                "aws": 14.9,
+                "awa": 49.1,
+                "heel": 17.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.67,
+                "vmg": 0.0,
+                "aws": 13.99,
+                "awa": 56.8,
+                "heel": 12.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.12,
+                "vmg": 2.78,
+                "aws": 11.2,
+                "awa": 69.0,
+                "heel": 22.0,
+                "reef": 0.97,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.22,
+                "vmg": 4.11,
+                "aws": 10.15,
+                "awa": 77.3,
+                "heel": 17.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.93,
+                "vmg": 5.6,
+                "aws": 8.46,
+                "awa": 93.8,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.35,
+                "vmg": 6.37,
+                "aws": 6.68,
+                "awa": 117.1,
+                "heel": 7.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 157.9,
+                "bsp": 7.01,
+                "vmg": 6.49,
+                "aws": 6.08,
+                "awa": 132.5,
+                "heel": 7.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.67,
+                "vmg": 6.44,
+                "aws": 5.81,
+                "awa": 147.9,
+                "heel": 6.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.26,
+                "vmg": 6.26,
+                "aws": 5.74,
+                "awa": 180.0,
+                "heel": 5.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 14,
+            "curve": [
+              {
+                "twa": 38.0,
+                "bsp": 6.55,
+                "vmg": 5.16,
+                "aws": 19.31,
+                "awa": 24.4,
+                "heel": 22.1,
+                "reef": 0.93,
+                "flat": 0.75
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.33,
+                "vmg": 4.52,
+                "aws": 18.84,
+                "awa": 32.2,
+                "heel": 24.6,
+                "reef": 0.93,
+                "flat": 0.81
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.56,
+                "vmg": 3.78,
+                "aws": 18.23,
+                "awa": 37.0,
+                "heel": 25.2,
+                "reef": 0.93,
+                "flat": 0.86
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.77,
+                "vmg": 2.66,
+                "aws": 17.28,
+                "awa": 43.4,
+                "heel": 25.6,
+                "reef": 1.0,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.85,
+                "vmg": 2.03,
+                "aws": 16.86,
+                "awa": 47.1,
+                "heel": 24.1,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.91,
+                "vmg": 1.37,
+                "aws": 16.42,
+                "awa": 51.0,
+                "heel": 22.3,
+                "reef": 1.0,
+                "flat": 0.98
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.97,
+                "vmg": 0.0,
+                "aws": 15.58,
+                "awa": 59.2,
+                "heel": 17.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.38,
+                "vmg": 2.87,
+                "aws": 12.72,
+                "awa": 73.6,
+                "heel": 22.0,
+                "reef": 0.91,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.66,
+                "vmg": 4.33,
+                "aws": 11.39,
+                "awa": 81.6,
+                "heel": 21.7,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.45,
+                "vmg": 5.97,
+                "aws": 9.9,
+                "awa": 98.4,
+                "heel": 8.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.86,
+                "vmg": 6.81,
+                "aws": 8.17,
+                "awa": 121.5,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 164.8,
+                "bsp": 7.34,
+                "vmg": 7.08,
+                "aws": 7.17,
+                "awa": 149.5,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.33,
+                "vmg": 7.08,
+                "aws": 7.16,
+                "awa": 149.9,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.0,
+                "vmg": 7.0,
+                "aws": 7.0,
+                "awa": 180.0,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 16,
+            "curve": [
+              {
+                "twa": 38.4,
+                "bsp": 6.66,
+                "vmg": 5.22,
+                "aws": 21.29,
+                "awa": 25.6,
+                "heel": 22.2,
+                "reef": 0.6,
+                "flat": 0.69
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.4,
+                "vmg": 4.56,
+                "aws": 20.69,
+                "awa": 33.5,
+                "heel": 25.0,
+                "reef": 0.64,
+                "flat": 0.75
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.63,
+                "vmg": 3.82,
+                "aws": 19.99,
+                "awa": 38.6,
+                "heel": 25.9,
+                "reef": 0.64,
+                "flat": 0.8
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.87,
+                "vmg": 2.69,
+                "aws": 18.92,
+                "awa": 45.2,
+                "heel": 26.8,
+                "reef": 0.85,
+                "flat": 0.86
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.98,
+                "vmg": 2.06,
+                "aws": 18.31,
+                "awa": 48.6,
+                "heel": 27.4,
+                "reef": 0.88,
+                "flat": 0.92
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.08,
+                "vmg": 1.4,
+                "aws": 17.81,
+                "awa": 52.4,
+                "heel": 26.4,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.22,
+                "vmg": 0.0,
+                "aws": 16.97,
+                "awa": 61.0,
+                "heel": 22.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.61,
+                "vmg": 2.95,
+                "aws": 14.29,
+                "awa": 77.3,
+                "heel": 22.0,
+                "reef": 0.85,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.97,
+                "vmg": 4.49,
+                "aws": 12.88,
+                "awa": 85.7,
+                "heel": 22.0,
+                "reef": 0.96,
+                "flat": 0.94
+              },
+              {
+                "twa": 135.0,
+                "bsp": 9.0,
+                "vmg": 6.36,
+                "aws": 11.32,
+                "awa": 101.8,
+                "heel": 11.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.35,
+                "vmg": 7.23,
+                "aws": 9.7,
+                "awa": 124.6,
+                "heel": 3.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.81,
+                "vmg": 7.55,
+                "aws": 8.68,
+                "awa": 151.8,
+                "heel": 7.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 168.2,
+                "bsp": 7.72,
+                "vmg": 7.56,
+                "aws": 8.58,
+                "awa": 157.8,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.54,
+                "vmg": 7.54,
+                "aws": 8.46,
+                "awa": 180.0,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 20,
+            "curve": [
+              {
+                "twa": 38.8,
+                "bsp": 6.73,
+                "vmg": 5.25,
+                "aws": 25.15,
+                "awa": 27.4,
+                "heel": 22.3,
+                "reef": 0.5,
+                "flat": 0.56
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.46,
+                "vmg": 4.59,
+                "aws": 24.39,
+                "awa": 35.8,
+                "heel": 25.0,
+                "reef": 0.5,
+                "flat": 0.62
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.71,
+                "vmg": 3.85,
+                "aws": 23.55,
+                "awa": 41.2,
+                "heel": 26.3,
+                "reef": 0.5,
+                "flat": 0.67
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.99,
+                "vmg": 2.73,
+                "aws": 22.27,
+                "awa": 48.2,
+                "heel": 27.9,
+                "reef": 0.5,
+                "flat": 0.75
+              },
+              {
+                "twa": 75.0,
+                "bsp": 8.14,
+                "vmg": 2.11,
+                "aws": 21.61,
+                "awa": 52.0,
+                "heel": 28.2,
+                "reef": 0.5,
+                "flat": 0.8
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.28,
+                "vmg": 1.44,
+                "aws": 20.93,
+                "awa": 55.8,
+                "heel": 28.4,
+                "reef": 0.5,
+                "flat": 0.86
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.57,
+                "vmg": 0.0,
+                "aws": 19.59,
+                "awa": 64.1,
+                "heel": 28.3,
+                "reef": 0.93,
+                "flat": 0.95
+              },
+              {
+                "twa": 110.0,
+                "bsp": 9.03,
+                "vmg": 3.09,
+                "aws": 17.56,
+                "awa": 82.8,
+                "heel": 22.0,
+                "reef": 0.75,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.55,
+                "vmg": 4.78,
+                "aws": 16.06,
+                "awa": 91.6,
+                "heel": 22.0,
+                "reef": 0.85,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 10.43,
+                "vmg": 7.38,
+                "aws": 13.83,
+                "awa": 105.6,
+                "heel": 19.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 9.47,
+                "vmg": 8.2,
+                "aws": 12.69,
+                "awa": 128.2,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 8.74,
+                "vmg": 8.44,
+                "aws": 11.76,
+                "awa": 154.1,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 167.3,
+                "bsp": 8.66,
+                "vmg": 8.45,
+                "aws": 11.69,
+                "awa": 158.2,
+                "heel": 8.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 8.43,
+                "vmg": 8.43,
+                "aws": 11.57,
+                "awa": 180.0,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 24,
+            "curve": [
+              {
+                "twa": 40.7,
+                "bsp": 6.7,
+                "vmg": 5.08,
+                "aws": 28.77,
+                "awa": 30.1,
+                "heel": 22.9,
+                "reef": 0.47,
+                "flat": 0.53
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.4,
+                "vmg": 4.55,
+                "aws": 28.01,
+                "awa": 37.7,
+                "heel": 25.2,
+                "reef": 0.49,
+                "flat": 0.53
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.66,
+                "vmg": 3.83,
+                "aws": 27.12,
+                "awa": 43.5,
+                "heel": 26.0,
+                "reef": 0.42,
+                "flat": 0.74
+              },
+              {
+                "twa": 70.0,
+                "bsp": 8.01,
+                "vmg": 2.74,
+                "aws": 25.74,
+                "awa": 50.9,
+                "heel": 27.6,
+                "reef": 0.44,
+                "flat": 0.78
+              },
+              {
+                "twa": 75.0,
+                "bsp": 8.19,
+                "vmg": 2.12,
+                "aws": 24.98,
+                "awa": 54.8,
+                "heel": 28.3,
+                "reef": 0.45,
+                "flat": 0.81
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.37,
+                "vmg": 1.45,
+                "aws": 24.14,
+                "awa": 58.7,
+                "heel": 29.2,
+                "reef": 0.47,
+                "flat": 0.83
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.75,
+                "vmg": 0.0,
+                "aws": 22.47,
+                "awa": 67.1,
+                "heel": 30.4,
+                "reef": 0.49,
+                "flat": 0.92
+              },
+              {
+                "twa": 110.0,
+                "bsp": 9.27,
+                "vmg": 3.17,
+                "aws": 20.84,
+                "awa": 87.1,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.78
+              },
+              {
+                "twa": 120.0,
+                "bsp": 10.13,
+                "vmg": 5.07,
+                "aws": 19.35,
+                "awa": 95.5,
+                "heel": 22.1,
+                "reef": 0.76,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 12.14,
+                "vmg": 8.59,
+                "aws": 16.44,
+                "awa": 107.1,
+                "heel": 22.2,
+                "reef": 0.95,
+                "flat": 0.95
+              },
+              {
+                "twa": 142.3,
+                "bsp": 12.81,
+                "vmg": 10.14,
+                "aws": 15.25,
+                "awa": 114.0,
+                "heel": 18.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 11.32,
+                "vmg": 9.8,
+                "aws": 15.15,
+                "awa": 128.7,
+                "heel": 9.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 9.89,
+                "vmg": 9.55,
+                "aws": 14.62,
+                "awa": 155.4,
+                "heel": 11.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 9.42,
+                "vmg": 9.42,
+                "aws": 14.58,
+                "awa": 180.0,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "headsail": {
+        "description": "TRUE GRIT GER 7447 JPK 10.80 HLP 4.38 HQW 3.38 HHW 2.29 HTW 1.19 HUW 0.64 HHB 0.10 HLU 13.98 Area 31.68 Headsail, 31.68 m\u00b2\n\t\t\t\t\t\t\t\t\t\t(id=#55940)",
+        "is_composite": false,
+        "linked_sail_internal_id": "HEAD_4",
+        "data": [
+          {
+            "tws": 6,
+            "curve": [
+              {
+                "twa": 42.3,
+                "bsp": 4.84,
+                "vmg": 3.58,
+                "aws": 10.12,
+                "awa": 23.5,
+                "heel": 5.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 52.0,
+                "bsp": 5.4,
+                "vmg": 3.32,
+                "aws": 10.24,
+                "awa": 27.4,
+                "heel": 5.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 60.0,
+                "bsp": 5.65,
+                "vmg": 2.83,
+                "aws": 10.08,
+                "awa": 30.9,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 5.8,
+                "vmg": 1.98,
+                "aws": 9.66,
+                "awa": 35.6,
+                "heel": 3.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 5.82,
+                "vmg": 1.51,
+                "aws": 9.37,
+                "awa": 38.1,
+                "heel": 3.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 5.8,
+                "vmg": 1.01,
+                "aws": 9.04,
+                "awa": 40.8,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 5.69,
+                "vmg": 0.0,
+                "aws": 8.27,
+                "awa": 46.5,
+                "heel": 1.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 5.02,
+                "vmg": 1.72,
+                "aws": 6.37,
+                "awa": 62.2,
+                "heel": 0.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 4.5,
+                "vmg": 2.25,
+                "aws": 5.41,
+                "awa": 73.9,
+                "heel": 0.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 3.68,
+                "vmg": 2.6,
+                "aws": 4.28,
+                "awa": 97.5,
+                "heel": 1.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 3.23,
+                "vmg": 2.8,
+                "aws": 3.58,
+                "awa": 123.2,
+                "heel": 3.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 3.02,
+                "vmg": 2.91,
+                "aws": 3.18,
+                "awa": 150.9,
+                "heel": 4.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 171.2,
+                "bsp": 2.96,
+                "vmg": 2.93,
+                "aws": 3.11,
+                "awa": 162.9,
+                "heel": 5.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 2.92,
+                "vmg": 2.92,
+                "aws": 3.08,
+                "awa": 180.0,
+                "heel": 4.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 8,
+            "curve": [
+              {
+                "twa": 40.5,
+                "bsp": 5.74,
+                "vmg": 4.36,
+                "aws": 12.87,
+                "awa": 23.3,
+                "heel": 12.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 52.0,
+                "bsp": 6.4,
+                "vmg": 3.94,
+                "aws": 12.89,
+                "awa": 28.6,
+                "heel": 12.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 60.0,
+                "bsp": 6.62,
+                "vmg": 3.31,
+                "aws": 12.61,
+                "awa": 32.6,
+                "heel": 11.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.74,
+                "vmg": 2.31,
+                "aws": 12.04,
+                "awa": 38.0,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.76,
+                "vmg": 1.75,
+                "aws": 11.68,
+                "awa": 40.9,
+                "heel": 8.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.75,
+                "vmg": 1.17,
+                "aws": 11.29,
+                "awa": 43.8,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 6.67,
+                "vmg": 0.0,
+                "aws": 10.4,
+                "awa": 50.1,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 6.06,
+                "vmg": 2.07,
+                "aws": 8.22,
+                "awa": 66.1,
+                "heel": 1.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 5.56,
+                "vmg": 2.78,
+                "aws": 7.1,
+                "awa": 77.3,
+                "heel": 1.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 4.76,
+                "vmg": 3.37,
+                "aws": 5.72,
+                "awa": 99.0,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 4.26,
+                "vmg": 3.69,
+                "aws": 4.8,
+                "awa": 123.8,
+                "heel": 4.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.0,
+                "vmg": 3.86,
+                "aws": 4.26,
+                "awa": 151.1,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 173.0,
+                "bsp": 3.92,
+                "vmg": 3.89,
+                "aws": 4.14,
+                "awa": 166.4,
+                "heel": 5.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 3.88,
+                "vmg": 3.88,
+                "aws": 4.12,
+                "awa": 180.0,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 10,
+            "curve": [
+              {
+                "twa": 39.0,
+                "bsp": 6.25,
+                "vmg": 4.85,
+                "aws": 15.23,
+                "awa": 23.0,
+                "heel": 18.9,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 52.0,
+                "bsp": 6.98,
+                "vmg": 4.3,
+                "aws": 15.08,
+                "awa": 29.4,
+                "heel": 19.9,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.18,
+                "vmg": 3.59,
+                "aws": 14.7,
+                "awa": 34.0,
+                "heel": 18.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.3,
+                "vmg": 2.5,
+                "aws": 14.03,
+                "awa": 40.2,
+                "heel": 15.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.32,
+                "vmg": 1.89,
+                "aws": 13.64,
+                "awa": 43.4,
+                "heel": 13.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.32,
+                "vmg": 1.27,
+                "aws": 13.22,
+                "awa": 46.8,
+                "heel": 12.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.28,
+                "vmg": 0.0,
+                "aws": 12.28,
+                "awa": 53.6,
+                "heel": 8.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 6.83,
+                "vmg": 2.34,
+                "aws": 9.99,
+                "awa": 70.0,
+                "heel": 2.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 6.41,
+                "vmg": 3.2,
+                "aws": 8.76,
+                "awa": 80.8,
+                "heel": 3.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 5.67,
+                "vmg": 4.01,
+                "aws": 7.19,
+                "awa": 101.2,
+                "heel": 4.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 5.19,
+                "vmg": 4.49,
+                "aws": 6.06,
+                "awa": 124.9,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.91,
+                "vmg": 4.75,
+                "aws": 5.4,
+                "awa": 151.6,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 174.8,
+                "bsp": 4.8,
+                "vmg": 4.78,
+                "aws": 5.23,
+                "awa": 170.1,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 4.78,
+                "vmg": 4.78,
+                "aws": 5.22,
+                "awa": 180.0,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 12,
+            "curve": [
+              {
+                "twa": 38.2,
+                "bsp": 6.44,
+                "vmg": 5.06,
+                "aws": 17.31,
+                "awa": 23.5,
+                "heel": 21.4,
+                "reef": 1.0,
+                "flat": 0.85
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.22,
+                "vmg": 4.45,
+                "aws": 16.97,
+                "awa": 30.6,
+                "heel": 24.0,
+                "reef": 1.0,
+                "flat": 0.92
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.44,
+                "vmg": 3.72,
+                "aws": 16.48,
+                "awa": 35.3,
+                "heel": 23.5,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.6,
+                "vmg": 2.6,
+                "aws": 15.72,
+                "awa": 41.9,
+                "heel": 21.4,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.65,
+                "vmg": 1.98,
+                "aws": 15.31,
+                "awa": 45.4,
+                "heel": 19.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.67,
+                "vmg": 1.33,
+                "aws": 14.9,
+                "awa": 49.1,
+                "heel": 17.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.67,
+                "vmg": 0.0,
+                "aws": 13.99,
+                "awa": 56.8,
+                "heel": 12.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.34,
+                "vmg": 2.51,
+                "aws": 11.7,
+                "awa": 74.0,
+                "heel": 4.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.03,
+                "vmg": 3.51,
+                "aws": 10.42,
+                "awa": 84.3,
+                "heel": 4.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 6.44,
+                "vmg": 4.55,
+                "aws": 8.69,
+                "awa": 103.6,
+                "heel": 5.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.01,
+                "vmg": 5.2,
+                "aws": 7.38,
+                "awa": 126.4,
+                "heel": 8.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 5.73,
+                "vmg": 5.54,
+                "aws": 6.62,
+                "awa": 152.2,
+                "heel": 7.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 176.6,
+                "bsp": 5.61,
+                "vmg": 5.6,
+                "aws": 6.41,
+                "awa": 173.7,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 5.6,
+                "vmg": 5.6,
+                "aws": 6.4,
+                "awa": 180.0,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 14,
+            "curve": [
+              {
+                "twa": 38.0,
+                "bsp": 6.55,
+                "vmg": 5.16,
+                "aws": 19.31,
+                "awa": 24.4,
+                "heel": 22.1,
+                "reef": 0.93,
+                "flat": 0.75
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.33,
+                "vmg": 4.52,
+                "aws": 18.84,
+                "awa": 32.2,
+                "heel": 24.6,
+                "reef": 0.93,
+                "flat": 0.81
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.56,
+                "vmg": 3.78,
+                "aws": 18.23,
+                "awa": 37.0,
+                "heel": 25.2,
+                "reef": 0.93,
+                "flat": 0.86
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.77,
+                "vmg": 2.66,
+                "aws": 17.28,
+                "awa": 43.4,
+                "heel": 25.6,
+                "reef": 1.0,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.85,
+                "vmg": 2.03,
+                "aws": 16.86,
+                "awa": 47.1,
+                "heel": 24.1,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.91,
+                "vmg": 1.37,
+                "aws": 16.42,
+                "awa": 51.0,
+                "heel": 22.3,
+                "reef": 1.0,
+                "flat": 0.98
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.97,
+                "vmg": 0.0,
+                "aws": 15.58,
+                "awa": 59.2,
+                "heel": 17.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.7,
+                "vmg": 2.63,
+                "aws": 13.39,
+                "awa": 77.4,
+                "heel": 6.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.46,
+                "vmg": 3.73,
+                "aws": 12.11,
+                "awa": 87.8,
+                "heel": 3.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.04,
+                "vmg": 4.98,
+                "aws": 10.24,
+                "awa": 106.2,
+                "heel": 6.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.71,
+                "vmg": 5.81,
+                "aws": 8.78,
+                "awa": 128.1,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.46,
+                "vmg": 6.24,
+                "aws": 7.92,
+                "awa": 153.0,
+                "heel": 7.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 177.5,
+                "bsp": 6.33,
+                "vmg": 6.33,
+                "aws": 7.68,
+                "awa": 175.5,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.32,
+                "vmg": 6.32,
+                "aws": 7.68,
+                "awa": 180.0,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 16,
+            "curve": [
+              {
+                "twa": 38.4,
+                "bsp": 6.66,
+                "vmg": 5.22,
+                "aws": 21.29,
+                "awa": 25.6,
+                "heel": 22.2,
+                "reef": 0.6,
+                "flat": 0.69
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.4,
+                "vmg": 4.56,
+                "aws": 20.69,
+                "awa": 33.5,
+                "heel": 25.0,
+                "reef": 0.64,
+                "flat": 0.75
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.63,
+                "vmg": 3.82,
+                "aws": 19.99,
+                "awa": 38.6,
+                "heel": 25.9,
+                "reef": 0.64,
+                "flat": 0.8
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.87,
+                "vmg": 2.69,
+                "aws": 18.92,
+                "awa": 45.2,
+                "heel": 26.8,
+                "reef": 0.85,
+                "flat": 0.86
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.98,
+                "vmg": 2.06,
+                "aws": 18.31,
+                "awa": 48.6,
+                "heel": 27.4,
+                "reef": 0.88,
+                "flat": 0.92
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.08,
+                "vmg": 1.4,
+                "aws": 17.81,
+                "awa": 52.4,
+                "heel": 26.4,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.22,
+                "vmg": 0.0,
+                "aws": 16.97,
+                "awa": 61.0,
+                "heel": 22.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.03,
+                "vmg": 2.75,
+                "aws": 15.06,
+                "awa": 80.2,
+                "heel": 9.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.81,
+                "vmg": 3.9,
+                "aws": 13.8,
+                "awa": 90.8,
+                "heel": 5.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.48,
+                "vmg": 5.29,
+                "aws": 11.88,
+                "awa": 108.9,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.24,
+                "vmg": 6.27,
+                "aws": 10.27,
+                "awa": 130.1,
+                "heel": 10.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.06,
+                "vmg": 6.82,
+                "aws": 9.35,
+                "awa": 154.0,
+                "heel": 8.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 178.4,
+                "bsp": 6.94,
+                "vmg": 6.94,
+                "aws": 9.06,
+                "awa": 177.2,
+                "heel": 6.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.94,
+                "vmg": 6.94,
+                "aws": 9.06,
+                "awa": 180.0,
+                "heel": 6.2,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 20,
+            "curve": [
+              {
+                "twa": 38.8,
+                "bsp": 6.73,
+                "vmg": 5.25,
+                "aws": 25.15,
+                "awa": 27.4,
+                "heel": 22.3,
+                "reef": 0.5,
+                "flat": 0.56
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.46,
+                "vmg": 4.59,
+                "aws": 24.39,
+                "awa": 35.8,
+                "heel": 25.0,
+                "reef": 0.5,
+                "flat": 0.62
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.71,
+                "vmg": 3.85,
+                "aws": 23.55,
+                "awa": 41.2,
+                "heel": 26.3,
+                "reef": 0.5,
+                "flat": 0.67
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.99,
+                "vmg": 2.73,
+                "aws": 22.27,
+                "awa": 48.2,
+                "heel": 27.9,
+                "reef": 0.5,
+                "flat": 0.75
+              },
+              {
+                "twa": 75.0,
+                "bsp": 8.14,
+                "vmg": 2.11,
+                "aws": 21.61,
+                "awa": 52.0,
+                "heel": 28.2,
+                "reef": 0.5,
+                "flat": 0.8
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.28,
+                "vmg": 1.44,
+                "aws": 20.93,
+                "awa": 55.8,
+                "heel": 28.4,
+                "reef": 0.5,
+                "flat": 0.86
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.57,
+                "vmg": 0.0,
+                "aws": 19.59,
+                "awa": 64.1,
+                "heel": 28.3,
+                "reef": 0.93,
+                "flat": 0.95
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.64,
+                "vmg": 2.96,
+                "aws": 18.15,
+                "awa": 84.3,
+                "heel": 16.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.45,
+                "vmg": 4.23,
+                "aws": 17.06,
+                "awa": 95.2,
+                "heel": 11.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.18,
+                "vmg": 5.79,
+                "aws": 15.26,
+                "awa": 113.0,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.0,
+                "vmg": 6.93,
+                "aws": 13.58,
+                "awa": 133.4,
+                "heel": 9.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.87,
+                "vmg": 7.6,
+                "aws": 12.53,
+                "awa": 156.0,
+                "heel": 10.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 179.1,
+                "bsp": 7.79,
+                "vmg": 7.78,
+                "aws": 12.22,
+                "awa": 178.5,
+                "heel": 7.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.78,
+                "vmg": 7.78,
+                "aws": 12.22,
+                "awa": 180.0,
+                "heel": 6.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 24,
+            "curve": [
+              {
+                "twa": 40.7,
+                "bsp": 6.7,
+                "vmg": 5.08,
+                "aws": 28.77,
+                "awa": 30.1,
+                "heel": 22.9,
+                "reef": 0.47,
+                "flat": 0.53
+              },
+              {
+                "twa": 52.0,
+                "bsp": 7.4,
+                "vmg": 4.55,
+                "aws": 28.01,
+                "awa": 37.7,
+                "heel": 25.2,
+                "reef": 0.49,
+                "flat": 0.53
+              },
+              {
+                "twa": 60.0,
+                "bsp": 7.66,
+                "vmg": 3.83,
+                "aws": 27.12,
+                "awa": 43.5,
+                "heel": 26.0,
+                "reef": 0.42,
+                "flat": 0.74
+              },
+              {
+                "twa": 70.0,
+                "bsp": 8.01,
+                "vmg": 2.74,
+                "aws": 25.74,
+                "awa": 50.9,
+                "heel": 27.6,
+                "reef": 0.44,
+                "flat": 0.78
+              },
+              {
+                "twa": 75.0,
+                "bsp": 8.19,
+                "vmg": 2.12,
+                "aws": 24.98,
+                "awa": 54.8,
+                "heel": 28.3,
+                "reef": 0.45,
+                "flat": 0.81
+              },
+              {
+                "twa": 80.0,
+                "bsp": 8.37,
+                "vmg": 1.45,
+                "aws": 24.14,
+                "awa": 58.7,
+                "heel": 29.2,
+                "reef": 0.47,
+                "flat": 0.83
+              },
+              {
+                "twa": 90.0,
+                "bsp": 8.75,
+                "vmg": 0.0,
+                "aws": 22.47,
+                "awa": 67.1,
+                "heel": 30.4,
+                "reef": 0.49,
+                "flat": 0.92
+              },
+              {
+                "twa": 110.0,
+                "bsp": 9.18,
+                "vmg": 3.14,
+                "aws": 20.64,
+                "awa": 87.3,
+                "heel": 23.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.09,
+                "vmg": 4.55,
+                "aws": 19.94,
+                "awa": 98.4,
+                "heel": 18.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.89,
+                "vmg": 6.29,
+                "aws": 18.42,
+                "awa": 116.0,
+                "heel": 12.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.73,
+                "vmg": 7.56,
+                "aws": 16.94,
+                "awa": 135.3,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 8.6,
+                "vmg": 8.3,
+                "aws": 15.79,
+                "awa": 157.5,
+                "heel": 13.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 179.1,
+                "bsp": 8.51,
+                "vmg": 8.51,
+                "aws": 15.49,
+                "awa": 178.6,
+                "heel": 7.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 8.51,
+                "vmg": 8.51,
+                "aws": 15.49,
+                "awa": 180.0,
+                "heel": 7.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "asymmetric": {
+        "description": "TRUE GRIT GER 7447 JPK 10.80 SLU 17.37 SLE 14.75 SHW 8.67 SFL 8.67 Asymmetric\nArea 116.03 Asymmetric on Centerline, 116.03 m\u00b2\n\t\t\t\t\t\t\t\t\t\t(id=#180387)",
+        "is_composite": false,
+        "linked_sail_internal_id": "ASYM_10",
+        "data": [
+          {
+            "tws": 6,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 4.01,
+                "vmg": 2.0,
+                "aws": 8.71,
+                "awa": 36.5,
+                "heel": 4.9,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 70.0,
+                "bsp": 4.91,
+                "vmg": 1.68,
+                "aws": 8.93,
+                "awa": 38.8,
+                "heel": 7.5,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 75.0,
+                "bsp": 5.25,
+                "vmg": 1.36,
+                "aws": 8.9,
+                "awa": 40.1,
+                "heel": 8.6,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 80.0,
+                "bsp": 5.54,
+                "vmg": 0.96,
+                "aws": 8.79,
+                "awa": 41.6,
+                "heel": 9.3,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 90.0,
+                "bsp": 5.91,
+                "vmg": 0.0,
+                "aws": 8.37,
+                "awa": 45.0,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 110.0,
+                "bsp": 6.08,
+                "vmg": 2.08,
+                "aws": 6.91,
+                "awa": 54.3,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 5.95,
+                "vmg": 2.98,
+                "aws": 5.97,
+                "awa": 60.3,
+                "heel": 2.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 5.31,
+                "vmg": 3.76,
+                "aws": 4.37,
+                "awa": 75.9,
+                "heel": 2.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 143.0,
+                "bsp": 4.85,
+                "vmg": 3.87,
+                "aws": 3.61,
+                "awa": 89.1,
+                "heel": 2.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 4.41,
+                "vmg": 3.82,
+                "aws": 3.1,
+                "awa": 104.6,
+                "heel": 2.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 3.38,
+                "vmg": 3.26,
+                "aws": 2.87,
+                "awa": 147.3,
+                "heel": 4.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 2.92,
+                "vmg": 2.92,
+                "aws": 3.08,
+                "awa": 180.0,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 8,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.04,
+                "vmg": 2.52,
+                "aws": 11.29,
+                "awa": 36.7,
+                "heel": 13.0,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 70.0,
+                "bsp": 5.99,
+                "vmg": 2.05,
+                "aws": 11.3,
+                "awa": 39.5,
+                "heel": 17.3,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.32,
+                "vmg": 1.64,
+                "aws": 11.13,
+                "awa": 41.1,
+                "heel": 18.8,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.58,
+                "vmg": 1.14,
+                "aws": 10.89,
+                "awa": 42.9,
+                "heel": 19.6,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 90.0,
+                "bsp": 6.95,
+                "vmg": 0.0,
+                "aws": 10.28,
+                "awa": 47.5,
+                "heel": 18.8,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.18,
+                "vmg": 2.46,
+                "aws": 8.58,
+                "awa": 58.8,
+                "heel": 12.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.1,
+                "vmg": 3.55,
+                "aws": 7.53,
+                "awa": 65.7,
+                "heel": 8.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 6.57,
+                "vmg": 4.64,
+                "aws": 5.72,
+                "awa": 80.8,
+                "heel": 4.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 147.1,
+                "bsp": 5.8,
+                "vmg": 4.87,
+                "aws": 4.42,
+                "awa": 102.0,
+                "heel": 4.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 5.62,
+                "vmg": 4.86,
+                "aws": 4.2,
+                "awa": 108.2,
+                "heel": 4.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.44,
+                "vmg": 4.29,
+                "aws": 3.88,
+                "awa": 147.9,
+                "heel": 5.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 3.88,
+                "vmg": 3.88,
+                "aws": 4.12,
+                "awa": 180.0,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 10,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.63,
+                "vmg": 2.81,
+                "aws": 13.38,
+                "awa": 37.4,
+                "heel": 20.2,
+                "reef": 0.97,
+                "flat": 0.94
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.48,
+                "vmg": 2.21,
+                "aws": 13.2,
+                "awa": 41.4,
+                "heel": 21.6,
+                "reef": 0.92,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.77,
+                "vmg": 1.75,
+                "aws": 12.96,
+                "awa": 43.8,
+                "heel": 21.8,
+                "reef": 0.91,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.0,
+                "vmg": 1.22,
+                "aws": 12.65,
+                "awa": 46.3,
+                "heel": 21.9,
+                "reef": 0.91,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.36,
+                "vmg": 0.0,
+                "aws": 11.84,
+                "awa": 51.6,
+                "heel": 21.9,
+                "reef": 0.94,
+                "flat": 0.93
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.76,
+                "vmg": 2.66,
+                "aws": 9.87,
+                "awa": 63.9,
+                "heel": 19.5,
+                "reef": 1.0,
+                "flat": 0.99
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.73,
+                "vmg": 3.87,
+                "aws": 8.88,
+                "awa": 72.1,
+                "heel": 12.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.38,
+                "vmg": 5.22,
+                "aws": 7.05,
+                "awa": 87.5,
+                "heel": 5.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 149.0,
+                "bsp": 6.69,
+                "vmg": 5.73,
+                "aws": 5.46,
+                "awa": 110.1,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.62,
+                "vmg": 5.73,
+                "aws": 5.38,
+                "awa": 112.3,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 5.39,
+                "vmg": 5.21,
+                "aws": 4.98,
+                "awa": 148.9,
+                "heel": 6.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 4.77,
+                "vmg": 4.77,
+                "aws": 5.23,
+                "awa": 180.0,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 12,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.93,
+                "vmg": 2.96,
+                "aws": 15.38,
+                "awa": 39.1,
+                "heel": 21.0,
+                "reef": 0.85,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.75,
+                "vmg": 2.31,
+                "aws": 15.08,
+                "awa": 44.0,
+                "heel": 21.8,
+                "reef": 0.82,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.03,
+                "vmg": 1.82,
+                "aws": 14.78,
+                "awa": 46.7,
+                "heel": 21.9,
+                "reef": 0.81,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.25,
+                "vmg": 1.26,
+                "aws": 14.4,
+                "awa": 49.6,
+                "heel": 21.9,
+                "reef": 0.82,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.6,
+                "vmg": 0.0,
+                "aws": 13.48,
+                "awa": 55.7,
+                "heel": 22.0,
+                "reef": 0.85,
+                "flat": 0.93
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.12,
+                "vmg": 2.78,
+                "aws": 11.2,
+                "awa": 69.0,
+                "heel": 22.0,
+                "reef": 0.97,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.22,
+                "vmg": 4.11,
+                "aws": 10.15,
+                "awa": 77.3,
+                "heel": 17.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.93,
+                "vmg": 5.6,
+                "aws": 8.46,
+                "awa": 93.8,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.35,
+                "vmg": 6.37,
+                "aws": 6.69,
+                "awa": 117.1,
+                "heel": 7.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 152.3,
+                "bsp": 7.22,
+                "vmg": 6.39,
+                "aws": 6.5,
+                "awa": 121.6,
+                "heel": 7.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.27,
+                "vmg": 6.06,
+                "aws": 6.15,
+                "awa": 149.9,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 5.6,
+                "vmg": 5.6,
+                "aws": 6.4,
+                "awa": 180.0,
+                "heel": 5.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 14,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 6.11,
+                "vmg": 3.06,
+                "aws": 17.3,
+                "awa": 40.7,
+                "heel": 21.4,
+                "reef": 0.77,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.94,
+                "vmg": 2.37,
+                "aws": 16.93,
+                "awa": 46.2,
+                "heel": 21.8,
+                "reef": 0.74,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.21,
+                "vmg": 1.87,
+                "aws": 16.58,
+                "awa": 49.2,
+                "heel": 21.9,
+                "reef": 0.74,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.42,
+                "vmg": 1.29,
+                "aws": 16.15,
+                "awa": 52.4,
+                "heel": 21.9,
+                "reef": 0.75,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.79,
+                "vmg": 0.0,
+                "aws": 15.14,
+                "awa": 59.1,
+                "heel": 21.9,
+                "reef": 0.78,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.38,
+                "vmg": 2.87,
+                "aws": 12.72,
+                "awa": 73.6,
+                "heel": 22.0,
+                "reef": 0.91,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.66,
+                "vmg": 4.33,
+                "aws": 11.39,
+                "awa": 81.6,
+                "heel": 21.7,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.45,
+                "vmg": 5.97,
+                "aws": 9.9,
+                "awa": 98.4,
+                "heel": 8.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.82,
+                "vmg": 6.77,
+                "aws": 8.19,
+                "awa": 121.7,
+                "heel": 5.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 156.1,
+                "bsp": 7.48,
+                "vmg": 6.83,
+                "aws": 7.74,
+                "awa": 133.4,
+                "heel": 8.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.95,
+                "vmg": 6.71,
+                "aws": 7.49,
+                "awa": 151.3,
+                "heel": 6.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.33,
+                "vmg": 6.33,
+                "aws": 7.67,
+                "awa": 180.0,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 16,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 6.19,
+                "vmg": 3.1,
+                "aws": 19.14,
+                "awa": 42.1,
+                "heel": 22.0,
+                "reef": 0.73,
+                "flat": 0.85
+              },
+              {
+                "twa": 70.0,
+                "bsp": 7.02,
+                "vmg": 2.4,
+                "aws": 18.69,
+                "awa": 48.1,
+                "heel": 22.4,
+                "reef": 0.73,
+                "flat": 0.8
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.3,
+                "vmg": 1.89,
+                "aws": 18.31,
+                "awa": 51.3,
+                "heel": 22.3,
+                "reef": 0.73,
+                "flat": 0.81
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.53,
+                "vmg": 1.31,
+                "aws": 17.86,
+                "awa": 54.7,
+                "heel": 22.2,
+                "reef": 0.73,
+                "flat": 0.83
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.94,
+                "vmg": 0.0,
+                "aws": 16.81,
+                "awa": 61.8,
+                "heel": 22.1,
+                "reef": 0.73,
+                "flat": 0.92
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.61,
+                "vmg": 2.95,
+                "aws": 14.29,
+                "awa": 77.3,
+                "heel": 22.0,
+                "reef": 0.85,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.97,
+                "vmg": 4.49,
+                "aws": 12.88,
+                "awa": 85.7,
+                "heel": 22.0,
+                "reef": 0.96,
+                "flat": 0.94
+              },
+              {
+                "twa": 135.0,
+                "bsp": 9.0,
+                "vmg": 6.36,
+                "aws": 11.32,
+                "awa": 101.8,
+                "heel": 11.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.26,
+                "vmg": 7.15,
+                "aws": 9.75,
+                "awa": 125.0,
+                "heel": 3.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 159.2,
+                "bsp": 7.73,
+                "vmg": 7.23,
+                "aws": 9.16,
+                "awa": 142.1,
+                "heel": 8.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.45,
+                "vmg": 7.19,
+                "aws": 9.0,
+                "awa": 152.8,
+                "heel": 7.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.94,
+                "vmg": 6.94,
+                "aws": 9.06,
+                "awa": 180.0,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 20,
+            "curve": [
+              {
+                "twa": 90.0,
+                "bsp": 8.03,
+                "vmg": 0.0,
+                "aws": 20.13,
+                "awa": 66.5,
+                "heel": 22.6,
+                "reef": 0.73,
+                "flat": 0.64
+              },
+              {
+                "twa": 110.0,
+                "bsp": 9.03,
+                "vmg": 3.09,
+                "aws": 17.56,
+                "awa": 82.8,
+                "heel": 22.0,
+                "reef": 0.75,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.55,
+                "vmg": 4.78,
+                "aws": 16.06,
+                "awa": 91.6,
+                "heel": 22.0,
+                "reef": 0.85,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 10.43,
+                "vmg": 7.38,
+                "aws": 13.83,
+                "awa": 105.6,
+                "heel": 19.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 149.2,
+                "bsp": 9.31,
+                "vmg": 7.99,
+                "aws": 12.91,
+                "awa": 127.5,
+                "heel": 3.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 9.23,
+                "vmg": 7.99,
+                "aws": 12.86,
+                "awa": 129.0,
+                "heel": 2.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 8.22,
+                "vmg": 7.94,
+                "aws": 12.22,
+                "awa": 155.2,
+                "heel": 8.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.77,
+                "vmg": 7.77,
+                "aws": 12.23,
+                "awa": 180.0,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 24,
+            "curve": [
+              {
+                "twa": 110.0,
+                "bsp": 9.27,
+                "vmg": 3.17,
+                "aws": 20.84,
+                "awa": 87.1,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.78
+              },
+              {
+                "twa": 120.0,
+                "bsp": 10.13,
+                "vmg": 5.07,
+                "aws": 19.35,
+                "awa": 95.5,
+                "heel": 22.1,
+                "reef": 0.76,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 12.14,
+                "vmg": 8.59,
+                "aws": 16.44,
+                "awa": 107.1,
+                "heel": 22.2,
+                "reef": 0.95,
+                "flat": 0.95
+              },
+              {
+                "twa": 142.3,
+                "bsp": 12.81,
+                "vmg": 10.14,
+                "aws": 15.25,
+                "awa": 114.0,
+                "heel": 18.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 10.66,
+                "vmg": 9.23,
+                "aws": 15.63,
+                "awa": 130.4,
+                "heel": 7.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 9.04,
+                "vmg": 8.73,
+                "aws": 15.43,
+                "awa": 156.4,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 8.49,
+                "vmg": 8.49,
+                "aws": 15.51,
+                "awa": 180.0,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "asymmetric_1": {
+        "description": "TRUE GRIT GER 7447 JPK 10.80 SLU 17.37 SLE 14.75 SHW 8.67 SFL 8.67 Asymmetric\nArea 116.03 Asymmetric on Pole, 116.03 m\u00b2\n\t\t\t\t\t\t\t\t\t\t(id=#180387)",
+        "is_composite": false,
+        "linked_sail_internal_id": "ASYM_10",
+        "data": [
+          {
+            "tws": 6,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 4.03,
+                "vmg": 2.01,
+                "aws": 8.73,
+                "awa": 36.4,
+                "heel": 5.5,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 70.0,
+                "bsp": 4.92,
+                "vmg": 1.68,
+                "aws": 8.93,
+                "awa": 38.7,
+                "heel": 8.3,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 75.0,
+                "bsp": 5.27,
+                "vmg": 1.36,
+                "aws": 8.9,
+                "awa": 40.0,
+                "heel": 9.4,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 80.0,
+                "bsp": 5.54,
+                "vmg": 0.96,
+                "aws": 8.78,
+                "awa": 41.5,
+                "heel": 10.2,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 90.0,
+                "bsp": 5.89,
+                "vmg": 0.0,
+                "aws": 8.34,
+                "awa": 45.0,
+                "heel": 10.3,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 110.0,
+                "bsp": 6.02,
+                "vmg": 2.06,
+                "aws": 6.87,
+                "awa": 54.7,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 5.89,
+                "vmg": 2.94,
+                "aws": 5.94,
+                "awa": 60.9,
+                "heel": 3.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 5.32,
+                "vmg": 3.76,
+                "aws": 4.37,
+                "awa": 75.8,
+                "heel": 2.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 142.2,
+                "bsp": 4.94,
+                "vmg": 3.9,
+                "aws": 3.68,
+                "awa": 87.0,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 4.43,
+                "vmg": 3.83,
+                "aws": 3.09,
+                "awa": 104.4,
+                "heel": 2.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 3.61,
+                "vmg": 3.49,
+                "aws": 2.68,
+                "awa": 144.7,
+                "heel": 4.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 3.33,
+                "vmg": 3.33,
+                "aws": 2.67,
+                "awa": 180.0,
+                "heel": 5.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 8,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.05,
+                "vmg": 2.52,
+                "aws": 11.27,
+                "awa": 36.6,
+                "heel": 13.9,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 70.0,
+                "bsp": 5.97,
+                "vmg": 2.04,
+                "aws": 11.25,
+                "awa": 39.3,
+                "heel": 18.6,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.29,
+                "vmg": 1.63,
+                "aws": 11.07,
+                "awa": 41.0,
+                "heel": 20.2,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.54,
+                "vmg": 1.14,
+                "aws": 10.81,
+                "awa": 42.9,
+                "heel": 21.0,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 6.89,
+                "vmg": 0.0,
+                "aws": 10.19,
+                "awa": 47.5,
+                "heel": 20.0,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.12,
+                "vmg": 2.44,
+                "aws": 8.51,
+                "awa": 59.0,
+                "heel": 14.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.03,
+                "vmg": 3.51,
+                "aws": 7.48,
+                "awa": 66.1,
+                "heel": 8.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 6.55,
+                "vmg": 4.63,
+                "aws": 5.71,
+                "awa": 81.0,
+                "heel": 4.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 146.7,
+                "bsp": 5.85,
+                "vmg": 4.89,
+                "aws": 4.46,
+                "awa": 100.8,
+                "heel": 5.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 5.63,
+                "vmg": 4.87,
+                "aws": 4.19,
+                "awa": 108.1,
+                "heel": 4.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.73,
+                "vmg": 4.57,
+                "aws": 3.64,
+                "awa": 145.5,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 4.4,
+                "vmg": 4.4,
+                "aws": 3.6,
+                "awa": 180.0,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 10,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.59,
+                "vmg": 2.79,
+                "aws": 13.34,
+                "awa": 37.5,
+                "heel": 20.4,
+                "reef": 0.95,
+                "flat": 0.94
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.41,
+                "vmg": 2.19,
+                "aws": 13.15,
+                "awa": 41.6,
+                "heel": 21.7,
+                "reef": 0.9,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.69,
+                "vmg": 1.73,
+                "aws": 12.91,
+                "awa": 44.0,
+                "heel": 21.8,
+                "reef": 0.89,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.92,
+                "vmg": 1.2,
+                "aws": 12.59,
+                "awa": 46.5,
+                "heel": 21.9,
+                "reef": 0.89,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.27,
+                "vmg": 0.0,
+                "aws": 11.78,
+                "awa": 51.9,
+                "heel": 21.9,
+                "reef": 0.92,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.68,
+                "vmg": 2.63,
+                "aws": 9.76,
+                "awa": 64.1,
+                "heel": 20.8,
+                "reef": 1.0,
+                "flat": 0.98
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.67,
+                "vmg": 3.83,
+                "aws": 8.81,
+                "awa": 72.4,
+                "heel": 14.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.36,
+                "vmg": 5.21,
+                "aws": 7.05,
+                "awa": 87.6,
+                "heel": 5.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 149.8,
+                "bsp": 6.64,
+                "vmg": 5.74,
+                "aws": 5.39,
+                "awa": 111.9,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.63,
+                "vmg": 5.74,
+                "aws": 5.37,
+                "awa": 112.2,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 5.73,
+                "vmg": 5.53,
+                "aws": 4.7,
+                "awa": 146.8,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 5.38,
+                "vmg": 5.38,
+                "aws": 4.62,
+                "awa": 180.0,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 12,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.87,
+                "vmg": 2.94,
+                "aws": 15.32,
+                "awa": 39.2,
+                "heel": 21.2,
+                "reef": 0.84,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.67,
+                "vmg": 2.28,
+                "aws": 15.02,
+                "awa": 44.2,
+                "heel": 21.8,
+                "reef": 0.8,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.94,
+                "vmg": 1.8,
+                "aws": 14.72,
+                "awa": 47.0,
+                "heel": 21.9,
+                "reef": 0.8,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.16,
+                "vmg": 1.24,
+                "aws": 14.33,
+                "awa": 49.9,
+                "heel": 22.0,
+                "reef": 0.81,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.5,
+                "vmg": 0.0,
+                "aws": 13.42,
+                "awa": 56.0,
+                "heel": 22.0,
+                "reef": 0.83,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.98,
+                "vmg": 2.73,
+                "aws": 11.15,
+                "awa": 69.7,
+                "heel": 22.0,
+                "reef": 0.95,
+                "flat": 0.94
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.14,
+                "vmg": 4.07,
+                "aws": 10.02,
+                "awa": 77.6,
+                "heel": 19.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.91,
+                "vmg": 5.59,
+                "aws": 8.45,
+                "awa": 93.9,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.35,
+                "vmg": 6.36,
+                "aws": 6.68,
+                "awa": 117.1,
+                "heel": 7.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 156.7,
+                "bsp": 7.03,
+                "vmg": 6.45,
+                "aws": 6.17,
+                "awa": 130.3,
+                "heel": 7.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.61,
+                "vmg": 6.39,
+                "aws": 5.86,
+                "awa": 148.2,
+                "heel": 6.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.26,
+                "vmg": 6.26,
+                "aws": 5.74,
+                "awa": 180.0,
+                "heel": 5.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 14,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 6.04,
+                "vmg": 3.02,
+                "aws": 17.24,
+                "awa": 40.9,
+                "heel": 21.6,
+                "reef": 0.75,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.83,
+                "vmg": 2.34,
+                "aws": 16.86,
+                "awa": 46.4,
+                "heel": 21.9,
+                "reef": 0.73,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.1,
+                "vmg": 1.84,
+                "aws": 16.51,
+                "awa": 49.5,
+                "heel": 21.9,
+                "reef": 0.73,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.32,
+                "vmg": 1.27,
+                "aws": 16.08,
+                "awa": 52.7,
+                "heel": 21.9,
+                "reef": 0.74,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.67,
+                "vmg": 0.0,
+                "aws": 15.08,
+                "awa": 59.4,
+                "heel": 22.0,
+                "reef": 0.76,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.22,
+                "vmg": 2.81,
+                "aws": 12.67,
+                "awa": 74.3,
+                "heel": 22.0,
+                "reef": 0.88,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.52,
+                "vmg": 4.26,
+                "aws": 11.34,
+                "awa": 82.3,
+                "heel": 22.0,
+                "reef": 0.99,
+                "flat": 0.94
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.42,
+                "vmg": 5.96,
+                "aws": 9.87,
+                "awa": 98.6,
+                "heel": 9.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.85,
+                "vmg": 6.8,
+                "aws": 8.17,
+                "awa": 121.6,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.28,
+                "vmg": 7.03,
+                "aws": 7.2,
+                "awa": 150.1,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 166.0,
+                "bsp": 7.25,
+                "vmg": 7.03,
+                "aws": 7.17,
+                "awa": 151.9,
+                "heel": 7.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.0,
+                "vmg": 7.0,
+                "aws": 7.0,
+                "awa": 180.0,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 16,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 6.07,
+                "vmg": 3.03,
+                "aws": 19.02,
+                "awa": 42.3,
+                "heel": 22.5,
+                "reef": 0.73,
+                "flat": 0.82
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.86,
+                "vmg": 2.35,
+                "aws": 18.56,
+                "awa": 48.4,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.77
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.15,
+                "vmg": 1.85,
+                "aws": 18.19,
+                "awa": 51.6,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.78
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.39,
+                "vmg": 1.28,
+                "aws": 17.75,
+                "awa": 55.1,
+                "heel": 22.6,
+                "reef": 0.73,
+                "flat": 0.8
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.79,
+                "vmg": 0.0,
+                "aws": 16.73,
+                "awa": 62.3,
+                "heel": 22.3,
+                "reef": 0.73,
+                "flat": 0.87
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.44,
+                "vmg": 2.89,
+                "aws": 14.25,
+                "awa": 78.0,
+                "heel": 22.0,
+                "reef": 0.82,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.8,
+                "vmg": 4.4,
+                "aws": 12.87,
+                "awa": 86.4,
+                "heel": 22.0,
+                "reef": 0.93,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.96,
+                "vmg": 6.33,
+                "aws": 11.27,
+                "awa": 102.1,
+                "heel": 13.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.33,
+                "vmg": 7.21,
+                "aws": 9.71,
+                "awa": 124.7,
+                "heel": 3.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.76,
+                "vmg": 7.5,
+                "aws": 8.72,
+                "awa": 151.9,
+                "heel": 7.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 175.0,
+                "bsp": 7.57,
+                "vmg": 7.54,
+                "aws": 8.48,
+                "awa": 170.5,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.54,
+                "vmg": 7.54,
+                "aws": 8.46,
+                "awa": 180.0,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 20,
+            "curve": [
+              {
+                "twa": 90.0,
+                "bsp": 7.78,
+                "vmg": 0.0,
+                "aws": 20.0,
+                "awa": 67.1,
+                "heel": 22.9,
+                "reef": 0.73,
+                "flat": 0.59
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.83,
+                "vmg": 3.02,
+                "aws": 17.54,
+                "awa": 83.5,
+                "heel": 22.0,
+                "reef": 0.73,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.34,
+                "vmg": 4.67,
+                "aws": 16.07,
+                "awa": 92.4,
+                "heel": 22.1,
+                "reef": 0.82,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 10.29,
+                "vmg": 7.27,
+                "aws": 13.74,
+                "awa": 106.3,
+                "heel": 21.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 9.41,
+                "vmg": 8.15,
+                "aws": 12.73,
+                "awa": 128.4,
+                "heel": 4.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 8.68,
+                "vmg": 8.38,
+                "aws": 11.81,
+                "awa": 154.3,
+                "heel": 7.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 175.9,
+                "bsp": 8.46,
+                "vmg": 8.43,
+                "aws": 11.58,
+                "awa": 172.9,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 8.43,
+                "vmg": 8.43,
+                "aws": 11.57,
+                "awa": 180.0,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 24,
+            "curve": [
+              {
+                "twa": 110.0,
+                "bsp": 8.93,
+                "vmg": 3.06,
+                "aws": 20.77,
+                "awa": 88.0,
+                "heel": 23.0,
+                "reef": 0.73,
+                "flat": 0.7
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.86,
+                "vmg": 4.93,
+                "aws": 19.38,
+                "awa": 96.3,
+                "heel": 22.1,
+                "reef": 0.74,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 11.62,
+                "vmg": 8.22,
+                "aws": 16.6,
+                "awa": 108.8,
+                "heel": 22.2,
+                "reef": 0.93,
+                "flat": 0.95
+              },
+              {
+                "twa": 143.8,
+                "bsp": 12.35,
+                "vmg": 9.96,
+                "aws": 15.25,
+                "awa": 117.4,
+                "heel": 17.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 11.15,
+                "vmg": 9.66,
+                "aws": 15.27,
+                "awa": 129.1,
+                "heel": 9.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 9.79,
+                "vmg": 9.46,
+                "aws": 14.71,
+                "awa": 155.5,
+                "heel": 11.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 9.42,
+                "vmg": 9.42,
+                "aws": 14.58,
+                "awa": 180.0,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          }
+        ]
+      },
+      "symmetric": {
+        "description": "TRUE GRIT GER 7447 JPK 10.80 SL 15.65 SHW 8.96\n \nArea 115.00 SFL 8.25 Symmetric, 115.00 m\u00b2\n\t\t\t\t\t\t\t\t\t\t(id=#62068)",
+        "is_composite": false,
+        "linked_sail_internal_id": "SYM_9",
+        "data": [
+          {
+            "tws": 6,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 3.81,
+                "vmg": 1.9,
+                "aws": 8.55,
+                "awa": 37.2,
+                "heel": 5.5,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 70.0,
+                "bsp": 4.74,
+                "vmg": 1.62,
+                "aws": 8.79,
+                "awa": 39.4,
+                "heel": 8.2,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 75.0,
+                "bsp": 5.1,
+                "vmg": 1.32,
+                "aws": 8.77,
+                "awa": 40.7,
+                "heel": 9.2,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 80.0,
+                "bsp": 5.38,
+                "vmg": 0.93,
+                "aws": 8.67,
+                "awa": 42.2,
+                "heel": 9.9,
+                "reef": 1.0,
+                "flat": 0.96
+              },
+              {
+                "twa": 90.0,
+                "bsp": 5.75,
+                "vmg": 0.0,
+                "aws": 8.25,
+                "awa": 45.8,
+                "heel": 9.8,
+                "reef": 1.0,
+                "flat": 0.97
+              },
+              {
+                "twa": 110.0,
+                "bsp": 5.92,
+                "vmg": 2.02,
+                "aws": 6.81,
+                "awa": 55.4,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 5.79,
+                "vmg": 2.89,
+                "aws": 5.89,
+                "awa": 61.7,
+                "heel": 3.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 5.21,
+                "vmg": 3.68,
+                "aws": 4.35,
+                "awa": 77.2,
+                "heel": 2.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 141.4,
+                "bsp": 4.88,
+                "vmg": 3.82,
+                "aws": 3.74,
+                "awa": 87.1,
+                "heel": 2.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 4.39,
+                "vmg": 3.8,
+                "aws": 3.1,
+                "awa": 105.1,
+                "heel": 2.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 3.65,
+                "vmg": 3.53,
+                "aws": 2.64,
+                "awa": 144.1,
+                "heel": 4.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 3.33,
+                "vmg": 3.33,
+                "aws": 2.67,
+                "awa": 180.0,
+                "heel": 5.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 8,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 4.79,
+                "vmg": 2.39,
+                "aws": 11.07,
+                "awa": 37.4,
+                "heel": 13.9,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 70.0,
+                "bsp": 5.77,
+                "vmg": 1.97,
+                "aws": 11.11,
+                "awa": 40.0,
+                "heel": 18.3,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.12,
+                "vmg": 1.58,
+                "aws": 10.96,
+                "awa": 41.6,
+                "heel": 19.7,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.4,
+                "vmg": 1.11,
+                "aws": 10.73,
+                "awa": 43.5,
+                "heel": 20.4,
+                "reef": 1.0,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 6.78,
+                "vmg": 0.0,
+                "aws": 10.14,
+                "awa": 48.1,
+                "heel": 19.4,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.04,
+                "vmg": 2.41,
+                "aws": 8.49,
+                "awa": 59.5,
+                "heel": 13.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 120.0,
+                "bsp": 6.93,
+                "vmg": 3.47,
+                "aws": 7.46,
+                "awa": 66.8,
+                "heel": 8.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 6.43,
+                "vmg": 4.55,
+                "aws": 5.7,
+                "awa": 82.2,
+                "heel": 4.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 149.0,
+                "bsp": 5.66,
+                "vmg": 4.85,
+                "aws": 4.27,
+                "awa": 106.4,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 5.6,
+                "vmg": 4.85,
+                "aws": 4.2,
+                "awa": 108.4,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 4.79,
+                "vmg": 4.62,
+                "aws": 3.59,
+                "awa": 145.0,
+                "heel": 6.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 4.4,
+                "vmg": 4.4,
+                "aws": 3.6,
+                "awa": 180.0,
+                "heel": 5.6,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 10,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.31,
+                "vmg": 2.66,
+                "aws": 13.15,
+                "awa": 38.4,
+                "heel": 19.4,
+                "reef": 0.94,
+                "flat": 0.94
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.24,
+                "vmg": 2.13,
+                "aws": 13.02,
+                "awa": 42.1,
+                "heel": 21.7,
+                "reef": 0.9,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.56,
+                "vmg": 1.7,
+                "aws": 12.81,
+                "awa": 44.5,
+                "heel": 21.8,
+                "reef": 0.89,
+                "flat": 0.93
+              },
+              {
+                "twa": 80.0,
+                "bsp": 6.81,
+                "vmg": 1.18,
+                "aws": 12.51,
+                "awa": 46.9,
+                "heel": 21.8,
+                "reef": 0.9,
+                "flat": 0.93
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.19,
+                "vmg": 0.0,
+                "aws": 11.74,
+                "awa": 52.2,
+                "heel": 22.0,
+                "reef": 0.93,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.62,
+                "vmg": 2.61,
+                "aws": 9.76,
+                "awa": 64.5,
+                "heel": 20.4,
+                "reef": 1.0,
+                "flat": 0.98
+              },
+              {
+                "twa": 120.0,
+                "bsp": 7.59,
+                "vmg": 3.8,
+                "aws": 8.81,
+                "awa": 72.9,
+                "heel": 13.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.28,
+                "vmg": 5.15,
+                "aws": 7.04,
+                "awa": 88.3,
+                "heel": 5.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 6.61,
+                "vmg": 5.73,
+                "aws": 5.38,
+                "awa": 112.4,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 152.0,
+                "bsp": 6.5,
+                "vmg": 5.74,
+                "aws": 5.22,
+                "awa": 116.5,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 5.79,
+                "vmg": 5.59,
+                "aws": 4.65,
+                "awa": 146.4,
+                "heel": 6.3,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 5.37,
+                "vmg": 5.37,
+                "aws": 4.63,
+                "awa": 180.0,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 12,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.62,
+                "vmg": 2.81,
+                "aws": 15.16,
+                "awa": 40.0,
+                "heel": 20.5,
+                "reef": 0.83,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.52,
+                "vmg": 2.23,
+                "aws": 14.92,
+                "awa": 44.6,
+                "heel": 21.7,
+                "reef": 0.8,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 6.82,
+                "vmg": 1.77,
+                "aws": 14.64,
+                "awa": 47.3,
+                "heel": 21.9,
+                "reef": 0.8,
+                "flat": 0.94
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.06,
+                "vmg": 1.23,
+                "aws": 14.28,
+                "awa": 50.2,
+                "heel": 21.9,
+                "reef": 0.81,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.44,
+                "vmg": 0.0,
+                "aws": 13.39,
+                "awa": 56.2,
+                "heel": 22.0,
+                "reef": 0.84,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 7.92,
+                "vmg": 2.71,
+                "aws": 11.13,
+                "awa": 69.9,
+                "heel": 22.0,
+                "reef": 0.96,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.06,
+                "vmg": 4.03,
+                "aws": 10.05,
+                "awa": 78.1,
+                "heel": 18.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 135.0,
+                "bsp": 7.84,
+                "vmg": 5.54,
+                "aws": 8.45,
+                "awa": 94.4,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.35,
+                "vmg": 6.37,
+                "aws": 6.68,
+                "awa": 117.1,
+                "heel": 7.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 157.9,
+                "bsp": 7.01,
+                "vmg": 6.49,
+                "aws": 6.08,
+                "awa": 132.5,
+                "heel": 7.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 6.67,
+                "vmg": 6.44,
+                "aws": 5.81,
+                "awa": 147.9,
+                "heel": 6.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.25,
+                "vmg": 6.25,
+                "aws": 5.75,
+                "awa": 180.0,
+                "heel": 5.8,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 14,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.79,
+                "vmg": 2.9,
+                "aws": 17.08,
+                "awa": 41.5,
+                "heel": 21.0,
+                "reef": 0.75,
+                "flat": 0.93
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.69,
+                "vmg": 2.29,
+                "aws": 16.76,
+                "awa": 46.8,
+                "heel": 21.8,
+                "reef": 0.73,
+                "flat": 0.93
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.0,
+                "vmg": 1.81,
+                "aws": 16.44,
+                "awa": 49.8,
+                "heel": 21.9,
+                "reef": 0.74,
+                "flat": 0.94
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.24,
+                "vmg": 1.26,
+                "aws": 16.03,
+                "awa": 52.9,
+                "heel": 21.9,
+                "reef": 0.74,
+                "flat": 0.94
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.61,
+                "vmg": 0.0,
+                "aws": 15.05,
+                "awa": 59.6,
+                "heel": 22.0,
+                "reef": 0.77,
+                "flat": 0.94
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.16,
+                "vmg": 2.79,
+                "aws": 12.65,
+                "awa": 74.6,
+                "heel": 22.0,
+                "reef": 0.89,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.44,
+                "vmg": 4.22,
+                "aws": 11.33,
+                "awa": 82.7,
+                "heel": 22.0,
+                "reef": 1.0,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.35,
+                "vmg": 5.9,
+                "aws": 9.88,
+                "awa": 99.0,
+                "heel": 9.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 7.86,
+                "vmg": 6.81,
+                "aws": 8.17,
+                "awa": 121.5,
+                "heel": 5.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 164.8,
+                "bsp": 7.34,
+                "vmg": 7.08,
+                "aws": 7.17,
+                "awa": 149.5,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.33,
+                "vmg": 7.08,
+                "aws": 7.16,
+                "awa": 149.9,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 6.99,
+                "vmg": 6.99,
+                "aws": 7.01,
+                "awa": 180.0,
+                "heel": 5.9,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 16,
+            "curve": [
+              {
+                "twa": 60.0,
+                "bsp": 5.8,
+                "vmg": 2.9,
+                "aws": 18.81,
+                "awa": 42.8,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.82
+              },
+              {
+                "twa": 70.0,
+                "bsp": 6.69,
+                "vmg": 2.29,
+                "aws": 18.43,
+                "awa": 48.7,
+                "heel": 22.9,
+                "reef": 0.73,
+                "flat": 0.77
+              },
+              {
+                "twa": 75.0,
+                "bsp": 7.03,
+                "vmg": 1.82,
+                "aws": 18.1,
+                "awa": 51.9,
+                "heel": 22.8,
+                "reef": 0.73,
+                "flat": 0.78
+              },
+              {
+                "twa": 80.0,
+                "bsp": 7.3,
+                "vmg": 1.27,
+                "aws": 17.69,
+                "awa": 55.3,
+                "heel": 22.7,
+                "reef": 0.73,
+                "flat": 0.79
+              },
+              {
+                "twa": 90.0,
+                "bsp": 7.72,
+                "vmg": 0.0,
+                "aws": 16.69,
+                "awa": 62.4,
+                "heel": 22.4,
+                "reef": 0.73,
+                "flat": 0.86
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.37,
+                "vmg": 2.86,
+                "aws": 14.24,
+                "awa": 78.3,
+                "heel": 22.0,
+                "reef": 0.83,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 8.71,
+                "vmg": 4.35,
+                "aws": 12.86,
+                "awa": 86.8,
+                "heel": 22.1,
+                "reef": 0.93,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 8.88,
+                "vmg": 6.28,
+                "aws": 11.27,
+                "awa": 102.5,
+                "heel": 13.5,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 8.35,
+                "vmg": 7.23,
+                "aws": 9.7,
+                "awa": 124.6,
+                "heel": 3.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 7.81,
+                "vmg": 7.55,
+                "aws": 8.68,
+                "awa": 151.8,
+                "heel": 7.7,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 168.2,
+                "bsp": 7.72,
+                "vmg": 7.56,
+                "aws": 8.58,
+                "awa": 157.8,
+                "heel": 7.2,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 7.53,
+                "vmg": 7.53,
+                "aws": 8.47,
+                "awa": 180.0,
+                "heel": 6.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 20,
+            "curve": [
+              {
+                "twa": 90.0,
+                "bsp": 7.67,
+                "vmg": 0.0,
+                "aws": 19.93,
+                "awa": 67.4,
+                "heel": 23.1,
+                "reef": 0.73,
+                "flat": 0.58
+              },
+              {
+                "twa": 110.0,
+                "bsp": 8.74,
+                "vmg": 2.99,
+                "aws": 17.52,
+                "awa": 83.8,
+                "heel": 22.0,
+                "reef": 0.73,
+                "flat": 0.95
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.21,
+                "vmg": 4.6,
+                "aws": 16.07,
+                "awa": 92.8,
+                "heel": 22.0,
+                "reef": 0.82,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 10.12,
+                "vmg": 7.15,
+                "aws": 13.73,
+                "awa": 107.1,
+                "heel": 21.9,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 9.47,
+                "vmg": 8.2,
+                "aws": 12.69,
+                "awa": 128.2,
+                "heel": 4.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 8.74,
+                "vmg": 8.44,
+                "aws": 11.76,
+                "awa": 154.1,
+                "heel": 6.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 167.3,
+                "bsp": 8.66,
+                "vmg": 8.45,
+                "aws": 11.69,
+                "awa": 158.2,
+                "heel": 8.4,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 8.42,
+                "vmg": 8.42,
+                "aws": 11.58,
+                "awa": 180.0,
+                "heel": 6.5,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          },
+          {
+            "tws": 24,
+            "curve": [
+              {
+                "twa": 110.0,
+                "bsp": 8.77,
+                "vmg": 3.0,
+                "aws": 20.73,
+                "awa": 88.4,
+                "heel": 23.2,
+                "reef": 0.73,
+                "flat": 0.69
+              },
+              {
+                "twa": 120.0,
+                "bsp": 9.68,
+                "vmg": 4.84,
+                "aws": 19.4,
+                "awa": 96.9,
+                "heel": 22.1,
+                "reef": 0.74,
+                "flat": 0.95
+              },
+              {
+                "twa": 135.0,
+                "bsp": 11.21,
+                "vmg": 7.93,
+                "aws": 16.74,
+                "awa": 110.1,
+                "heel": 22.2,
+                "reef": 0.92,
+                "flat": 0.96
+              },
+              {
+                "twa": 145.7,
+                "bsp": 12.04,
+                "vmg": 9.94,
+                "aws": 15.17,
+                "awa": 120.8,
+                "heel": 15.8,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 150.0,
+                "bsp": 11.32,
+                "vmg": 9.8,
+                "aws": 15.15,
+                "awa": 128.7,
+                "heel": 9.6,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 165.0,
+                "bsp": 9.89,
+                "vmg": 9.55,
+                "aws": 14.62,
+                "awa": 155.4,
+                "heel": 11.0,
+                "reef": 1.0,
+                "flat": 1.0
+              },
+              {
+                "twa": 180.0,
+                "bsp": 9.41,
+                "vmg": 9.41,
+                "aws": 14.59,
+                "awa": 180.0,
+                "heel": 7.1,
+                "reef": 1.0,
+                "flat": 1.0
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
