@@ -312,11 +312,10 @@ class PolarData:
             complex_pts = []
             for p in raw_pts:
                 r = (p["bsp"] / tws) * scale_factor
-                # Nautical coordinate: 0° is North (top, +Y), 90° is East (right, +X)
-                complex_pts.append(cmath.rect(r, math.radians(90.0 - p["twa"])))
+                complex_pts.append(cmath.rect(r, math.radians(p["twa"])))
 
             smooth = catmull_rom_spline(complex_pts, num_points=12)
-            port_side = [complex(-pt.real, pt.imag) for pt in smooth]
+            port_side = [complex(pt.real, -pt.imag) for pt in smooth]
 
             results.append({
                 "tws": tws,
@@ -341,10 +340,10 @@ class PolarData:
             complex_pts = []
             for p in raw_pts:
                 r = (p["bsp"] / tws) * scale_factor
-                complex_pts.append(cmath.rect(r, math.radians(90.0 - p["twa"])))
+                complex_pts.append(cmath.rect(r, math.radians(p["twa"])))
 
             smooth = catmull_rom_spline(complex_pts, num_points=10)
-            port_side = [complex(-pt.real, pt.imag) for pt in smooth]
+            port_side = [complex(pt.real, -pt.imag) for pt in smooth]
             results.append({
                 "tws": tws,
                 "starboard": smooth,

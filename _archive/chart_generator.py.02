@@ -1,25 +1,14 @@
 """
 chart_generator.py - CAD/CAM Vector Rendering (ezdxf) for Dual-Sided Rechenscheibe
-JPK 1080 (GER 7447 - TRUE GRIT)
-
-Orientation:
-- Nautical Coordinates: 0° is North (12 o'clock, +Y), 90° East (3 o'clock, +X),
-  180° South (6 o'clock, -Y), 270° West (9 o'clock, -X). Clockwise rotation.
-- Transformation: math_angle = 90° - nautical_angle.
-
-Features:
+Generates:
 1. Front Side (Taktik & Polaren):
-   - Rotor: 8 ORC Polar curves upright (upwind at top, downwind at bottom),
-     AWA radial rays & AWS speed arcs from lower pole (0, -Y_AWA), VMG diamonds.
-   - Stator: 360° Compass Rose (outer scale, 0° at top) +
-     Complete, fully-labeled AWA angle scale from lower pole (inner scale).
+   - Rotor: 8 ORC Polar curves, AWA grid, AWS speed arcs, VMG diamonds
+   - Stator: 360° Compass rose (outer scale) + AWA angle scale from lower pole (inner scale)
 2. Back Side (Logarithmischer Rechenschieber):
-   - Dense, high-precision slide rule scale (1.0 to 10.0).
-   - Tenths fully labeled from 1.0 to 2.0 (1.0, 1.1, ..., 2.0).
-   - Step 0.2/0.5 from 2.0 to 5.0, full units from 5.0 to 10.0.
-   - Large, clear typography (3.4 mm) on both Stator and Rotor.
-3. Central Ratio Pointer (Zeiger am Pol 0,0):
-   - Ratio scale V_BS / TWS (0.0 to 1.20) along the reading edge.
+   - Rotor: Inner logarithmic scale (1 to 10/100, ticks outward to R_split)
+   - Stator: Outer logarithmic scale (1 to 10/100, ticks inward to R_split)
+3. Central Ratio Pointer:
+   - Pivoting at (0,0) with engraved Ratio scale V_BS / TWS (0.0 to 1.20)
 """
 
 import math
@@ -35,12 +24,6 @@ import matplotlib.pyplot as plt
 
 def z_to_coords(z: complex) -> Tuple[float, float]:
     return (z.real, z.imag)
-
-
-def nautical_to_complex(radius: float, deg_nautical: float) -> complex:
-    """Converts nautical degree (0° = North, 90° = East, clockwise) to complex coordinate."""
-    math_rad = math.radians(90.0 - deg_nautical)
-    return cmath.rect(radius, math_rad)
 
 
 def clip_segment(p1: complex, p2: complex, r_max: float) -> Optional[Tuple[complex, complex]]:
@@ -90,7 +73,7 @@ class NauticalChart:
         self._setup_layers()
 
         # Matplotlib visualization
-        self.fig, self.ax = plt.subplots(figsize=(11, 11), dpi=300)
+        self.fig, self.ax = plt.subplots(figsize=(10, 10), dpi=300)
         self.ax.set_aspect("equal")
         self.ax.axis("off")
         r_lim = self.cfg.get("R_MAX", 57.5) * 1.08
@@ -140,7 +123,7 @@ class NauticalChart:
         align_enum = getattr(TextEntityAlignment, align, TextEntityAlignment.MIDDLE_CENTER)
         t = self.modspc.add_text(text, dxfattribs={"layer": layer, "height": height, "rotation": angle_deg})
         t.set_placement(pos, align=align_enum)
-        self.ax.text(pos[0], pos[1], text, fontsize=height * 1.8, rotation=angle_deg, ha='center', va='center', color=color)
+        self.ax.text(pos[0], pos[1], text, fontsize=height * 1.5, rotation=angle_deg, ha='center', va='center', color=color)
 
     def draw_point_marker(self, pos_z: complex, radius: float = 0.6, layer: str = "ENGRAVE_VMG", color: str = "#d62728"):
         self.draw_circle(radius, pos_z, layer=layer, color=color, linewidth=1.0)
@@ -149,9 +132,8 @@ class NauticalChart:
 def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
     """
     Builds the Front Side (Taktik & Polaren):
-    - Rotor: Upright ORC polars (head to wind at 12 o'clock, beam reach at 3 & 9 o'clock),
-      AWA radial rays & AWS speed arcs from lower pole (0, -Y_AWA), VMG diamonds.
-    - Stator: Outer 360° Compass Rose (0° at 12 o'clock) + Inner AWA Scale from lower pole.
+    - Rotor: Polars, AWA-Grid, AWS-Arcs, VMG Targets
+    - Stator: Outer 360° Compass Rose + Inner AWA Scale from lower pole
     """
     cfg = chart.cfg
     r_max = geo["R_MAX"]
@@ -161,12 +143,12 @@ def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
     mm_100 = geo["MM_PER_100PCT"]
     max_norm = geo["MAX_NORM"]
 
-    # 1. Reference circles
+    # 1. Reference boundaries
     chart.draw_circle(r_max, layer="CUT_REFERENCE", color="#d62728", linewidth=1.2)
     chart.draw_circle(r_split, layer="CUT_REFERENCE", color="#d62728", linewidth=0.9)
     chart.draw_circle(hole_r, layer="CUT_REFERENCE", color="#d62728", linewidth=0.8)
 
-    # 2. INNER ROTOR: Concentric Ratio Rings (0.2, 0.4, 0.6, 0.8, 1.0)
+    # 2. INNER ROTOR: Concentric Ratio Rings (0.2, 0.4, 0.6, 0.8, 1.0, 1.2)
     step = 0.2 * mm_100
     i = 1
     while True:
@@ -174,37 +156,29 @@ def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
         if r >= r_split - 1.5:
             break
         chart.draw_circle(r, layer="ENGRAVE_AWA", color="#e0e0e0", linewidth=0.35)
-        # Ratio label along positive X-axis (clean and clear of vertical wind axis)
-        lbl_pos = complex(r, 0.8)
-        chart.draw_text(f"{i*0.2:.1f}", lbl_pos, 2.8, 0, layer="ENGRAVE_TEXT", align="BOTTOM_CENTER", color="#777777")
+        lbl_pos = complex(r - 0.8, 0)
+        chart.draw_text(f"{i*0.2:.1f}", lbl_pos, cfg.get("GRID_LABEL_HEIGHT", 3.8), 0, layer="ENGRAVE_TEXT", align="TOP_CENTER", color="#888888")
         i += 1
 
     # Heading arrow at top (0° True Wind reference / Boat centerline)
-    chart.draw_line(0j, complex(0, r_split - 1.5), layer="ENGRAVE_AWA", color="#666666", linewidth=0.8)
-    chart.draw_line(complex(0, r_split - 1.5), complex(-1.5, r_split - 4.5), layer="ENGRAVE_AWA", color="#666666", linewidth=0.8)
-    chart.draw_line(complex(0, r_split - 1.5), complex(1.5, r_split - 4.5), layer="ENGRAVE_AWA", color="#666666", linewidth=0.8)
+    chart.draw_line(0j, complex(0, r_split - 2.0), layer="ENGRAVE_AWA", color="#999999", linewidth=0.6)
+    chart.draw_line(complex(0, r_split - 2.0), complex(-1.2, r_split - 4.5), layer="ENGRAVE_AWA", color="#999999", linewidth=0.6)
+    chart.draw_line(complex(0, r_split - 2.0), complex(1.2, r_split - 4.5), layer="ENGRAVE_AWA", color="#999999", linewidth=0.6)
 
     # 3. INNER ROTOR: AWA Rays & Speed Arcs from lower pole (0, -Y_AWA)
-    # Rays fan out upwards from (0, -Y_AWA)
     for a in range(0, 360, 10):
-        rad = math.radians(a)
-        dir_vec = complex(math.sin(rad), math.cos(rad))
-        p_far = awa_o + dir_vec * (r_split * 3)
+        p_far = awa_o + cmath.rect(r_split * 3, math.radians(a))
         seg = clip_segment(awa_o, p_far, r_split - 0.5)
         if seg:
             chart.draw_line(awa_o, seg[1], layer="ENGRAVE_AWA", color="#00bcd4", linewidth=0.35)
 
-        # Label inside rotor along the ray
         ang_norm = a if a <= 180 else a - 360
-        if 10 <= abs(ang_norm) <= 80:
-            r_lbl = 0.38 * mm_100
-            pos_lbl = awa_o + dir_vec * r_lbl
-            lbl_rot = -a
-            if 90 < (a % 360) < 270:
-                lbl_rot += 180
-            chart.draw_text(f"{abs(ang_norm)}°", pos_lbl, 2.6, lbl_rot, layer="ENGRAVE_TEXT", color="#00838f")
+        if -80 <= ang_norm <= 80 and abs(ang_norm) > 0:
+            r_lbl = 0.35 * mm_100
+            pos_lbl = awa_o + cmath.rect(r_lbl, math.radians(a))
+            chart.draw_text(str(abs(ang_norm)), pos_lbl, 2.8, -a, layer="ENGRAVE_TEXT", color="#00838f")
 
-    # AWA Speed arcs centered at awa_o
+    # AWA Speed arcs
     step_awa = 0.2 * mm_100
     i = 1
     while True:
@@ -217,11 +191,11 @@ def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
             s, e = angles
             chart.draw_arc(awa_o, r, s, e, layer="ENGRAVE_AWA", color="#80deea", linewidth=0.4)
             if r > 4.0:
-                pos = awa_o + complex(0.8, r)
-                chart.draw_text(f"{i*0.2:.1f}", pos, 2.6, 0, layer="ENGRAVE_TEXT", align="BOTTOM_LEFT", color="#00838f")
+                pos = awa_o + complex(r + 0.8, 0)
+                chart.draw_text(f"{i*0.2:.1f}", pos, 2.6, 0, layer="ENGRAVE_TEXT", align="BOTTOM_CENTER", color="#00838f")
         i += 1
 
-    # 4. INNER ROTOR: 8 ORC Polar Speed Curves of JPK 1080 (Upright Nautical Orientation)
+    # 4. INNER ROTOR: 8 ORC Polar Speed Curves of JPK 1080
     dyn_scale = (1.00 * (r_split - 0.5)) / max_norm
     curves = polar_data.get_spline_curves(dyn_scale)
     color_palette = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#17becf']
@@ -233,36 +207,38 @@ def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
 
         # Draw Starboard and Port curve segments
         for side in [c_info["starboard"], c_info["port"]]:
-            if len(side) > 1:
-                for k in range(len(side) - 1):
-                    seg = clip_segment(side[k], side[k+1], r_split - 0.5)
+            filtered_pts = [p for p in side if 18 <= (math.degrees(cmath.phase(p)) % 360) <= 342]
+            if len(filtered_pts) > 1:
+                for k in range(len(filtered_pts) - 1):
+                    seg = clip_segment(filtered_pts[k], filtered_pts[k+1], r_split - 0.5)
                     if seg:
-                        chart.draw_line(seg[0], seg[1], layer="ENGRAVE_POLARS", color=color, linewidth=0.95)
+                        chart.draw_line(seg[0], seg[1], layer="ENGRAVE_POLARS", color=color, linewidth=0.9)
 
-        # Labels (TWS) near entry (at Beat angle)
+        # Labels (TWS) at entry
         if c_info["starboard"]:
             first_pt = c_info["starboard"][0]
-            pos_r = first_pt + complex(1.2, 0.4)
-            pos_l = complex(-pos_r.real, pos_r.imag)
+            ang = cmath.phase(first_pt)
+            pos_r = cmath.rect(abs(first_pt), ang - math.radians(4))
+            pos_l = complex(pos_r.real, -pos_r.imag)
             lbl = f"{int(tws)}" if tws.is_integer() else f"{tws}"
-            chart.draw_text(lbl, pos_r, 3.6, 0, layer="ENGRAVE_TEXT", color=color)
-            chart.draw_text(lbl, pos_l, 3.6, 0, layer="ENGRAVE_TEXT", color=color)
+            chart.draw_text(lbl, pos_r, cfg.get("POLAR_LABEL_HEIGHT", 4.5), 0, layer="ENGRAVE_TEXT", color=color)
+            chart.draw_text(lbl, pos_l, cfg.get("POLAR_LABEL_HEIGHT", 4.5), 0, layer="ENGRAVE_TEXT", color=color)
 
         # Beat VMG Target (Red diamond)
         beat_r = (targets["beat_sog"] / tws) * dyn_scale
-        beat_pt_stbd = nautical_to_complex(beat_r, targets["beat_angle"])
-        beat_pt_port = complex(-beat_pt_stbd.real, beat_pt_stbd.imag)
-        chart.draw_point_marker(beat_pt_stbd, radius=0.65, layer="ENGRAVE_VMG", color="#d62728")
-        chart.draw_point_marker(beat_pt_port, radius=0.65, layer="ENGRAVE_VMG", color="#d62728")
+        beat_pt_stbd = cmath.rect(beat_r, math.radians(targets["beat_angle"]))
+        beat_pt_port = complex(beat_pt_stbd.real, -beat_pt_stbd.imag)
+        chart.draw_point_marker(beat_pt_stbd, radius=0.6, layer="ENGRAVE_VMG", color="#d62728")
+        chart.draw_point_marker(beat_pt_port, radius=0.6, layer="ENGRAVE_VMG", color="#d62728")
 
         # Run VMG Target (Green diamond)
         run_r = (targets["run_sog"] / tws) * dyn_scale
-        run_pt_stbd = nautical_to_complex(run_r, targets["gybe_angle"])
-        run_pt_port = complex(-run_pt_stbd.real, run_pt_stbd.imag)
-        chart.draw_point_marker(run_pt_stbd, radius=0.65, layer="ENGRAVE_VMG", color="#2ca02c")
-        chart.draw_point_marker(run_pt_port, radius=0.65, layer="ENGRAVE_VMG", color="#2ca02c")
+        run_pt_stbd = cmath.rect(run_r, math.radians(targets["gybe_angle"]))
+        run_pt_port = complex(run_pt_stbd.real, -run_pt_stbd.imag)
+        chart.draw_point_marker(run_pt_stbd, radius=0.6, layer="ENGRAVE_VMG", color="#2ca02c")
+        chart.draw_point_marker(run_pt_port, radius=0.6, layer="ENGRAVE_VMG", color="#2ca02c")
 
-    # Optional dedicated sail curves
+    # Optional: Dedicated sail curves
     if geo.get("RENDER_SAIL_LAYERS", False) and hasattr(polar_data, "get_sail_spline_curves"):
         sail_specs = [
             ("Jib", "ENGRAVE_POLAR_JIB", "#78909c"),
@@ -273,95 +249,65 @@ def build_front_side(chart: NauticalChart, geo: Dict[str, Any], polar_data):
             s_curves = polar_data.get_sail_spline_curves(s_name, dyn_scale)
             for c_info in s_curves:
                 for side in [c_info["starboard"], c_info["port"]]:
-                    if len(side) > 1:
-                        for k in range(len(side) - 1):
-                            seg = clip_segment(side[k], side[k+1], r_split - 0.5)
+                    filtered_pts = [p for p in side if 18 <= (math.degrees(cmath.phase(p)) % 360) <= 342]
+                    if len(filtered_pts) > 1:
+                        for k in range(len(filtered_pts) - 1):
+                            seg = clip_segment(filtered_pts[k], filtered_pts[k+1], r_split - 0.5)
                             if seg:
                                 chart.draw_line(seg[0], seg[1], layer=s_layer, color=s_color, linewidth=0.5)
 
     # 5. OUTER STATOR RIM: Dual Scales
-    # 5A. 360° Compass Rose (0° at 12 o'clock / North, clockwise)
+    # 5A. 360° Compass Rose (Outermost Scale)
     r_comp = r_max - 0.3
-    t_maj = 1.8
-    t_min = 1.0
-    txt_h_comp = 3.4
-    chart.draw_circle(r_comp, layer="ENGRAVE_COMPASS", color="#000000", linewidth=0.6)
+    t_maj = cfg.get("COMPASS_TICK_MAJ", 1.6)
+    t_min = cfg.get("COMPASS_TICK_MIN", 0.9)
+    txt_h = cfg.get("COMPASS_TEXT_H", 3.2)
+    chart.draw_circle(r_comp, layer="ENGRAVE_COMPASS", color="#000000", linewidth=0.5)
 
     for deg in range(0, 360, 2):
         is_major = (deg % 10 == 0)
         is_labeled = (deg % 30 == 0)
         length = t_maj if is_major else t_min
-        p_out = nautical_to_complex(r_comp, deg)
-        p_in = nautical_to_complex(r_comp - length, deg)
-        chart.draw_line(p_out, p_in, layer="ENGRAVE_COMPASS", color="#000000", linewidth=0.65 if is_major else 0.35)
+        p_out = cmath.rect(r_comp, math.radians(deg))
+        p_in = cmath.rect(r_comp - length, math.radians(deg))
+        chart.draw_line(p_out, p_in, layer="ENGRAVE_COMPASS", color="#000000", linewidth=0.6 if is_major else 0.3)
 
         if is_labeled:
-            p_txt = nautical_to_complex(r_comp - t_maj - txt_h_comp * 0.5 - 0.4, deg)
+            p_txt = cmath.rect(r_comp - t_maj - txt_h * 0.5 - 0.3, math.radians(deg))
             lbl = f"{deg}°" if deg > 0 else "0°/360°"
-            # Tangential text orientation, upright
-            lbl_rot = -deg
-            if 90 < (deg % 360) < 270:
-                lbl_rot += 180
-            chart.draw_text(lbl, p_txt, txt_h_comp, lbl_rot, layer="ENGRAVE_TEXT", color="#000000")
+            chart.draw_text(lbl, p_txt, txt_h, -deg + 90, layer="ENGRAVE_TEXT", color="#000000")
 
-    # 5B. AWA Angle Scale from lower pole (Complete, labeled on Stb & Port)
-    r_awa_scale = r_split + 0.9
-    chart.draw_circle(r_awa_scale, layer="ENGRAVE_AWA", color="#00838f", linewidth=0.55)
-    awa_t_maj = 1.8
-    awa_t_min = 1.0
-    awa_txt_h = 3.2
+    # 5B. AWA Angle Scale from lower pole (Inner Scale on Stator)
+    r_awa_scale = r_split + 0.8
+    chart.draw_circle(r_awa_scale, layer="ENGRAVE_AWA", color="#00838f", linewidth=0.5)
+    awa_t_maj = cfg.get("AWA_TICK_MAJ", 1.4)
+    awa_t_min = cfg.get("AWA_TICK_MIN", 0.7)
+    awa_txt_h = cfg.get("AWA_TEXT_H", 2.8)
 
-    y0 = abs(awa_o.imag) # distance of lower pole from center
-    # For every angle beta from 0° (straight up) to 180° (straight down)
-    for beta_deg in range(0, 181, 2):
+    y0 = abs(awa_o.imag)
+    for beta_deg in range(10, 181, 2):
         beta = math.radians(beta_deg)
         sin_b = math.sin(beta)
         cos_b = math.cos(beta)
-
         det = r_awa_scale**2 - (y0 * sin_b)**2
         if det < 0:
             continue
         t_dist = y0 * cos_b + math.sqrt(det)
-
-        # Starboard & Port points
-        pt_stbd = complex(t_dist * sin_b, -y0 + t_dist * cos_b)
+        pt_stbd = awa_o + complex(t_dist * sin_b, t_dist * cos_b)
         pt_port = complex(-pt_stbd.real, pt_stbd.imag)
 
         is_major = (beta_deg % 10 == 0)
-        is_labeled = (beta_deg % 20 == 0 or beta_deg in [0, 180])
+        is_labeled = (beta_deg % 20 == 0 or beta_deg == 180)
         l_tick = awa_t_maj if is_major else awa_t_min
 
-        # Direction from lower pole
-        dir_stbd = complex(sin_b, cos_b)
-        dir_port = complex(-sin_b, cos_b)
+        for pt in [pt_stbd, pt_port]:
+            phi = cmath.phase(pt - awa_o)
+            p_out = pt + cmath.rect(l_tick, phi)
+            chart.draw_line(pt, p_out, layer="ENGRAVE_AWA", color="#00838f", linewidth=0.5 if is_major else 0.3)
 
-        # Starboard tick
-        p_out_stbd = pt_stbd + dir_stbd * l_tick
-        chart.draw_line(pt_stbd, p_out_stbd, layer="ENGRAVE_AWA", color="#00838f", linewidth=0.6 if is_major else 0.35)
-
-        # Port tick (only if beta_deg > 0 to avoid duplicate at 0° and 180°)
-        if beta_deg > 0 and beta_deg < 180:
-            p_out_port = pt_port + dir_port * l_tick
-            chart.draw_line(pt_port, p_out_port, layer="ENGRAVE_AWA", color="#00838f", linewidth=0.6 if is_major else 0.35)
-
-        # Labels
-        if is_labeled:
-            lbl_str = f"{beta_deg}°"
-
-            # Label on Starboard
-            p_lbl_stbd = pt_stbd + dir_stbd * (l_tick + awa_txt_h * 0.5 + 0.3)
-            rot_stbd = -beta_deg
-            if 90 < (beta_deg % 360) < 270:
-                rot_stbd += 180
-            chart.draw_text(lbl_str, p_lbl_stbd, awa_txt_h, rot_stbd, layer="ENGRAVE_TEXT", color="#00838f")
-
-            # Label on Port
-            if beta_deg > 0 and beta_deg < 180:
-                p_lbl_port = pt_port + dir_port * (l_tick + awa_txt_h * 0.5 + 0.3)
-                rot_port = beta_deg
-                if 90 < (beta_deg % 360) < 270:
-                    rot_port += 180
-                chart.draw_text(lbl_str, p_lbl_port, awa_txt_h, rot_port, layer="ENGRAVE_TEXT", color="#00838f")
+            if is_labeled and pt.real > 0:
+                p_text = pt + cmath.rect(l_tick + awa_txt_h * 0.5 + 0.3, phi)
+                chart.draw_text(f"{beta_deg}°", p_text, awa_txt_h, -math.degrees(phi) + 90, layer="ENGRAVE_TEXT", color="#00838f")
 
 
 def build_back_side(chart: NauticalChart, geo: Dict[str, Any]):
@@ -369,52 +315,41 @@ def build_back_side(chart: NauticalChart, geo: Dict[str, Any]):
     Builds the Back Side (Logarithmischer Rechenschieber):
     - Rotor: Inner logarithmic scale (1 to 10), ticks outward to R_split
     - Stator: Outer logarithmic scale (1 to 10), ticks inward to R_split
-    - Highly dense, professional slide rule divisions:
-      * Range 1.0 to 2.0: Ticks every 0.01, 0.05, 0.1; Tenths fully labeled (1.0, 1.1, ..., 2.0).
-      * Range 2.0 to 5.0: Ticks every 0.02, 0.1; labeled at 2.0, 2.2, 2.5, 2.8, 3.0, 3.5, 4.0, 4.5, 5.0.
-      * Range 5.0 to 10.0: Ticks every 0.05, 0.1; labeled at 5, 6, 7, 8, 9, 10.
-      * Large font size (3.5 mm).
+    Both meet precisely at R_split and slide past each other!
     """
     cfg = chart.cfg
     r_max = geo["R_MAX"]
     r_split = geo["R_SPLIT"]
     hole_r = geo["HOLE_RADIUS"]
-    txt_h = 3.5
-    dash = 0.65
+    txt_h = cfg.get("LOG_TEXT_H", 3.0)
+    dash = 0.5
 
     # Reference circles
     chart.draw_circle(r_max, layer="CUT_REFERENCE", color="#d62728", linewidth=1.2)
     chart.draw_circle(r_split, layer="CUT_REFERENCE", color="#d62728", linewidth=0.9)
     chart.draw_circle(hole_r, layer="CUT_REFERENCE", color="#d62728", linewidth=0.8)
 
-    # Values to explicitly label (clean integers and high-density subdivisions)
-    labeled_values = {
-        # Range 1 to 2 (all tenths)
-        100: "1", 110: "1.1", 120: "1.2", 130: "1.3", 140: "1.4",
-        150: "1.5", 160: "1.6", 170: "1.7", 180: "1.8", 190: "1.9",
-        # Range 2 to 5
-        200: "2", 220: "2.2", 250: "2.5", 280: "2.8", 300: "3",
-        350: "3.5", 400: "4", 450: "4.5",
-        # Range 5 to 10
-        500: "5", 600: "6", 700: "7", 800: "8", 900: "9"
-    }
+    # Classic high-precision logarithmic tick generation (matching rechenscheibe_V1.0.py)
+    circum = 2 * math.pi * r_split
+    inc_list = [1, 2, 5]
+    threshold = 0.45
+    x = 100
+    arc = 0.0
+    inc = inc_list.pop(0)
 
-    # Generate fine logarithmic ticks
-    # x goes from 100 to 1000 (representing 1.00 to 10.00)
-    for x in range(100, 1001):
-        # Determine tick increment level
-        if x < 200:
-            step_valid = (x % 1 == 0) # every 0.01
-        elif x < 500:
-            step_valid = (x % 2 == 0) # every 0.02
-        else:
-            step_valid = (x % 5 == 0) # every 0.05
-
-        if not step_valid:
-            continue
-
+    while x <= 1000:
         y = math.log10(x / 100.0)
-        angle = y * 360.0 # from 0° (top) clockwise
+        angle = y * 360.0
+        delta_arc = y * circum - arc
+        arc = y * circum
+
+        # Tick length factor
+        f = 1
+        if x % 10 == 0: f = 2
+        if x % 50 == 0: f = 3
+        if x % 100 == 0: f = 4
+
+        # Seemannisch: 0° oben (Nord), rechtsdrehend
         rot_ang = 90.0 - angle
         cs = math.cos(math.radians(rot_ang))
         sn = math.sin(math.radians(rot_ang))
@@ -422,39 +357,37 @@ def build_back_side(chart: NauticalChart, geo: Dict[str, Any]):
         # Base point on parting line
         p_base = complex(cs * r_split, sn * r_split)
 
-        # Tick length
-        if x in labeled_values or x % 100 == 0:
-            f = 4.0 # Major
-        elif x % 50 == 0 or (x < 200 and x % 10 == 0):
-            f = 2.8 # Medium
-        elif (x < 200 and x % 5 == 0) or (x < 500 and x % 10 == 0):
-            f = 1.8
-        else:
-            f = 1.0 # Minor
+        # 1. Inner Ring (on Rotor): Ticks go inwards from r_split
+        p_in = complex(cs * (r_split - f * dash * 1.2), sn * (r_split - f * dash * 1.2))
+        chart.draw_line(p_base, p_in, layer="ENGRAVE_LOG", color="#000000", linewidth=0.6 if f >= 3 else 0.35)
 
-        # 1. Inner Ring (Rotor): Ticks go inwards from r_split
-        p_in = complex(cs * (r_split - f * dash), sn * (r_split - f * dash))
-        chart.draw_line(p_base, p_in, layer="ENGRAVE_LOG", color="#000000", linewidth=0.65 if f >= 2.8 else 0.35)
+        # 2. Outer Ring (on Stator): Ticks go outwards from r_split
+        p_out = complex(cs * (r_split + f * dash * 1.2), sn * (r_split + f * dash * 1.2))
+        chart.draw_line(p_base, p_out, layer="ENGRAVE_LOG", color="#000000", linewidth=0.6 if f >= 3 else 0.35)
 
-        # 2. Outer Ring (Stator): Ticks go outwards from r_split
-        p_out = complex(cs * (r_split + f * dash), sn * (r_split + f * dash))
-        chart.draw_line(p_base, p_out, layer="ENGRAVE_LOG", color="#000000", linewidth=0.65 if f >= 2.8 else 0.35)
+        # Numbers
+        n = x / 100.0
+        if n == 10.0:
+            n = 1.0
 
-        # Labeling
-        if x in labeled_values:
-            text = labeled_values[x]
-            # Upright text rotation
-            lbl_rot = -angle
-            if 90 < (angle % 360) < 270:
-                lbl_rot += 180
+        if f == 3 and n < 6:
+            text = f"{n:.1f}"
+            p_txt_in = complex(cs * (r_split - 3.8), sn * (r_split - 3.8))
+            p_txt_out = complex(cs * (r_split + 3.8), sn * (r_split + 3.8))
+            chart.draw_text(text, p_txt_in, txt_h * 0.65, rot_ang, layer="ENGRAVE_TEXT", color="#000000")
+            chart.draw_text(text, p_txt_out, txt_h * 0.65, rot_ang, layer="ENGRAVE_TEXT", color="#000000")
 
-            # Rotor label (inside)
-            p_txt_in = complex(cs * (r_split - 4.4), sn * (r_split - 4.4))
-            chart.draw_text(text, p_txt_in, txt_h, lbl_rot, layer="ENGRAVE_TEXT", color="#000000")
+        if f == 4:
+            text = f"{int(n)}"
+            p_txt_in = complex(cs * (r_split - 4.2), sn * (r_split - 4.2))
+            p_txt_out = complex(cs * (r_split + 4.2), sn * (r_split + 4.2))
+            chart.draw_text(text, p_txt_in, txt_h, rot_ang, layer="ENGRAVE_TEXT", color="#000000")
+            chart.draw_text(text, p_txt_out, txt_h, rot_ang, layer="ENGRAVE_TEXT", color="#000000")
 
-            # Stator label (outside)
-            p_txt_out = complex(cs * (r_split + 4.4), sn * (r_split + 4.4))
-            chart.draw_text(text, p_txt_out, txt_h, lbl_rot, layer="ENGRAVE_TEXT", color="#000000")
+        if x % 100 == 0 and delta_arc < threshold and inc_list:
+            inc = inc_list.pop(0)
+
+        x += inc
 
 
 def build_pointer_dxf(filepath: Path, geo: Dict[str, Any]):
@@ -467,6 +400,7 @@ def build_pointer_dxf(filepath: Path, geo: Dict[str, Any]):
     hub_r = geo["POINTER_HUB_R"]
     hole_r = geo["HOLE_RADIUS"]
     max_norm = geo["MAX_NORM"]
+    r_split = geo["R_SPLIT"]
     mm_100 = geo["MM_PER_100PCT"]
 
     doc = ezdxf.new("R2010")
@@ -478,7 +412,7 @@ def build_pointer_dxf(filepath: Path, geo: Dict[str, Any]):
     # Center axle hole
     msp.add_circle((0, 0), hole_r, dxfattribs={"layer": "CUT_OUTLINE"})
 
-    # Pointer outline along +Y axis (Nautical North)
+    # Pointer outline along +Y axis
     tip_len = 3.5
     tab_len = 3.0
     y_end_body = length - tip_len - tab_len
@@ -489,13 +423,16 @@ def build_pointer_dxf(filepath: Path, geo: Dict[str, Any]):
         (width, y_end_body),
         (width + 2.0, y_end_body + tab_len / 2.0),
         (width, y_end_body + tab_len),
-        (0.0, length),                              # Sharp index tip at x=0
+        (0.0, length),                              # Index tip at x=0
         (0.0, hub_r * 0.8)
     ]
     msp.add_lwpolyline(outline_pts, dxfattribs={"layer": "CUT_OUTLINE"})
+
+    # Hub outline (semicircle on back side)
     msp.add_arc((0, 0), hub_r, 90, 270, dxfattribs={"layer": "CUT_OUTLINE"})
 
     # Engrave Ratio scale along reading edge (x = 0)
+    # Ratio = r / mm_100
     for ratio_i in range(1, int(max_norm * 20) + 1):
         ratio = ratio_i * 0.05
         y_pos = ratio * mm_100
@@ -503,13 +440,13 @@ def build_pointer_dxf(filepath: Path, geo: Dict[str, Any]):
             break
 
         is_major = (ratio_i % 2 == 0) # every 0.1
-        is_labeled = (ratio_i % 2 == 0) # every 0.1
-        tick_w = 2.6 if is_major else 1.3
+        is_labeled = (ratio_i % 4 == 0) # every 0.2
+        tick_w = 2.4 if is_major else 1.2
         msp.add_line((0.0, y_pos), (tick_w, y_pos), dxfattribs={"layer": "ENGRAVE_SCALE"})
 
         if is_labeled:
             text = f"{ratio:.1f}"
-            t = msp.add_text(text, dxfattribs={"layer": "ENGRAVE_TEXT", "height": 2.0, "rotation": 0})
+            t = msp.add_text(text, dxfattribs={"layer": "ENGRAVE_TEXT", "height": 1.8, "rotation": 0})
             t.set_placement((tick_w + 0.6, y_pos), align=TextEntityAlignment.MIDDLE_LEFT)
 
     doc.saveas(str(filepath))

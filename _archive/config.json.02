@@ -1,0 +1,51 @@
+{
+  "project": {
+    "title": "Nautical Rechenscheibe - JPK 1080 (GER 7447 - TRUE GRIT)",
+    "polar_file": "data/249116.slk",
+    "output_dir": "output"
+  },
+  "display": {
+    "render_sail_layers": false
+  },
+  "dimensions": {
+    "outer_radius_mm": 57.5,
+    "split_radius_mm": 47.0,
+    "true_wind_scale_factor": 1.00,
+    "rotor_clearance_mm": 0.25,
+    "pocket_clearance_mm": 0.15,
+    "pin_clearance_mm": 0.10,
+    "center_hole_radius_mm": 1.60
+  },
+  "thicknesses": {
+    "stator_core_wall_mm": 1.6,
+    "front_rim_height_mm": 1.8,
+    "back_rim_height_mm": 1.8,
+    "front_rotor_disc_mm": 1.8,
+    "back_rotor_disc_mm": 1.8,
+    "pointer_arm_mm": 1.2,
+    "center_pin_head_thickness_mm": 1.0
+  },
+  "pointer": {
+    "width_mm": 6.0,
+    "hub_radius_mm": 4.5,
+    "thumb_tab_extension_mm": 4.5,
+    "max_ratio": 1.20
+  },
+  "scales_and_typography": {
+    "compass_text_h_mm": 3.2,
+    "compass_tick_maj_mm": 1.6,
+    "compass_tick_min_mm": 0.9,
+    "awa_text_h_mm": 2.8,
+    "awa_tick_maj_mm": 1.4,
+    "awa_tick_min_mm": 0.7,
+    "polar_label_height_mm": 4.5,
+    "grid_label_height_mm": 3.8,
+    "log_text_h_mm": 3.0,
+    "log_tick_maj_mm": 2.0,
+    "log_tick_min_mm": 1.0
+  },
+  "preview": {
+    "pointer_twa_deg": 110.0,
+    "dpi": 300
+  }
+}

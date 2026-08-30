@@ -226,8 +226,8 @@ def main():
         # Overlay central pointer on front preview
         p_len = geo.pointer_length
         p_w = geo.pointer_width
-        rad_twa = math.radians(90.0 - twa_deg)
-        # Vector along pointer (nautical orientation)
+        rad_twa = math.radians(twa_deg)
+        # Vector along pointer
         v_dir = cmath.rect(1.0, rad_twa)
         v_norm = cmath.rect(1.0, rad_twa - math.pi / 2.0)
 
