@@ -1,38 +1,34 @@
 #!/usr/bin/env python3
 """
-rechenscheibe.py - Nautical Rechenscheibe / Tactical Sailing Computer Generator
-JPK 1080 (GER 7447) Edition
+rechenscheibe.py - Master Orchestrator for Dual-Sided Nautical Rechenscheibe
+JPK 1080 (GER 7447 - TRUE GRIT)
 
 Generates:
-1. 3D-Printable STL files (Stator Base, Rotor Dial, Center Axle Pin)
-2. Laser-Engraving DXF files (CAM color-coded for LightBurn / LaserGRBL)
-3. High-resolution PNG visual preview
-
-Usage:
-    python rechenscheibe.py [--csv GER7447_polars.csv] [--radius 57.5] [--outdir output]
+1. Watertight 3D Printable STL models (Stator, Front Rotor, Back Rotor, Pointer, Pin)
+2. Laser-ready CAM DXF files (Front Side, Back Side, Pointer)
+3. 300 DPI high-resolution visual previews of both sides
 """
 
-import argparse
 import sys
 import math
+import cmath
+import argparse
 from pathlib import Path
-import numpy as np
+import matplotlib.pyplot as plt
 
-# Local modules
 from polar_parser import PolarData
 from config_manager import ConfigManager, ResolvedGeometry
 from stl_generator import (
-    generate_rotor_stl,
-    generate_stator_stl,
-    generate_tactical_ruler_stl,
-    generate_flush_center_pin_stl,
-    generate_awa_pivot_pin_stl
+    generate_stator_mesh,
+    generate_rotor_mesh,
+    generate_central_pointer_mesh,
+    generate_pin_mesh
 )
 from chart_generator import (
-    DEFAULT_CONFIG,
     NauticalChart,
-    build_rechenscheibe,
-    build_ruler_dxf
+    build_front_side,
+    build_back_side,
+    build_pointer_dxf
 )
 import ezdxf
 
@@ -42,13 +38,11 @@ def export_separated_dxf(source_doc, out_path: Path, include_layers: list):
     new_doc = ezdxf.new(source_doc.dxfversion)
     new_msp = new_doc.modelspace()
 
-    # Copy layer definitions
     for name in include_layers:
         if name in source_doc.layers:
             layer = source_doc.layers.get(name)
             new_doc.layers.new(name=name, dxfattribs={"color": layer.color})
 
-    # Copy matching entities
     src_msp = source_doc.modelspace()
     for entity in src_msp:
         if entity.dxf.layer in include_layers:
@@ -59,7 +53,7 @@ def export_separated_dxf(source_doc, out_path: Path, include_layers: list):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Parametric Nautical Rechenscheibe Generator (JPK 1080 GER 7447 Edition)"
+        description="Dual-Sided Parametric Rechenscheibe Generator (JPK 1080 GER 7447 Edition)"
     )
     parser.add_argument(
         "--config",
@@ -67,9 +61,8 @@ def main():
         default=Path(__file__).parent / "config.json",
         help="Path to central config.json parameter file (default: config.json)"
     )
-    parser.add_argument("--data", type=Path, default=None, help="Override path to ORC JSON or CSV polar file")
+    parser.add_argument("--data", type=Path, default=None, help="Override path to ORC SLK, JSON or CSV polar file")
     parser.add_argument("--radius", type=float, default=None, help="Override outer radius R_MAX in mm")
-    parser.add_argument("--hole", type=float, default=None, help="Override center axle hole radius in mm")
     parser.add_argument("--outdir", type=Path, default=None, help="Override output directory")
     parser.add_argument("--sail-layers", action="store_true", help="Render individual sail polars (Jib, Asym, Sym) on dedicated DXF layers")
     parser.add_argument("--no-stl", action="store_true", help="Skip STL 3D-mesh generation")
@@ -86,13 +79,11 @@ def main():
 
     raw_cfg = ConfigManager.load(cfg_path)
 
-    # Apply optional CLI overrides to config
+    # Apply optional CLI overrides
     if args.data is not None:
         raw_cfg.setdefault("project", {})["polar_file"] = str(args.data)
     if args.radius is not None:
         raw_cfg.setdefault("dimensions", {})["outer_radius_mm"] = args.radius
-    if args.hole is not None:
-        raw_cfg.setdefault("dimensions", {})["center_hole_radius_mm"] = args.hole
     if args.outdir is not None:
         raw_cfg.setdefault("project", {})["output_dir"] = str(args.outdir)
     if args.sail_layers:
@@ -105,7 +96,7 @@ def main():
         out_dir = Path(__file__).parent / out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    polar_file_str = raw_cfg.get("project", {}).get("polar_file", "data/ORC_SpeedGuide_TRUE_GRIT_27.12.2025.json")
+    polar_file_str = raw_cfg.get("project", {}).get("polar_file", "data/249116.slk")
     polar_path = Path(polar_file_str)
     if not polar_path.is_absolute():
         polar_path = Path(__file__).parent / polar_path
@@ -114,151 +105,167 @@ def main():
         print(f"[ERROR] Polardatei {polar_path} nicht gefunden!")
         sys.exit(1)
 
-    # 2. Load Polar Data
+    # 2. Parse Polars
     polar_data = PolarData(polar_path)
 
-    # 3. Resolve Geometric Interdependencies
-    geo = ConfigManager.resolve(raw_cfg, polar_data)
+    # 3. Resolve Parametric Geometry
+    geo: ResolvedGeometry = ConfigManager.resolve(raw_cfg, polar_data)
     geo.print_summary()
 
-    # 4. Generate 3D-Print STL Files
+    # 4. STL Generation
     if not args.no_stl:
         print("\n[*] Erzeuge 3D-Druck-Modelle (STL)...")
-        f_stator = generate_stator_stl(
-            out_dir / "rechenscheibe_stator_basis.stl",
+        f_stator_stl = out_dir / "rechenscheibe_stator_basis.stl"
+        generate_stator_mesh(
+            f_stator_stl,
             r_max=geo.r_max,
             r_pocket=geo.r_pocket,
-            r_hole=geo.center_hole_r,
-            floor_thickness=geo.stator_floor_thickness,
-            rim_height=geo.stator_rim_height
+            center_hole_r=geo.center_hole_r,
+            core_wall_thk=geo.stator_core_wall,
+            front_rim_h=geo.front_rim_height,
+            back_rim_h=geo.back_rim_height
         )
-        f_rotor = generate_rotor_stl(
-            out_dir / "rechenscheibe_rotor_drehscheibe.stl",
+        print(f"    -> [OK] {f_stator_stl.name} (Doppelseitige Basisscheibe mit Front- & Back-Taschen)")
+
+        f_rotor_front_stl = out_dir / "rechenscheibe_rotor_vorderseite.stl"
+        generate_rotor_mesh(
+            f_rotor_front_stl,
             r_rotor=geo.r_rotor,
-            r_center_hole=geo.center_hole_r,
-            awa_offset_y=geo.awa_offset_y,
-            r_awa_hole=geo.awa_hole_r,
-            thickness=geo.rotor_thickness
+            center_hole_r=geo.center_hole_r,
+            thickness=geo.front_rotor_disc
         )
-        f_ruler = generate_tactical_ruler_stl(
-            out_dir / "rechenscheibe_lineal.stl",
-            length=geo.ruler_length,
-            width=geo.ruler_width,
-            r_hub=geo.ruler_hub_r,
-            r_hole=geo.awa_hole_r,
-            thickness=geo.ruler_thickness
+        print(f"    -> [OK] {f_rotor_front_stl.name} (Vorderseite Drehscheibe / Polaren)")
+
+        f_rotor_back_stl = out_dir / "rechenscheibe_rotor_rueckseite.stl"
+        generate_rotor_mesh(
+            f_rotor_back_stl,
+            r_rotor=geo.r_rotor,
+            center_hole_r=geo.center_hole_r,
+            thickness=geo.back_rotor_disc
         )
-        f_center_pin = generate_flush_center_pin_stl(
-            out_dir / "rechenscheibe_achsstift_senkkopf.stl",
-            r_pin=geo.center_pin_r,
-            r_head=geo.center_pin_head_r,
-            head_thickness=geo.center_pin_head_thickness,
-            pin_length=geo.center_pin_length
+        print(f"    -> [OK] {f_rotor_back_stl.name} (Rückseite Drehscheibe / Rechenschieber)")
+
+        f_pointer_stl = out_dir / "rechenscheibe_zeiger_lineal.stl"
+        generate_central_pointer_mesh(
+            f_pointer_stl,
+            length=geo.pointer_length,
+            width=geo.pointer_width,
+            hub_radius=geo.pointer_hub_r,
+            center_hole_r=geo.center_hole_r,
+            thickness=geo.pointer_thickness
         )
-        f_awa_pin = generate_awa_pivot_pin_stl(
-            out_dir / "rechenscheibe_achsstift_awa.stl",
-            r_pin=geo.awa_pin_r,
-            r_head=geo.awa_pin_head_r,
-            head_thickness=geo.awa_pin_head_thickness,
-            pin_length=geo.awa_pin_length
+        print(f"    -> [OK] {f_pointer_stl.name} (Zentraler Ratio-Zeiger mit Peilspitze)")
+
+        f_pin_stl = out_dir / "rechenscheibe_achsstift.stl"
+        generate_pin_mesh(
+            f_pin_stl,
+            pin_radius=geo.center_pin_r,
+            pin_length=geo.center_pin_length,
+            head_radius=geo.center_pin_head_r,
+            head_thickness=geo.center_pin_head_thickness
         )
-        print(f"    -> [OK] {f_stator.name} (Basisscheibe mit Pass-Tasche)")
-        print(f"    -> [OK] {f_rotor.name} (Innenscheibe mit AWA-Bohrung)")
-        print(f"    -> [OK] {f_ruler.name} (Drehbares Peil-Lineal am AWA-Pol)")
-        print(f"    -> [OK] {f_center_pin.name} (Flacher Senkkopf-Zentralstift)")
-        print(f"    -> [OK] {f_awa_pin.name} (Drehstift für AWA-Lineal)")
+        print(f"    -> [OK] {f_pin_stl.name} (Durchgehender Zentral-Achsbolzen)")
 
-    # 5. Generate DXF Laser Vectors & Visual Preview
-    if not args.no_dxf or not args.no_preview:
-        print("\n[*] Berechne Vektorgrafiken und Laser-Ebenen...")
-        geo_dict = geo.as_dict()
-        chart = NauticalChart(geo_dict)
-        build_rechenscheibe(chart, geo_dict, polar_data)
+    # 5. DXF Vector & Laser Layer Generation
+    geo_dict = geo.as_dict()
 
-        if not args.no_dxf:
-            # 5a. Complete Master DXF
-            f_master_dxf = out_dir / "rechenscheibe_komplett.dxf"
-            chart.doc.saveas(str(f_master_dxf))
-            print(f"    -> [OK] {f_master_dxf.name} (Gesamt-Ansicht)")
+    print("\n[*] Berechne Vektorgrafiken und Laser-Ebenen (Vorderseite)...")
+    front_chart = NauticalChart(geo_dict, title="Vorderseite - Taktik")
+    build_front_side(front_chart, geo_dict, polar_data)
 
-            # 5b. Rotor-only DXF
-            rotor_layers = [
-                "CUT_REFERENCE", "ENGRAVE_AWA", "ENGRAVE_POLARS", "ENGRAVE_TEXT", "ENGRAVE_VMG"
-            ]
-            if geo.render_sail_layers:
-                rotor_layers.extend(["ENGRAVE_POLAR_JIB", "ENGRAVE_POLAR_ASYM", "ENGRAVE_POLAR_SYM"])
-            f_rotor_dxf = out_dir / "laser_rotor_drehscheibe.dxf"
-            export_separated_dxf(chart.doc, f_rotor_dxf, rotor_layers)
-            print(f"    -> [OK] {f_rotor_dxf.name} (Nur Innenscheibe für Lasergravur)")
+    if not args.no_dxf:
+        # Master Front DXF
+        f_front_dxf = out_dir / "rechenscheibe_vorderseite_komplett.dxf"
+        front_chart.doc.saveas(str(f_front_dxf))
+        print(f"    -> [OK] {f_front_dxf.name} (Vorderseite Gesamt-Ansicht)")
 
-            # 5c. Stator-only DXF
-            f_stator_dxf = out_dir / "laser_stator_aussenring.dxf"
-            export_separated_dxf(chart.doc, f_stator_dxf, [
-                "CUT_REFERENCE", "ENGRAVE_COMPASS", "ENGRAVE_LOG", "ENGRAVE_TEXT"
-            ])
-            print(f"    -> [OK] {f_stator_dxf.name} (Nur Außenring für Lasergravur)")
+        # Front Rotor only
+        front_rotor_layers = ["CUT_REFERENCE", "ENGRAVE_AWA", "ENGRAVE_POLARS", "ENGRAVE_TEXT", "ENGRAVE_VMG"]
+        if geo.render_sail_layers:
+            front_rotor_layers.extend(["ENGRAVE_POLAR_JIB", "ENGRAVE_POLAR_ASYM", "ENGRAVE_POLAR_SYM"])
+        f_front_rotor_dxf = out_dir / "laser_rotor_vorderseite.dxf"
+        export_separated_dxf(front_chart.doc, f_front_rotor_dxf, front_rotor_layers)
+        print(f"    -> [OK] {f_front_rotor_dxf.name} (Nur Innenscheibe Vorderseite für Lasergravur)")
 
-            # 5d. Ruler-only DXF
-            f_ruler_dxf = out_dir / "laser_lineal.dxf"
-            build_ruler_dxf(
-                f_ruler_dxf,
-                length=geo.ruler_length,
-                width=geo.ruler_width,
-                r_hub=geo.ruler_hub_r,
-                r_hole=geo.awa_hole_r,
-                mm_per_100pct=geo.mm_per_100pct
-            )
-            print(f"    -> [OK] {f_ruler_dxf.name} (Lineal mit AWS-Skala für Lasergravur/Cut)")
+        # Front Stator only
+        f_front_stator_dxf = out_dir / "laser_stator_vorderseite.dxf"
+        export_separated_dxf(front_chart.doc, f_front_stator_dxf, ["CUT_REFERENCE", "ENGRAVE_COMPASS", "ENGRAVE_AWA", "ENGRAVE_TEXT"])
+        print(f"    -> [OK] {f_front_stator_dxf.name} (Nur Außenring Vorderseite: Kompassrose & AWA)")
 
-        if not args.no_preview:
-            # Visualize the ruler arm on top of the preview chart
-            import matplotlib.patches as patches
-            preview_cfg = raw_cfg.get("preview", {})
-            awa_deg = float(preview_cfg.get("ruler_awa_angle_deg", 28.0))
-            dpi_val = int(preview_cfg.get("dpi", 300))
+        # Central Pointer DXF
+        f_pointer_dxf = out_dir / "laser_zeiger_lineal.dxf"
+        build_pointer_dxf(f_pointer_dxf, geo_dict)
+        print(f"    -> [OK] {f_pointer_dxf.name} (Zentralzeiger mit Ratio-Skala)")
 
-            awa_rad = math.radians(awa_deg)
-            r_len = geo.ruler_length - 2.0
-            r_w = geo.ruler_width
-            p0 = np.array([0.0, geo.awa_offset_y])
-            dir_vec = np.array([math.sin(awa_rad), math.cos(awa_rad)])
-            norm_vec = np.array([-math.cos(awa_rad), math.sin(awa_rad)])
+    print("\n[*] Berechne Vektorgrafiken und Laser-Ebenen (Rückseite - Rechenschieber)...")
+    back_chart = NauticalChart(geo_dict, title="Rückseite - Rechenschieber")
+    build_back_side(back_chart, geo_dict)
 
-            p1 = p0 + dir_vec * r_len
-            p2 = p1 + norm_vec * r_w
-            p3 = p0 + norm_vec * r_w
+    if not args.no_dxf:
+        # Master Back DXF
+        f_back_dxf = out_dir / "rechenscheibe_rueckseite_komplett.dxf"
+        back_chart.doc.saveas(str(f_back_dxf))
+        print(f"    -> [OK] {f_back_dxf.name} (Rückseite Gesamt-Ansicht)")
 
-            ruler_poly = patches.Polygon(
-                [p0, p1, p2, p3],
-                closed=True,
-                facecolor='#ff9800',
-                edgecolor='#e65100',
-                alpha=0.38,
-                linewidth=1.2,
-                zorder=20
-            )
-            chart.ax.add_patch(ruler_poly)
-            # Reading edge line (Collinear with pivot)
-            chart.ax.plot([p0[0], p1[0]], [p0[1], p1[1]], color='#d50000', linewidth=1.5, linestyle='-', zorder=21)
-            chart.ax.plot([p0[0]], [p0[1]], marker='o', markersize=6, color='#d50000', zorder=22)
-            # Text note
-            lbl_dist = min(75.0, r_len * 0.75)
-            lbl_pos = p0 + dir_vec * lbl_dist + norm_vec * (r_w + 3.0)
-            chart.ax.text(
-                lbl_pos[0], lbl_pos[1],
-                f"Tactical Ruler (AWA = {awa_deg:.0f}°)",
-                fontsize=9, color='#e65100', fontweight='bold',
-                rotation=-awa_deg, ha='center', va='center', zorder=23
-            )
+        # Back Rotor only
+        f_back_rotor_dxf = out_dir / "laser_rotor_rueckseite.dxf"
+        export_separated_dxf(back_chart.doc, f_back_rotor_dxf, ["CUT_REFERENCE", "ENGRAVE_LOG", "ENGRAVE_TEXT"])
+        print(f"    -> [OK] {f_back_rotor_dxf.name} (Nur Innenscheibe Rückseite: Innerer Log-Ring)")
 
-            f_preview = out_dir / "rechenscheibe_preview.png"
-            chart.fig.savefig(str(f_preview), dpi=dpi_val, bbox_inches='tight', pad_inches=0.05)
-            print(f"    -> [OK] {f_preview.name} ({dpi_val} DPI hochauflösende Bildvorschau mit Lineal)")
+        # Back Stator only
+        f_back_stator_dxf = out_dir / "laser_stator_rueckseite.dxf"
+        export_separated_dxf(back_chart.doc, f_back_stator_dxf, ["CUT_REFERENCE", "ENGRAVE_LOG", "ENGRAVE_TEXT"])
+        print(f"    -> [OK] {f_back_stator_dxf.name} (Nur Außenring Rückseite: Äußerer Log-Ring)")
 
-    print("\n" + "=" * 65)
-    print(f"Fertig! Alle Dateien befinden sich im Ordner:")
-    print(f"  {out_dir.resolve()}")
-    print("=" * 65)
+    # 6. PNG Previews
+    if not args.no_preview:
+        preview_cfg = raw_cfg.get("preview", {})
+        dpi = int(preview_cfg.get("dpi", 300))
+        twa_deg = float(preview_cfg.get("pointer_twa_deg", 110.0))
+
+        # Overlay central pointer on front preview
+        p_len = geo.pointer_length
+        p_w = geo.pointer_width
+        rad_twa = math.radians(twa_deg)
+        # Vector along pointer
+        v_dir = cmath.rect(1.0, rad_twa)
+        v_norm = cmath.rect(1.0, rad_twa - math.pi / 2.0)
+
+        p_start = 0j
+        p_end = v_dir * p_len
+        p_corner1 = v_norm * p_w
+        p_corner2 = p_end + v_norm * p_w
+
+        # Draw transparent pointer
+        poly_pts = [
+            (p_start.real, p_start.imag),
+            (p_corner1.real, p_corner1.imag),
+            (p_corner2.real, p_corner2.imag),
+            (p_end.real, p_end.imag)
+        ]
+        poly = plt.Polygon(poly_pts, color="#d62728", alpha=0.35, zorder=20)
+        front_chart.ax.add_patch(poly)
+        # Red reading edge line
+        front_chart.ax.plot([0, p_end.real], [0, p_end.imag], color="#d62728", linewidth=1.5, zorder=21)
+
+        # Title
+        front_chart.ax.text(0, -geo.r_max * 1.05, f"VORDERSEITE: TAKTIK & POLAREN (Zeiger auf TWA {twa_deg:.0f}°)", fontsize=9, ha="center", weight="bold")
+
+        f_front_preview = out_dir / "rechenscheibe_preview_vorderseite.png"
+        front_chart.fig.savefig(str(f_front_preview), bbox_inches="tight", dpi=dpi)
+        plt.close(front_chart.fig)
+        print(f"    -> [OK] {f_front_preview.name} ({dpi} DPI Vorschau Vorderseite mit Zeiger)")
+
+        # Back preview
+        back_chart.ax.text(0, -geo.r_max * 1.05, "RÜCKSEITE: LOGARITHMISCHER RECHENSCHIEBER (Trennfuge bei R=47 mm)", fontsize=9, ha="center", weight="bold")
+        f_back_preview = out_dir / "rechenscheibe_preview_rueckseite.png"
+        back_chart.fig.savefig(str(f_back_preview), bbox_inches="tight", dpi=dpi)
+        plt.close(back_chart.fig)
+        print(f"    -> [OK] {f_back_preview.name} ({dpi} DPI Vorschau Rückseite Rechenschieber)")
+
+    print("\n" + "=" * 68)
+    print(f"Fertig! Alle Dateien befinden sich im Ordner:\n  {out_dir}")
+    print("=" * 68 + "\n")
 
 
 if __name__ == "__main__":
