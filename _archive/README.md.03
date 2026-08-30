@@ -45,21 +45,17 @@ Durch die Auslagerung des Rechenschiebers auf die Rückseite gewinnt die Vorders
 
 ---
 
-## ⛵ Vorderseite: Taktik, Polaren & Echte AWA-Fasskreise
+## ⛵ Vorderseite: Taktik, Polaren & Zentralzeiger
 
 ### 1. Skalen auf dem Stator (fester Außenring)
 * **Äußere Skala ($360^\circ$-Kompassrose):**  
   Vollkreis-Skala vom geometrischen Mittelpunkt $(0, 0)$. Dient zum direkten Einstellen und Anpeilen von Kurs über Grund ($COG$), True Heading ($HDG$) oder Wahrem Windwinkel ($TWA$).
-* **Nautische Orientierung:** $0^\circ / 360^\circ$ (True Wind / Im Wind) steht exakt oben auf 12 Uhr.
+* **Innere Skala (AWA-Winkelskala vom unteren Pol):**  
+  Zeigt die vom exzentrischen Windfußpunkt $(0, -Y_{AWA})$ ausgehenden Winkelstrahlen.
 
 ### 2. Die Polardrehscheibe (Front Rotor)
 * **Zentrum $(0, 0)$:** Schiffsposition mit Voraus-Pfeil (Heading / Bug nach oben).
-* **Windfußpunkt $P_1(0, -Y_{AWA})$:** Exzentrischer Pol des Wahren Windes.
-* **Echte AWA-Fasskreisbögen (Peripheriewinkelsatz):**  
-  Die AWA-Linien sind Kreisbögen, die exakt durch das Zentrum $O(0,0)$ und den Windfußpunkt $P_1(0, -Y_0)$ verlaufen. Jeder dieser Bögen ist der geometrische Ort aller Betriebspunkte mit **konstantem scheinbarem Windwinkel ($AWA$)**:
-  * Für $AWA = 90^\circ$: Thaleskreis über $O P_1$.
-  * Für $AWA = 25^\circ, 35^\circ, 45^\circ, 55^\circ, 65^\circ, 75^\circ, 90^\circ, 110^\circ, 130^\circ, 155^\circ$: Harmonisch geschwungene Bögen für Am-Wind-, Halbwind- und Raumschots-Kurse.
-  * **Praxis-Vorteil:** Du liest am Verklicker $AWA = 65^\circ$ ab $\rightarrow$ folgst dem $65^\circ$-Bogen bis zur aktuellen Windstärke-Polare $\rightarrow$ liest direkt deinen wahren Windwinkel ($TWA$), deine Target-Bootsgeschwindigkeit und die scheinbare Windstärke ab!
+* **Windfußpunkt $(0, -Y_{AWA})$:** Exzentrischer Pol des Wahren Windes, von dem das AWA-Winkelgitter und die $AWS$-Geschwindigkeitsbögen ausgehen.
 * **8 ORC-Polarkurven der JPK 1080:** Für $6, 8, 10, 12, 14, 16, 20, 24\text{ kn}$ Wind.
 * **VMG-Ziele:** Rote Rauten (optimaler Beat-Wendewinkel) und grüne Rauten (optimaler Run-Halsenwinkel).
 
@@ -68,33 +64,22 @@ Das Lineal ist **im Mittelpunkt $(0, 0)$** drehbar gelagert:
 * **Physikalische Ratio-Skala:** Da die Polaren auf den wahren Wind normiert sind, wächst der Radius proportional zu:
   $$\text{Ratio} = \frac{V_{BS}}{TWS}$$
 * Das Lineal trägt eine gravierte Teilung von **$0.0$ bis $1.20$** (mit $0.05$-Zwischenteilung).
-* **Bedienung:** Zeiger auf den Wahren Windwinkel ($TWA$, z. B. $110^\circ$) drehen. An der Polarkurve (z. B. $16\text{ kn}$) an der Peilkante direkt das Verhältnis ablesen (z. B. **$0.54$**). Genau an dieser Stelle kreuzt im unterliegenden Gitter der scheinbare Windwinkel $AWA$ und die scheinbare Windstärke $AWS/TWS$.
+* **Bedienung:** Zeiger auf den Wahren Windwinkel ($TWA$, z. B. $110^\circ$) drehen. An der Polarkurve (z. B. $16\text{ kn}$) an der Peilkante direkt das Verhältnis ablesen (z. B. **$0.54$**). Genau an dieser Stelle kreuzt im unterliegenden Gitter der scheinbare Windwinkel $AWA$ ($78^\circ$) und die scheinbare Windstärke $AWS/TWS$.
 
 ---
 
-## 🔢 Rückseite: Logarithmischer Rechenschieber mit Sinus-Skala (S-Skala)
+## 🔢 Rückseite: Logarithmischer Rechenschieber
 
-Auf der Rückseite arbeiten drei konzentrische Skalen für Multiplikation, Division und Winkelfunktionen:
-* **Stator (D-Skala, fester Außenring):** Äußere logarithmische Skala ($1 \dots 10$).
-* **Rotor (C-Skala, drehbare Innenscheibe):** Innere logarithmische Skala ($1 \dots 10$) mit hoher Zehnteldichte von $1.0$ bis $2.0$.
-* **Rotor (S-Skala, Sinus-Skala):** Logarithmische Sinusskala für Winkel von $\mathbf{6^\circ}$ bis $\mathbf{90^\circ}$ ($\theta = 360^\circ \cdot \log_{10}(10 \sin\alpha)$).
-  * $90^\circ$ steht exakt unter der $1 / 10$ auf 12 Uhr.
-  * $30^\circ$ steht exakt radial unter der $5$ ($\sin 30^\circ = 0.5$).
-  * $11.5^\circ$ steht exakt radial unter der $2$ ($\sin 11.5^\circ \approx 0.2$).
+Auf der Rückseite gleiten zwei präzise logarithmische Skalen an der Trennkante ($R = 47.0\text{ mm}$) aneinander vorbei:
+* **Stator (fester Außenring):** Äußere Skala ($1 \dots 10$ bzw. $1 \dots 100$).
+* **Rotor (drehbare Innenscheibe):** Innere Skala ($1 \dots 10$ bzw. $1 \dots 100$).
 
 ### Direkte Rechenoperationen:
-1. **Lösung des Winddreiecks über den Sinussatz:**
-   Im Winddreieck gilt:
-   $$\sin(D) = \frac{BS}{TWS} \cdot \sin(AWA) \quad \text{mit} \quad TWA = AWA + D$$
-   * Stelle die $1$ der C-Skala auf die Geschwindigkeit $\frac{BS}{TWS}$ der D-Skala.
-   * Suche deinen Verklicker-Winkel $AWA$ auf der S-Skala.
-   * Lies den resultierenden Driftwinkel $D$ auf der S-Skala ab!
-   * Wahrer Windwinkel: $TWA = AWA + D$.
-2. **Ratio in Knoten umrechnen:**
+1. **Ratio in Knoten umrechnen:**
    * Stelle die **$1$** der Innenscheibe auf die abgelesene Ratio (z. B. **$0.54$**).
    * Lies gegenüber von $TWS = 16\text{ kn}$ direkt die **Bootsgeschwindigkeit ($8.64\text{ kn}$)** ab!
-3. **Geschwindigkeit, Weg und Zeit ($Distanz = Speed \times Zeit$):**
-   * Stelle die Geschwindigkeit in Knoten ein $\rightarrow$ lies für jede beliebige Fahrzeit direkt die zurückgelegte Distanz in Seemeilen ab.
+2. **Geschwindigkeit, Weg und Zeit ($Distanz = Speed \times Zeit$):**
+   * Stelle die Geschwindigkeit in Knoten ein $\rightarrow$ lies für jede beliebige Fahrzeit (Minuten oder Stunden) direkt die zurückgelegte Distanz in Seemeilen ab.
 
 ---
 
