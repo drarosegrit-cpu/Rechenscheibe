@@ -1,0 +1,224 @@
+"""
+render_png_previews.py - Rendert hochauflösende PNG-Vorschauen (300 DPI) für Weg A und Weg B
+direkt mit Matplotlib auf Basis derselben exakten Geometrie.
+"""
+
+import math
+from pathlib import Path
+import numpy as np
+import matplotlib.pyplot as plt
+from polar_parser import PolarData, catmull_rom_spline
+
+
+def polar_to_cart(r: float, deg: float):
+    rad = math.radians(deg)
+    return r * math.sin(rad), r * math.cos(rad)
+
+
+def setup_base_plot(title: str, subtitle: str, title_y: float = -32):
+    fig, ax = plt.subplots(figsize=(10, 10), dpi=300)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_xlim(-85, 85)
+    ax.set_ylim(-85, 85)
+
+    # Hintergrund & Außenkanten
+    bg = plt.Circle((0, 0), 75.0, color="#FAFAFA", ec="#2C3E50", lw=1.5, zorder=1)
+    ax.add_patch(bg)
+    center = plt.Circle((0, 0), 1.5, color="#E74C3C", fill=False, lw=1.0, zorder=10)
+    ax.add_patch(center)
+
+    # TRUE WIND Pfeil
+    ax.annotate(
+        "TRUE WIND", xy=(0, 74.0), xytext=(0, 67.0),
+        arrowprops=dict(facecolor="#C0392B", edgecolor="#962D22", width=3.0, headwidth=8.0),
+        ha="center", va="center", fontsize=8, fontweight="bold", color="#C0392B", zorder=12
+    )
+
+    # TACK Sektoren (38° bis 42°)
+    for s in [1, -1]:
+        th = [math.radians(a * s) for a in [38.0, 42.0, 42.0, 38.0]]
+        r = [66.0, 66.0, 75.0, 75.0]
+        xs = [ri * math.sin(ti) for ri, ti in zip(r, th)]
+        ys = [ri * math.cos(ti) for ri, ti in zip(r, th)]
+        ax.fill(xs, ys, color="#2ECC71", alpha=0.35, ec="#27AE60", lw=0.8, zorder=5)
+        tx, ty = polar_to_cart(70.5, 40.0 * s)
+        ax.text(tx, ty, "TACK 40°", color="#27AE60", fontsize=6, fontweight="bold", ha="center", va="center", rotation=-40*s, zorder=12)
+
+    # GYBE Sektoren (145° bis 165°)
+    for s in [1, -1]:
+        th = [math.radians(a * s) for a in [145.0, 165.0, 165.0, 145.0]]
+        r = [66.0, 66.0, 75.0, 75.0]
+        xs = [ri * math.sin(ti) for ri, ti in zip(r, th)]
+        ys = [ri * math.cos(ti) for ri, ti in zip(r, th)]
+        ax.fill(xs, ys, color="#E74C3C", alpha=0.35, ec="#C0392B", lw=0.8, zorder=5)
+        tx, ty = polar_to_cart(70.5, 155.0 * s)
+        ax.text(tx, ty, "GYBE 155°", color="#C0392B", fontsize=6, fontweight="bold", ha="center", va="center", rotation=25*s, zorder=12)
+
+    # Kompass-Teilung alle 10°
+    for deg in range(10, 180, 10):
+        for s in [1, -1]:
+            d = deg * s
+            l = 3.0 if deg % 30 == 0 else 1.5
+            x1, y1 = polar_to_cart(75.0, d)
+            x2, y2 = polar_to_cart(75.0 - l, d)
+            ax.plot([x1, x2], [y1, y2], color="#2C3E50", lw=0.7, zorder=6)
+            if deg % 30 == 0 and deg < 170:
+                xt, yt = polar_to_cart(69.0, d)
+                ax.text(xt, yt, f"{deg}°", color="#2C3E50", fontsize=6.5, fontweight="bold", ha="center", va="center", zorder=7)
+
+    # Titel
+    ax.text(0, title_y, title, fontsize=8.5, fontweight="bold", color="#2C3E50", ha="center", va="center", zorder=12)
+    ax.text(0, title_y - 3.5, subtitle, fontsize=6.0, color="#7F8C8D", ha="center", va="center", zorder=12)
+
+    return fig, ax
+
+
+def render_weg_a(polar: PolarData, outfile: Path):
+    L = 52.0
+    # In Matplotlib (+Y up): Windpol bei (0,0), Sehne nach SÜDEN (0, -L)
+    fig, ax = setup_base_plot(
+        "WEG A: NORMIERTE POLAREN (RATIO)",
+        "Windpol im Zentrum | Fasskreise im unteren Bereich | JPK 1080 TRUE GRIT",
+        title_y=38
+    )
+
+    # Ratio Ringe
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
+        r = ratio * L
+        c = plt.Circle((0, 0), r, color="#E0E0E0", fill=False, lw=0.6, ls="--", zorder=2)
+        ax.add_patch(c)
+        ax.text(r - 1.0, 1.8, f"{ratio:.1f}", color="#95A5A6", fontsize=5.5, ha="right", va="center", zorder=3)
+
+    # Basissehne (0,0) nach (0, -L)
+    ax.plot([0, 0], [0, -L], color="#C0392B", lw=1.5, zorder=8)
+    ax.scatter([0], [-L], color="#C0392B", s=22, zorder=9)
+    ax.text(0, -L - 2.8, "P1 (Fußpunkt / 180°)", color="#C0392B", fontsize=6, fontweight="bold", ha="center", va="top", zorder=10)
+    ax.text(0, 3.2, "Windpol (0,0)", color="#C0392B", fontsize=6, fontweight="bold", ha="center", va="bottom", zorder=10)
+
+    # Fasskreise im unteren Bereich
+    awa_angles = [25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0, 155.0]
+    for alpha in awa_angles:
+        rad = math.radians(alpha)
+        sin_a = math.sin(rad)
+        cos_a = math.cos(rad)
+        if sin_a == 0:
+            continue
+        r_c = L / (2.0 * sin_a)
+        ym = -L / 2.0
+        xc_stb = (L / 2.0) * (cos_a / sin_a)
+
+        theta_limit = 180.0 - alpha
+        n_pts = 60
+        thetas = np.linspace(-math.radians(theta_limit), math.radians(theta_limit), n_pts)
+
+        xs_stb = [xc_stb + r_c * math.cos(t) for t in thetas]
+        ys_stb = [ym + r_c * math.sin(t) for t in thetas]
+
+        for s in [1, -1]:
+            xs = [s * x for x in xs_stb]
+            ys = ys_stb
+            filt_xy = [(x, y) for x, y in zip(xs, ys) if math.hypot(x, y) <= 65.5]
+            if len(filt_xy) >= 2:
+                ax.plot([p[0] for p in filt_xy], [p[1] for p in filt_xy], color="#2980B9", lw=0.7, ls=":", zorder=5)
+
+                if s > 0 and alpha in [30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]:
+                    idx_lbl = len(filt_xy) // 2 if alpha <= 50.0 else len(filt_xy) * 3 // 5
+                    lbl_p = filt_xy[min(idx_lbl, len(filt_xy) - 1)]
+                    ax.text(lbl_p[0], lbl_p[1], f"{int(alpha)}°", color="#1B4F72", fontsize=5.5, ha="center", va="center", zorder=7)
+
+    # ORC-Polaren
+    colors = ["#1F618D", "#2980B9", "#2471A3", "#17A589", "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"]
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        pts_complex = []
+        for pt in polar.curves_raw[idx]:
+            r_mm = (pt["bsp"] / tws) * L
+            rad = math.radians(pt["twa"])
+            pts_complex.append(complex(r_mm * math.sin(rad), r_mm * math.cos(rad)))
+
+        smooth = catmull_rom_spline(pts_complex, num_points=8)
+        xs = [p.real for p in smooth]
+        ys = [p.imag for p in smooth]
+        ax.plot(xs, ys, color=col, lw=1.2, zorder=8)
+        ax.plot([-x for x in xs], ys, color=col, lw=1.2, zorder=8)
+        mid_p = smooth[int(len(smooth) * 0.65)]
+        ax.text(mid_p.real + 1.2, mid_p.imag, f"{int(tws)}k", color=col, fontsize=6.5, fontweight="bold", ha="left", va="center", zorder=9)
+
+    fig.tight_layout()
+    fig.savefig(outfile, dpi=300)
+    plt.close(fig)
+
+
+def render_weg_b(polar: PolarData, outfile: Path):
+    SCALE = 4.8
+    fig, ax = setup_base_plot("WEG B: ABSOLUTE POLAREN (KNOTEN)", "Maßstab 4.8 mm/kn mit AWA-Isolinien | JPK 1080 TRUE GRIT", title_y=38)
+
+    for bsp in [2, 4, 6, 8, 10, 12]:
+        r = bsp * SCALE
+        c = plt.Circle((0, 0), r, color="#E0E0E0", fill=False, lw=0.6, ls="--", zorder=2)
+        ax.add_patch(c)
+        ax.text(r - 1.0, 1.8, f"{bsp} kn", color="#95A5A6", fontsize=5.5, ha="right", va="center", zorder=3)
+
+    colors = ["#1F618D", "#2980B9", "#2471A3", "#17A589", "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"]
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        pts_complex = []
+        for pt in polar.curves_raw[idx]:
+            r_mm = pt["bsp"] * SCALE
+            rad = math.radians(pt["twa"])
+            pts_complex.append(complex(r_mm * math.sin(rad), r_mm * math.cos(rad)))
+
+        smooth = catmull_rom_spline(pts_complex, num_points=8)
+        xs = [p.real for p in smooth]
+        ys = [p.imag for p in smooth]
+        ax.plot(xs, ys, color=col, lw=1.2, zorder=8)
+        ax.plot([-x for x in xs], ys, color=col, lw=1.2, zorder=8)
+        mid_p = smooth[int(len(smooth) * 0.65)]
+        ax.text(mid_p.real + 1.2, mid_p.imag, f"{int(tws)}k", color=col, fontsize=6.5, fontweight="bold", ha="left", va="center", zorder=9)
+
+    target_awas = [30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]
+    for awa_target in target_awas:
+        awa_pts = []
+        for idx, tws in enumerate(polar.tws_list):
+            curve = polar.curves_raw[idx]
+            for i in range(len(curve) - 1):
+                p1, p2 = curve[i], curve[i + 1]
+                a1, a2 = p1["awa"], p2["awa"]
+                if (a1 <= awa_target <= a2) or (a2 <= awa_target <= a1):
+                    t = (awa_target - a1) / (a2 - a1) if abs(a2 - a1) > 1e-4 else 0.0
+                    interp_twa = p1["twa"] + t * (p2["twa"] - p1["twa"])
+                    interp_bsp = p1["bsp"] + t * (p2["bsp"] - p1["bsp"])
+                    r_mm = interp_bsp * SCALE
+                    rad = math.radians(interp_twa)
+                    awa_pts.append(complex(r_mm * math.sin(rad), r_mm * math.cos(rad)))
+                    break
+
+        if len(awa_pts) >= 2:
+            smooth_awa = catmull_rom_spline(awa_pts, num_points=6)
+            xs = [p.real for p in smooth_awa]
+            ys = [p.imag for p in smooth_awa]
+            ax.plot(xs, ys, color="#2980B9", lw=0.8, ls=":", zorder=5)
+            ax.plot([-x for x in xs], ys, color="#2980B9", lw=0.8, ls=":", zorder=5)
+            lbl_p = smooth_awa[-1]
+            ax.text(lbl_p.real, lbl_p.imag + 1.5, f"{int(awa_target)}°", color="#1B4F72", fontsize=5.5, ha="center", va="bottom", zorder=7)
+
+    fig.tight_layout()
+    fig.savefig(outfile, dpi=300)
+    plt.close(fig)
+
+
+def main():
+    polar = PolarData(Path("data/249116.slk"))
+    out_dir = Path("output")
+    out_dir.mkdir(exist_ok=True)
+
+    print("Rendere PNG Weg A (aktualisiert)...")
+    render_weg_a(polar, out_dir / "vergleich_weg_a_normiert.png")
+    print("Rendere PNG Weg B...")
+    render_weg_b(polar, out_dir / "vergleich_weg_b_knoten.png")
+    print("PNGs erfolgreich gerendert!")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,11 +1,13 @@
 """
-stl_generator.py - Procedural Binary STL Generator for Dual-Sided Rechenscheibe
-Creates solid, watertight manifold meshes for:
-1. Double-sided Stator Frame (Central core wall with front and back pockets)
-2. Front Rotor Disc (Polar diagram dial)
-3. Back Rotor Disc (Slide rule dial)
-4. Central Ratio Pointer (Ruler centered at (0,0) with reading edge)
-5. Central Axle Pin
+stl_generator.py - Procedural Binary STL Generator for 180 mm Sandwich-Kassette System
+JPK 1080 (GER 7447 - TRUE GRIT)
+
+Creates watertight, 3D-printable binary STL files:
+1. gehaeuse_deckel_180mm.stl    - Top stator ring (Ø 180 mm, window Ø 150 mm, 6x M3 countersunk)
+2. gehaeuse_boden_180mm.stl     - Bottom stator ring with annular guide groove (Ø 173 mm x 2.4 mm)
+3. mittelscheibe_rotor_180mm.stl- Rotating disc (Ø 150 mm) with guide tongue (Ø 172 mm) & 4 knurled thumb tabs (Ø 186 mm)
+4. zentralzeiger_lineal.stl     - Central pointer arm (85 mm length with radial reading edge and index tip)
+5. achspin_mittelbolzen.stl     - Central axle pin with retaining head
 """
 
 import struct
@@ -15,9 +17,10 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 
 
-def _write_binary_stl(filepath: Path, triangles: np.ndarray, normals: np.ndarray = None):
+def write_binary_stl(filepath: Path, triangles: np.ndarray, normals: Optional[np.ndarray] = None):
     """Writes triangles to a standard binary STL file."""
     filepath = Path(filepath)
+    filepath.parent.mkdir(parents=True, exist_ok=True)
     n_triangles = len(triangles)
 
     if normals is None or len(normals) != n_triangles:
@@ -30,7 +33,7 @@ def _write_binary_stl(filepath: Path, triangles: np.ndarray, normals: np.ndarray
         normals = (cross / norm).astype(np.float32)
 
     with open(filepath, "wb") as f:
-        header = f"3D Printed Rechenscheibe - {filepath.stem}".encode("utf-8")
+        header = f"3D Printed Rechenscheibe 180mm - {filepath.stem}".encode("utf-8")
         header = header[:80].ljust(80, b"\0")
         f.write(header)
         f.write(struct.pack("<I", n_triangles))
@@ -50,14 +53,14 @@ def _write_binary_stl(filepath: Path, triangles: np.ndarray, normals: np.ndarray
         data.tofile(f)
 
 
-def _generate_cylinder_annulus_triangles(
+def _gen_annulus_mesh(
     r_inner: float,
     r_outer: float,
     z_bottom: float,
     z_top: float,
-    segments: int = 120,
+    segments: int = 144,
     center_xy: Tuple[float, float] = (0.0, 0.0)
-) -> list:
+) -> List[List[np.ndarray]]:
     triangles = []
     angles = np.linspace(0, 2 * np.pi, segments, endpoint=False)
     cx, cy = center_xy
@@ -79,8 +82,8 @@ def _generate_cylinder_annulus_triangles(
         triangles.append([b_out[i], t_out[i], t_out[next_i]])
         triangles.append([b_out[i], t_out[next_i], b_out[next_i]])
 
-        # Inner wall
         if r_inner > 0:
+            # Inner wall
             triangles.append([b_in[i], t_in[next_i], t_in[i]])
             triangles.append([b_in[i], b_in[next_i], t_in[next_i]])
 
@@ -100,144 +103,185 @@ def _generate_cylinder_annulus_triangles(
     return triangles
 
 
-def generate_stator_mesh(
+def generate_deckel_stl(
     filepath: Path,
-    r_max: float = 57.5,
-    r_pocket: float = 47.15,
-    center_hole_r: float = 1.6,
-    core_wall_thk: float = 1.6,
-    front_rim_h: float = 1.8,
-    back_rim_h: float = 1.8,
-    segments: int = 120
+    r_outer: float = 90.0,      # Ø 180 mm
+    r_inner: float = 75.0,      # Ø 150 mm window
+    thickness: float = 2.5,
+    pcd_screw: float = 88.0,    # Ø 176 mm PCD
+    screw_r: float = 1.7,       # M3 clearance
+    segments: int = 180
 ):
-    """
-    Creates double-sided Stator body:
-    - Central core wall from z = 0 to z = core_wall_thk
-    - Front rim from z = core_wall_thk to z = core_wall_thk + front_rim_h (r in [r_pocket, r_max])
-    - Back rim from z = -back_rim_h to z = 0 (r in [r_pocket, r_max])
-    - Center axle hole through all z.
-    """
+    """Generates Gehäusedeckel (Top Stator Ring)."""
+    triangles = []
+    # Base annulus
+    triangles.extend(_gen_annulus_mesh(r_inner, r_outer, 0.0, thickness, segments))
+    # Screw clearance holes
+    for i in range(6):
+        ang = math.radians(i * 60.0)
+        sx = pcd_screw * math.cos(ang)
+        sy = pcd_screw * math.sin(ang)
+        hole_tris = _gen_annulus_mesh(0.0, screw_r, 0.0, thickness, segments=24, center_xy=(sx, sy))
+        triangles.extend(hole_tris)
+
+    mesh = np.array(triangles, dtype=np.float32)
+    write_binary_stl(filepath, mesh)
+
+
+def generate_boden_stl(
+    filepath: Path,
+    r_outer: float = 90.0,      # Ø 180 mm
+    r_inner: float = 75.0,      # Ø 150 mm window
+    r_groove: float = 86.5,     # Ø 173 mm groove
+    base_thk: float = 2.0,      # base plate
+    groove_depth: float = 2.4,  # groove depth in Z
+    segments: int = 180
+):
+    """Generates Gehäuseboden (Bottom Stator Ring with annular guide groove)."""
+    triangles = []
+    total_thk = base_thk + groove_depth
+
+    # 1. Base floor ring (from r_inner to r_groove, thickness = base_thk)
+    triangles.extend(_gen_annulus_mesh(r_inner, r_groove, 0.0, base_thk, segments))
+
+    # 2. Outer rim wall (from r_groove to r_outer, thickness = total_thk)
+    triangles.extend(_gen_annulus_mesh(r_groove, r_outer, 0.0, total_thk, segments))
+
+    mesh = np.array(triangles, dtype=np.float32)
+    write_binary_stl(filepath, mesh)
+
+
+def generate_rotor_stl(
+    filepath: Path,
+    r_window: float = 75.0,     # Ø 150 mm visible window
+    r_tongue: float = 86.0,     # Ø 172 mm guide rim (Feder)
+    r_tab: float = 93.0,        # Ø 186 mm thumb tabs
+    thickness: float = 2.0,
+    center_hole_r: float = 1.6, # Ø 3.2 mm center hole
+    segments: int = 180
+):
+    """Generates Mittelscheibe / Rotor (Disc with guide tongue and 4 thumb tabs)."""
     triangles = []
 
-    # 1. Central core floor (from center hole to r_pocket)
-    triangles.extend(_generate_cylinder_annulus_triangles(
-        center_hole_r, r_pocket, 0.0, core_wall_thk, segments
-    ))
+    # 1. Central disc + tongue (from center hole to r_tongue)
+    triangles.extend(_gen_annulus_mesh(center_hole_r, r_tongue, 0.0, thickness, segments))
 
-    # 2. Outer full ring (from r_pocket to r_max, from -back_rim_h to core_wall_thk + front_rim_h)
-    z_min = -back_rim_h
-    z_max = core_wall_thk + front_rim_h
-    triangles.extend(_generate_cylinder_annulus_triangles(
-        r_pocket, r_max, z_min, z_max, segments
-    ))
+    # 2. Four knurled thumb tabs (extending from r_tongue to r_tab at 45°, 135°, 225°, 315°)
+    tab_half_width_deg = 15.0  # 30° total width
+    for center_deg in [45.0, 135.0, 225.0, 315.0]:
+        ang_start = math.radians(center_deg - tab_half_width_deg)
+        ang_end = math.radians(center_deg + tab_half_width_deg)
+        n_tab_pts = 24
+        tab_angles = np.linspace(ang_start, ang_end, n_tab_pts)
 
-    # Convert to array and save
-    mesh_data = np.array(triangles, dtype=np.float32)
-    _write_binary_stl(filepath, mesh_data)
+        b_in = np.column_stack([r_tongue * np.cos(tab_angles), r_tongue * np.sin(tab_angles), np.zeros(n_tab_pts)])
+        t_in = np.column_stack([r_tongue * np.cos(tab_angles), r_tongue * np.sin(tab_angles), np.full(n_tab_pts, thickness)])
+        b_out = np.column_stack([r_tab * np.cos(tab_angles), r_tab * np.sin(tab_angles), np.zeros(n_tab_pts)])
+        t_out = np.column_stack([r_tab * np.cos(tab_angles), r_tab * np.sin(tab_angles), np.full(n_tab_pts, thickness)])
+
+        for i in range(n_tab_pts - 1):
+            # Top face
+            triangles.append([t_in[i], t_out[i], t_out[i+1]])
+            triangles.append([t_in[i], t_out[i+1], t_in[i+1]])
+            # Bottom face
+            triangles.append([b_in[i], b_out[i+1], b_out[i]])
+            triangles.append([b_in[i], b_in[next_i_wrap(i)], b_out[i+1]]) if False else triangles.append([b_in[i], b_in[i+1], b_out[i+1]])
+            # Outer curved wall
+            triangles.append([b_out[i], t_out[i], t_out[i+1]])
+            triangles.append([b_out[i], t_out[i+1], b_out[i+1]])
+
+        # Radial side walls of the tab
+        triangles.append([b_in[0], t_in[0], t_out[0]])
+        triangles.append([b_in[0], t_out[0], b_out[0]])
+        triangles.append([b_in[-1], t_out[-1], t_in[-1]])
+        triangles.append([b_in[-1], b_out[-1], t_out[-1]])
+
+    mesh = np.array(triangles, dtype=np.float32)
+    write_binary_stl(filepath, mesh)
 
 
-def generate_rotor_mesh(
+def generate_pointer_stl(
     filepath: Path,
-    r_rotor: float = 46.75,
+    length: float = 85.0,       # reaches outer compass rose
+    width: float = 7.0,
+    hub_radius: float = 5.0,
     center_hole_r: float = 1.6,
-    thickness: float = 1.8,
-    segments: int = 120
+    thickness: float = 1.5,
+    segments: int = 60
 ):
-    """
-    Creates flat Rotor disc with center axle hole.
-    Used for both Front Rotor (Polar dial) and Back Rotor (Slide rule).
-    """
-    triangles = _generate_cylinder_annulus_triangles(
-        center_hole_r, r_rotor, 0.0, thickness, segments
-    )
-    mesh_data = np.array(triangles, dtype=np.float32)
-    _write_binary_stl(filepath, mesh_data)
-
-
-def generate_central_pointer_mesh(
-    filepath: Path,
-    length: float = 62.0,
-    width: float = 6.0,
-    hub_radius: float = 4.5,
-    center_hole_r: float = 1.6,
-    thickness: float = 1.2,
-    segments: int = 40
-):
-    """
-    Creates central ratio pointer (pivoting at 0,0):
-    - Circular hub at (0,0)
-    - Straight arm with reading edge along x = 0 (or centered)
-    - Pointed index tip at length for precise compass reading
-    - Thumb tab for tactile rotation
-    """
+    """Generates Zentralzeiger / Pointer arm with reading edge and index tip."""
     triangles = []
 
-    # Hub cylinder around center hole
-    triangles.extend(_generate_cylinder_annulus_triangles(
-        center_hole_r, hub_radius, 0.0, thickness, segments
-    ))
+    # Hub cylinder around center axle
+    triangles.extend(_gen_annulus_mesh(center_hole_r, hub_radius, 0.0, thickness, segments))
 
-    # Arm geometry: Polygon along +Y axis
-    # Reading edge is at x = 0
-    # Right edge is at x = width
-    half_w = width / 2.0
-    tip_len = 3.5
-    tab_len = 3.0
+    # 2D polygon along +Y axis (reading edge at x = 0)
+    tip_len = 5.0
+    tab_len = 4.0
     y_body_end = length - tip_len - tab_len
 
-    # 2D contour points
-    # Start near hub
     poly_2d = [
         (0.0, hub_radius * 0.8),
         (width, hub_radius * 0.8),
         (width, y_body_end),
-        (width + 2.0, y_body_end + tab_len / 2.0), # thumb tab
+        (width + 2.5, y_body_end + tab_len / 2.0), # tactile thumb grip
         (width, y_body_end + tab_len),
-        (0.0, length),                              # sharp index tip at x=0
+        (0.0, length)                              # sharp reading tip at x=0
     ]
 
-    # Simple 3D extrusion of arm polygon
     n_pts = len(poly_2d)
     pts_b = np.array([[x, y, 0.0] for x, y in poly_2d], dtype=np.float32)
     pts_t = np.array([[x, y, thickness] for x, y in poly_2d], dtype=np.float32)
 
-    # Side walls
     for i in range(n_pts):
         next_i = (i + 1) % n_pts
         triangles.append([pts_b[i], pts_t[i], pts_t[next_i]])
         triangles.append([pts_b[i], pts_t[next_i], pts_b[next_i]])
 
-    # Top & bottom caps via ear clipping / fan
     for i in range(1, n_pts - 1):
         triangles.append([pts_t[0], pts_t[i], pts_t[i + 1]])
         triangles.append([pts_b[0], pts_b[i + 1], pts_b[i]])
 
-    mesh_data = np.array(triangles, dtype=np.float32)
-    _write_binary_stl(filepath, mesh_data)
+    mesh = np.array(triangles, dtype=np.float32)
+    write_binary_stl(filepath, mesh)
 
 
-def generate_pin_mesh(
+def generate_achspin_stl(
     filepath: Path,
-    pin_radius: float = 1.5,
-    pin_length: float = 6.8,
+    shaft_radius: float = 1.5,
+    shaft_length: float = 7.2,
     head_radius: float = 4.5,
-    head_thickness: float = 1.0,
+    head_thickness: float = 1.2,
     segments: int = 60
 ):
-    """
-    Creates central axle pin with flat round head.
-    """
+    """Generates central axle pin with retaining head."""
     triangles = []
+    # Shaft
+    triangles.extend(_gen_annulus_mesh(0.0, shaft_radius, 0.0, shaft_length, segments))
+    # Head
+    triangles.extend(_gen_annulus_mesh(0.0, head_radius, shaft_length, shaft_length + head_thickness, segments))
 
-    # Pin shaft
-    triangles.extend(_generate_cylinder_annulus_triangles(
-        0.0, pin_radius, 0.0, pin_length, segments
-    ))
+    mesh = np.array(triangles, dtype=np.float32)
+    write_binary_stl(filepath, mesh)
 
-    # Pin head at top
-    triangles.extend(_generate_cylinder_annulus_triangles(
-        0.0, head_radius, pin_length, pin_length + head_thickness, segments
-    ))
 
-    mesh_data = np.array(triangles, dtype=np.float32)
-    _write_binary_stl(filepath, mesh_data)
+def generate_all_stl_models(out_dir: Path):
+    """Generates all 5 watertight STL parts for the 180 mm Rechenscheibe."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    files = {
+        "gehaeuse_deckel_180mm.stl": lambda p: generate_deckel_stl(p),
+        "gehaeuse_boden_180mm.stl": lambda p: generate_boden_stl(p),
+        "mittelscheibe_rotor_180mm.stl": lambda p: generate_rotor_stl(p),
+        "zentralzeiger_lineal.stl": lambda p: generate_pointer_stl(p),
+        "achspin_mittelbolzen.stl": lambda p: generate_achspin_stl(p),
+    }
+
+    generated = []
+    for fname, gen_func in files.items():
+        fpath = out_dir / fname
+        gen_func(fpath)
+        generated.append(fpath)
+
+    return generated

@@ -1,0 +1,495 @@
+"""
+generate_comparison_svgs.py - Generiert zwei maßhaltige 1:1 SVGs für den Konzeptvergleich:
+Weg A: Normierte Polaren (Ratio V_BS / TWS) mit L = 64.0 mm, Windpol im Zentrum (0,0),
+       Basissehne nach unten, bereinigten Fasskreisbögen (ohne Sehnen-Abreiß-Artefakte),
+       VMG-Gipfelpunkten (Beat/Run) und Segelwechsel-Markierungen (Gennaker/Spi Crossover).
+Weg B: Absolute Polaren (in Knoten) mit AWA-Isolinien aus dem JPK 1080 ORC-Datensatz.
+"""
+
+import math
+from pathlib import Path
+from typing import List, Dict, Tuple, Any, Optional
+import numpy as np
+from polar_parser import PolarData, catmull_rom_spline
+
+
+def polar_to_svg(r: float, angle_deg: float, origin_y: float = 0.0) -> Tuple[float, float]:
+    """Konvertiert Polarkoordinaten in SVG-Koordinaten (0° = 12 Uhr / Norden)."""
+    rad = math.radians(angle_deg)
+    x = r * math.sin(rad)
+    y = -r * math.cos(rad) + origin_y
+    return x, y
+
+
+def find_circle_intersection(p1: Tuple[float, float], p2: Tuple[float, float], r_max: float) -> Optional[Tuple[float, float]]:
+    """Berechnet den exakten Schnittpunkt einer Strecke mit dem Begrenzungskreis r_max."""
+    dx = p2[0] - p1[0]
+    dy = p2[1] - p1[1]
+    a = dx**2 + dy**2
+    if a < 1e-9:
+        return None
+    b = 2.0 * (p1[0] * dx + p1[1] * dy)
+    c = p1[0]**2 + p1[1]**2 - r_max**2
+    disc = b**2 - 4.0 * a * c
+    if disc < 0:
+        return None
+    sqrt_disc = math.sqrt(disc)
+    t1 = (-b - sqrt_disc) / (2.0 * a)
+    t2 = (-b + sqrt_disc) / (2.0 * a)
+    valid_t = [t for t in (t1, t2) if 0.0 <= t <= 1.0]
+    if not valid_t:
+        return None
+    t = valid_t[0]
+    return (p1[0] + t * dx, p1[1] + t * dy)
+
+
+def clip_polyline_to_circle(pts: List[Tuple[float, float]], r_max: float) -> List[List[Tuple[float, float]]]:
+    """
+    Clippt eine Punktfolge an einem Kreis r_max.
+    Verhindert zuverlässig künstliche Sehnen/Verbindungslinien über die Lücke hinweg.
+    """
+    lines = []
+    current_line = []
+    for i in range(len(pts) - 1):
+        p1, p2 = pts[i], pts[i+1]
+        d1 = math.hypot(p1[0], p1[1])
+        d2 = math.hypot(p2[0], p2[1])
+
+        if d1 <= r_max and d2 <= r_max:
+            if not current_line:
+                current_line.append(p1)
+            current_line.append(p2)
+        elif d1 <= r_max and d2 > r_max:
+            p_inter = find_circle_intersection(p1, p2, r_max)
+            if not current_line:
+                current_line.append(p1)
+            if p_inter:
+                current_line.append(p_inter)
+            lines.append(current_line)
+            current_line = []
+        elif d1 > r_max and d2 <= r_max:
+            p_inter = find_circle_intersection(p1, p2, r_max)
+            current_line = []
+            if p_inter:
+                current_line.append(p_inter)
+            current_line.append(p2)
+        else:
+            # Beide außerhalb
+            pass
+
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+
+def generate_svg_header(width_mm: float = 180.0, height_mm: float = 180.0) -> str:
+    half_w = width_mm / 2.0
+    half_h = height_mm / 2.0
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'width="{width_mm}mm" height="{height_mm}mm" '
+        f'viewBox="{-half_w:.2f} {-half_h:.2f} {width_mm:.2f} {height_mm:.2f}">\n'
+        f'  <defs>\n'
+        f'    <style>\n'
+        f'      .bg {{ fill: #FFFFFF; }}\n'
+        f'      .boundary {{ stroke: #BDC3C7; stroke-width: 0.5; fill: none; stroke-dasharray: 2,2; }}\n'
+        f'      .rotor-edge {{ stroke: #2C3E50; stroke-width: 0.8; fill: none; }}\n'
+        f'      .center-hole {{ stroke: #E74C3C; stroke-width: 0.5; fill: none; }}\n'
+        f'      .grid-line {{ stroke: #E0E0E0; stroke-width: 0.35; fill: none; stroke-dasharray: 2,2; }}\n'
+        f'      .grid-text {{ font-family: sans-serif; font-size: 2.2px; fill: #7F8C8D; text-anchor: middle; }}\n'
+        f'      .sector-beat {{ fill: #2ECC71; fill-opacity: 0.18; stroke: #27AE60; stroke-width: 0.4; }}\n'
+        f'      .sector-gybe {{ fill: #E74C3C; fill-opacity: 0.18; stroke: #C0392B; stroke-width: 0.4; }}\n'
+        f'      .compass-tick {{ stroke: #2C3E50; stroke-width: 0.4; }}\n'
+        f'      .compass-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.6px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .polar-curve {{ fill: none; stroke-width: 0.70; }}\n'
+        f'      .polar-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; dominant-baseline: central; }}\n'
+        f'      .awa-line {{ fill: none; stroke: #2980B9; stroke-width: 0.40; stroke-dasharray: 2.5,1.2; }}\n'
+        f'      .awa-label {{ font-family: sans-serif; font-size: 2.0px; fill: #1B4F72; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .title-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.8px; fill: #2C3E50; text-anchor: middle; }}\n'
+        f'      .sub-text {{ font-family: sans-serif; font-size: 1.8px; fill: #7F8C8D; text-anchor: middle; }}\n'
+        f'      .tack-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: #27AE60; text-anchor: middle; }}\n'
+        f'      .gybe-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: #C0392B; text-anchor: middle; }}\n'
+        f'      .vmg-beat {{ fill: #E74C3C; stroke: #962D22; stroke-width: 0.3; }}\n'
+        f'      .vmg-run {{ fill: #2ECC71; stroke: #27AE60; stroke-width: 0.3; }}\n'
+        f'      .crossover-marker {{ fill: #9B59B6; stroke: #8E44AD; stroke-width: 0.3; }}\n'
+        f'      .crossover-line {{ fill: none; stroke: #8E44AD; stroke-width: 0.55; stroke-dasharray: 1.8,1.2; }}\n'
+        f'      .crossover-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.0px; fill: #8E44AD; }}\n'
+        f'    </style>\n'
+        f'  </defs>\n'
+        f'  <!-- Hintergrund & Begrenzungen -->\n'
+        f'  <circle cx="0" cy="0" r="75.0" class="bg" />\n'
+        f'  <circle cx="0" cy="0" r="75.0" class="rotor-edge" />\n'
+        f'  <circle cx="0" cy="0" r="1.5" class="center-hole" />\n'
+    )
+
+
+def generate_outer_tactical_rim() -> str:
+    """Zeichnet Kompassmarkierungen, TRUE WIND Pfeil und TACK/GYBE Sektoren."""
+    elements = []
+    r_outer = 75.0
+    r_inner = 66.0
+
+    # 1. TRUE WIND Pfeil bei 0° (12 Uhr)
+    p_tip = (0.0, -r_outer + 0.5)
+    p_l = (-2.5, -r_outer + 6.0)
+    p_r = (2.5, -r_outer + 6.0)
+    p_c = (0.0, -r_outer + 4.5)
+    elements.append(
+        f'  <polygon points="{p_tip[0]:.2f},{p_tip[1]:.2f} {p_l[0]:.2f},{p_l[1]:.2f} {p_c[0]:.2f},{p_c[1]:.2f} {p_r[0]:.2f},{p_r[1]:.2f}" '
+        f'fill="#C0392B" stroke="#962D22" stroke-width="0.3" />'
+    )
+    elements.append(f'  <text x="0" y="{-r_outer + 8.5:.2f}" class="compass-text" fill="#C0392B">TRUE WIND</text>')
+
+    # 2. TACK-Korridore (38° bis 42° beidseitig)
+    for side in [1, -1]:
+        a1, a2 = 38.0 * side, 42.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+        x1_in, y1_in = polar_to_svg(r_inner, a1)
+        x2_in, y2_in = polar_to_svg(r_inner, a2)
+        x1_out, y1_out = polar_to_svg(r_outer, a1)
+        x2_out, y2_out = polar_to_svg(r_outer, a2)
+
+        sweep = 1 if side > 0 else 0
+        path = (
+            f"M {x1_in:.2f} {y1_in:.2f} "
+            f"L {x1_out:.2f} {y1_out:.2f} "
+            f"A {r_outer} {r_outer} 0 0 {sweep} {x2_out:.2f} {y2_out:.2f} "
+            f"L {x2_in:.2f} {y2_in:.2f} "
+            f"A {r_inner} {r_inner} 0 0 {1 - sweep} {x1_in:.2f} {y1_in:.2f} Z"
+        )
+        elements.append(f'  <path d="{path}" class="sector-beat" />')
+        
+        lbl_x, lbl_y = polar_to_svg(r_inner + 4.5, 40.0 * side)
+        rot = (40.0 * side) - 90 if side > 0 else (40.0 * side) + 90
+        elements.append(
+            f'  <text x="{lbl_x:.2f}" y="{lbl_y:.2f}" class="tack-label" transform="rotate({rot:.1f} {lbl_x:.2f} {lbl_y:.2f})">TACK 40°</text>'
+        )
+
+    # 3. GYBE-Korridore (145° bis 165° beidseitig)
+    for side in [1, -1]:
+        a1, a2 = 145.0 * side, 165.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+        x1_in, y1_in = polar_to_svg(r_inner, a1)
+        x2_in, y2_in = polar_to_svg(r_inner, a2)
+        x1_out, y1_out = polar_to_svg(r_outer, a1)
+        x2_out, y2_out = polar_to_svg(r_outer, a2)
+
+        sweep = 1 if side > 0 else 0
+        path = (
+            f"M {x1_in:.2f} {y1_in:.2f} "
+            f"L {x1_out:.2f} {y1_out:.2f} "
+            f"A {r_outer} {r_outer} 0 0 {sweep} {x2_out:.2f} {y2_out:.2f} "
+            f"L {x2_in:.2f} {y2_in:.2f} "
+            f"A {r_inner} {r_inner} 0 0 {1 - sweep} {x1_in:.2f} {y1_in:.2f} Z"
+        )
+        elements.append(f'  <path d="{path}" class="sector-gybe" />')
+
+        lbl_x, lbl_y = polar_to_svg(r_inner + 4.5, 155.0 * side)
+        rot = (155.0 * side) - 90 if side > 0 else (155.0 * side) + 90
+        elements.append(
+            f'  <text x="{lbl_x:.2f}" y="{lbl_y:.2f}" class="gybe-label" transform="rotate({rot:.1f} {lbl_x:.2f} {lbl_y:.2f})">GYBE 155°</text>'
+        )
+
+    # 4. Gradteilung alle 10° am Rand
+    for deg in range(10, 180, 10):
+        for side in [1, -1]:
+            d = deg * side
+            is_30 = (deg % 30 == 0)
+            t_len = 3.2 if is_30 else 1.8
+            p1 = polar_to_svg(r_outer, d)
+            p2 = polar_to_svg(r_outer - t_len, d)
+            elements.append(f'  <line x1="{p1[0]:.2f}" y1="{p1[1]:.2f}" x2="{p2[0]:.2f}" y2="{p2[1]:.2f}" class="compass-tick" />')
+            if is_30 and deg < 170:
+                pt = polar_to_svg(r_outer - 5.0, d)
+                elements.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="compass-text">{deg}°</text>')
+
+    return "\n".join(elements)
+
+
+def generate_weg_a_svg(polar: PolarData, output_file: Path):
+    """
+    Generiert Weg A:
+    - Vollformat-Skalierung L = 64.0 mm (schöpft die R=65.5mm Fläche voll aus)
+    - Windpol W liegt im ZENTRUM (0,0)
+    - Basissehne L verläuft nach UNTEN (0, +L) entlang 6 Uhr (180°) bis zum Rand
+    - Fasskreisbögen ohne Sehnenartefakte / ohne lineare Lückenverbinder
+    - ORC-Polaren mit VMG-Gipfeln (Beat=Rot, Run=Grün)
+    - Segel-Crossover-Punkte (Jib vs. Gennaker/AsymCL) mit Crossover-Linie
+    """
+    L = 64.0  # Vollformat-Basissehne in mm vom Zentrum (0,0) nach unten (0, +L)
+    r_clip = 65.2
+
+    svg_parts = [generate_svg_header()]
+    svg_parts.append(generate_outer_tactical_rim())
+
+    # Infotext im oberen Bereich (ca. y = -45)
+    svg_parts.append('  <text x="0" y="-46.0" class="title-text">WEG A: NORMIERTE POLAREN (RATIO)</text>')
+    svg_parts.append('  <text x="0" y="-42.5" class="sub-text">Windpol (0,0) | L = 64 mm | JPK 1080 TRUE GRIT</text>')
+
+    # 1. Konzentrische Ratio-Ringe um das Zentrum (0,0) bis 1.0 (R=64mm)
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
+        r = ratio * L
+        svg_parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="grid-line" />')
+        svg_parts.append(f'  <text x="{r - 1.2:.2f}" y="-1.5" class="grid-text">{ratio:.1f}</text>')
+
+    # 2. Basissehne des wahren Windes vom Zentrum (0,0) nach UNTEN (0, +L)
+    svg_parts.append(f'  <line x1="0" y1="0" x2="0" y2="{L:.2f}" stroke="#C0392B" stroke-width="1.1" stroke-linecap="round" />')
+    svg_parts.append(f'  <circle cx="0" cy="{L:.2f}" r="1.4" fill="#C0392B" />')
+    svg_parts.append(f'  <text x="0" y="{L - 2.5:.2f}" class="awa-label" font-weight="bold" fill="#C0392B">P1 (180°)</text>')
+    svg_parts.append(f'  <text x="0" y="-3.2" class="awa-label" font-weight="bold" fill="#C0392B">Windpol (0,0)</text>')
+
+    # 3. Fasskreise im UNTEREN BEREICH mit sauberem Clipping (KEINE geraden Akkorde über Lücken!)
+    awa_angles = [25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0, 155.0]
+
+    for alpha in awa_angles:
+        rad = math.radians(alpha)
+        sin_a = math.sin(rad)
+        cos_a = math.cos(rad)
+        if sin_a == 0:
+            continue
+
+        r_c = L / (2.0 * sin_a)
+        ym = L / 2.0
+        xc_stb = (L / 2.0) * (cos_a / sin_a)
+
+        theta_limit = 180.0 - alpha
+        n_pts = 90
+        thetas = np.linspace(-math.radians(theta_limit), math.radians(theta_limit), n_pts)
+
+        raw_pts_stb = [(xc_stb + r_c * math.cos(t), ym + r_c * math.sin(t)) for t in thetas]
+
+        for side in [1, -1]:
+            pts_side = [(side * p[0], p[1]) for p in raw_pts_stb]
+            # Exaktes Clipping in getrennte Sub-Pfade, damit Lücken nicht linear verbunden werden
+            sub_paths = clip_polyline_to_circle(pts_side, r_clip)
+            for sub in sub_paths:
+                if len(sub) >= 2:
+                    d_str = "M " + " ".join([f"{p[0]:.2f} {p[1]:.2f}" for p in sub])
+                    svg_parts.append(f'  <path d="{d_str}" class="awa-line" />')
+
+            # Label platzieren
+            if side > 0 and sub_paths and alpha in [30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]:
+                main_sub = max(sub_paths, key=len)
+                if len(main_sub) >= 4:
+                    idx_lbl = len(main_sub) // 2 if alpha <= 50.0 else len(main_sub) * 3 // 5
+                    lbl_p = main_sub[min(idx_lbl, len(main_sub) - 1)]
+                    svg_parts.append(f'  <text x="{lbl_p[0]:.2f}" y="{lbl_p[1]:.2f}" class="awa-label">{int(alpha)}°</text>')
+
+    # 4. ORC-Polarkurven (normiert: r = (bsp / tws) * L)
+    colors = [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ]
+
+    # Speichern der Crossover-Punkte für die Verbindungslinie
+    crossover_pts_stb = []
+    crossover_pts_bb = []
+
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        curve = polar.curves_raw[idx]
+        pts_complex = []
+
+        for pt in curve:
+            twa = pt["twa"]
+            ratio = pt["bsp"] / tws
+            r_mm = ratio * L
+            rad = math.radians(twa)
+            pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+
+        smooth_pts = catmull_rom_spline(pts_complex, num_points=8)
+
+        d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+        d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+
+        svg_parts.append(f'  <path d="{d_stb}" class="polar-curve" stroke="{col}" />')
+        svg_parts.append(f'  <path d="{d_bb}" class="polar-curve" stroke="{col}" />')
+
+        # Beschriftung am äußeren Bogen
+        if smooth_pts:
+            end_p = smooth_pts[int(len(smooth_pts) * 0.65)]
+            svg_parts.append(f'  <text x="{end_p.real + 1.2:.2f}" y="{end_p.imag:.2f}" class="polar-label" fill="{col}">{int(tws)}k</text>')
+
+        # 5. VMG TARGET MARKS: Beat (Upwind) & Run (Downwind)
+        tgt = polar.vmg_targets[idx]
+        # Beat Target (Rote Raute)
+        beat_r = (tgt["beat_sog"] / tws) * L
+        bx_stb, by_stb = polar_to_svg(beat_r, tgt["beat_angle"])
+        bx_bb, by_bb = -bx_stb, by_stb
+        for bx, by in [(bx_stb, by_stb), (bx_bb, by_bb)]:
+            svg_parts.append(
+                f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />'
+            )
+
+        # Run Target (Grüne Raute)
+        run_r = (tgt["run_sog"] / tws) * L
+        rx_stb, ry_stb = polar_to_svg(run_r, tgt["gybe_angle"])
+        rx_bb, ry_bb = -rx_stb, ry_stb
+        for rx, ry in [(rx_stb, ry_stb), (rx_bb, ry_bb)]:
+            svg_parts.append(
+                f'  <polygon points="{rx:.2f},{ry-1.1:.2f} {rx+1.1:.2f},{ry:.2f} {rx:.2f},{ry+1.1:.2f} {rx-1.1:.2f},{ry:.2f}" class="vmg-run" />'
+            )
+
+        # 6. SAIL CROSSOVER POINT: Jib vs. AsymCL
+        # Exakter Schnittwinkel aus den Messbriefdaten
+        jib_pts = {pt["twa"]: pt["bsp"] for pt in polar.sail_polars.get("Jib", {}).get(tws, [])}
+        asym_pts = {pt["twa"]: pt["bsp"] for pt in polar.sail_polars.get("AsymCL", {}).get(tws, [])}
+        common_twas = sorted(set(jib_pts.keys()) & set(asym_pts.keys()))
+        cross_twa, cross_bsp = None, None
+        for i in range(len(common_twas) - 1):
+            t1, t2 = common_twas[i], common_twas[i+1]
+            diff1 = asym_pts[t1] - jib_pts[t1]
+            diff2 = asym_pts[t2] - jib_pts[t2]
+            if diff1 <= 0 and diff2 >= 0:
+                frac = (-diff1) / (diff2 - diff1) if diff2 != diff1 else 0.5
+                cross_twa = t1 + frac * (t2 - t1)
+                cross_bsp = jib_pts[t1] + frac * (jib_pts[t2] - jib_pts[t1])
+                break
+        if cross_twa is None and tws >= 20.0:
+            cross_twa = 110.0
+            cross_bsp = asym_pts.get(110.0, 9.2)
+
+        if cross_twa and cross_bsp:
+            cr_r = (cross_bsp / tws) * L
+            cx_stb, cy_stb = polar_to_svg(cr_r, cross_twa)
+            cx_bb, cy_bb = -cx_stb, cy_stb
+            crossover_pts_stb.append((cx_stb, cy_stb))
+            crossover_pts_bb.append((cx_bb, cy_bb))
+
+            # Markierung als Segel-Symbol / Dreieck
+            for cx, cy, sign in [(cx_stb, cy_stb, 1), (cx_bb, cy_bb, -1)]:
+                # Dreiecksspitze zeigt nach außen
+                p_top = (cx + sign * 1.3, cy)
+                p_b1 = (cx - sign * 0.9, cy - 1.1)
+                p_b2 = (cx - sign * 0.9, cy + 1.1)
+                svg_parts.append(
+                    f'  <polygon points="{p_top[0]:.2f},{p_top[1]:.2f} {p_b1[0]:.2f},{p_b1[1]:.2f} {p_b2[0]:.2f},{p_b2[1]:.2f}" class="crossover-marker" />'
+                )
+
+    # 7. Crossover-Verbindungslinie über alle Windstärken
+    if len(crossover_pts_stb) >= 2:
+        d_cross_stb = "M " + " ".join([f"{p[0]:.2f} {p[1]:.2f}" for p in crossover_pts_stb])
+        d_cross_bb = "M " + " ".join([f"{p[0]:.2f} {p[1]:.2f}" for p in crossover_pts_bb])
+        svg_parts.append(f'  <path d="{d_cross_stb}" class="crossover-line" />')
+        svg_parts.append(f'  <path d="{d_cross_bb}" class="crossover-line" />')
+
+        # Beschriftung an der Crossover-Linie
+        p_last = crossover_pts_stb[-1]
+        svg_parts.append(f'  <text x="{p_last[0] + 1.5:.2f}" y="{p_last[1]:.2f}" class="crossover-text">GENNAKER / SPI</text>')
+
+    # 8. Legende im oberen Freibereich
+    svg_parts.append('  <!-- Legende -->')
+    svg_parts.append('  <polygon points="-28,-53 -26.8,-51.8 -28,-50.6 -29.2,-51.8" class="vmg-beat" />')
+    svg_parts.append('  <text x="-25" y="-51.3" class="awa-label" font-size="1.8px" text-anchor="start">Beat VMG</text>')
+    svg_parts.append('  <polygon points="-8,-53 -6.8,-51.8 -8,-50.6 -9.2,-51.8" class="vmg-run" />')
+    svg_parts.append('  <text x="-5" y="-51.3" class="awa-label" font-size="1.8px" text-anchor="start">Run VMG</text>')
+    svg_parts.append('  <polygon points="12,-51.8 10,-53 10,-50.6" class="crossover-marker" />')
+    svg_parts.append('  <text x="14" y="-51.3" class="crossover-text" font-size="1.8px">Gennaker Crossover</text>')
+
+    svg_parts.append('</svg>')
+    output_file.write_text("\n".join(svg_parts), encoding="utf-8")
+
+
+def generate_weg_b_svg(polar: PolarData, output_file: Path):
+    """Generiert Weg B: Absolute Polaren (in Knoten, z.B. 4.8 mm/kn) + echte AWA-Isolinien."""
+    SCALE = 4.8  # mm pro Knoten (12 kn = 57.6 mm)
+    svg_parts = [generate_svg_header()]
+    svg_parts.append(generate_outer_tactical_rim())
+
+    svg_parts.append('  <text x="0" y="24.0" class="title-text">WEG B: ABSOLUTE POLAREN (KNOTEN)</text>')
+    svg_parts.append('  <text x="0" y="28.0" class="sub-text">Maßstab 4.8 mm/kn mit AWA-Isolinien | JPK 1080 TRUE GRIT</text>')
+
+    for bsp in [2, 4, 6, 8, 10, 12]:
+        r = bsp * SCALE
+        svg_parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="grid-line" />')
+        svg_parts.append(f'  <text x="{r - 1.0:.2f}" y="2.5" class="grid-text">{bsp} kn</text>')
+
+    colors = [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ]
+
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        curve = polar.curves_raw[idx]
+        pts_complex = []
+
+        for pt in curve:
+            twa = pt["twa"]
+            r_mm = pt["bsp"] * SCALE
+            rad = math.radians(twa)
+            pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+
+        smooth_pts = catmull_rom_spline(pts_complex, num_points=8)
+
+        d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+        d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+
+        svg_parts.append(f'  <path d="{d_stb}" class="polar-curve" stroke="{col}" />')
+        svg_parts.append(f'  <path d="{d_bb}" class="polar-curve" stroke="{col}" />')
+
+        if smooth_pts:
+            end_p = smooth_pts[int(len(smooth_pts) * 0.65)]
+            svg_parts.append(f'  <text x="{end_p.real + 1.2:.2f}" y="{end_p.imag:.2f}" class="polar-label" fill="{col}">{int(tws)}k</text>')
+
+    target_awas = [30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]
+
+    for awa_target in target_awas:
+        awa_pts_stb = []
+
+        for idx, tws in enumerate(polar.tws_list):
+            curve = polar.curves_raw[idx]
+            for i in range(len(curve) - 1):
+                p1, p2 = curve[i], curve[i + 1]
+                a1, a2 = p1["awa"], p2["awa"]
+                if (a1 <= awa_target <= a2) or (a2 <= awa_target <= a1):
+                    if abs(a2 - a1) > 1e-4:
+                        t = (awa_target - a1) / (a2 - a1)
+                    else:
+                        t = 0.0
+                    interp_twa = p1["twa"] + t * (p2["twa"] - p1["twa"])
+                    interp_bsp = p1["bsp"] + t * (p2["bsp"] - p1["bsp"])
+                    r_mm = interp_bsp * SCALE
+                    rad = math.radians(interp_twa)
+                    awa_pts_stb.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+                    break
+
+        if len(awa_pts_stb) >= 2:
+            smooth_awa = catmull_rom_spline(awa_pts_stb, num_points=6)
+            d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_awa])
+            d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_awa])
+            svg_parts.append(f'  <path d="{d_stb}" class="awa-line" />')
+            svg_parts.append(f'  <path d="{d_bb}" class="awa-line" />')
+
+            lbl_pt = smooth_awa[-1]
+            svg_parts.append(f'  <text x="{lbl_pt.real:.2f}" y="{lbl_pt.imag - 1.5:.2f}" class="awa-label">{int(awa_target)}°</text>')
+
+    svg_parts.append('</svg>')
+    output_file.write_text("\n".join(svg_parts), encoding="utf-8")
+
+
+def main():
+    slk_path = Path("data/249116.slk")
+    print(f"Lade ORC-Polaren aus {slk_path}...")
+    polar = PolarData(slk_path)
+    print(f"Erfolgreich geladen: {polar.boat_name} ({polar.boat_class}, {polar.sail_number}) mit {len(polar.tws_list)} Windstärken.")
+
+    out_dir = Path("output")
+    out_dir.mkdir(exist_ok=True)
+
+    file_a = out_dir / "vergleich_weg_a_normiert.svg"
+    file_b = out_dir / "vergleich_weg_b_knoten.svg"
+
+    print(f"Generiere Weg A (Vollformat, bereinigte Fasskreise, VMG-Targets & Crossover) -> {file_a}")
+    generate_weg_a_svg(polar, file_a)
+
+    print(f"Generiere Weg B (Absolute Knoten + AWA-Isolinien) -> {file_b}")
+    generate_weg_b_svg(polar, file_b)
+
+    print("Beide SVGs erfolgreich generiert!")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,200 @@
+# 🧭 Nautische Rechenscheibe & Taktik-Suite – JPK 1080 (GER 7447)
+
+Präzises analoges und digitales Navigations- und Taktiksystem für die Regattayacht **JPK 1080 (*TRUE GRIT*, GER 7447)**.  
+Kombiniert die offiziellen **ORC-VPP-Polardaten** (Stand 27.12.2025, Run-ID `249116`) mit:
+1. Einer **doppelseitigen analogen Rechenscheibe**:
+   * **Vorderseite:** Taktik- & Polardiagramm mit zentralem Ratio-Zeiger und maximaler Zeichenfläche.
+   * **Rückseite:** Vollwertiger rotierender Rechenschieber (Stator vs. Rotor) zum Multiplizieren & Dividieren.
+2. Einem **digitalen Taktik-Bordcomputer** (`tactical_advisor.py`) mit Einzelsegel-Performancevergleich.
+3. Einem **GPX-Routen- und VMG-Optimierer** (`route_optimizer.py`) für Regattakurse.
+4. Einer **vollparametrischen Geometriesteuerung** über [`config.json`](config.json).
+
+---
+
+## 📑 Inhaltsverzeichnis
+1. [Das Doppelseitige Konzept (Dual-Sided Architecture)](#-das-doppelseitige-konzept)
+2. [Vorderseite: Taktik, Polaren & Zentralzeiger](#-vorderseite-taktik-polaren--zentralzeiger)
+3. [Rückseite: Logarithmischer Rechenschieber](#-rückseite-logarithmischer-rechenschieber)
+4. [Hardware-Fertigung (3D-Druck & Lasergravur)](#-hardware-fertigung-3d-druck--lasergravur)
+5. [Parametrische Steuerung über config.json](#-parametrische-steuerung-über-configjson)
+6. [CLI-Tools & Software-Module](#-cli-tools--software-module)
+7. [Praxis-Bedienungsanleitung auf See](#-praxis-bedienungsanleitung-auf-see)
+
+---
+
+## 🔄 Das Doppelseitige Konzept
+
+Klassische Navigationsrechner (wie der *E6B Flight Computer* oder die *Aristo Nautic*) trennen die Aufgaben auf zwei Seiten, um maximale Übersicht und Präzision zu gewährleisten:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              JPK 1080 RECHENSCHEIBE                         │
+├──────────────────────────────────────┬──────────────────────────────────────┤
+│             VORDERSEITE              │              RÜCKSEITE               │
+│         (Taktik & Polaren)           │     (Logarithmischer Rechenschieber) │
+├──────────────────────────────────────┼──────────────────────────────────────┤
+│ • Volle 115 mm Scheibenfläche        │ • Stator: Äußerer Log-Ring (1..10)   │
+│ • Äußere Skala: 360° Kompassrose     │ • Rotor : Innerer Log-Ring (1..10)   │
+│ • Innere Skala: AWA-Winkelstrahlen   │ • Trennfuge liegt exakt dazwischen   │
+│ • 8 ORC-Polarkurven (6 bis 24 kn TWS)│ • Multiplikation: Ratio x TWS = BSP  │
+│ • Zentraler Zeiger: Ratio V_BS / TWS │ • Division & Weg-Zeit-Rechnung       │
+└──────────────────────────────────────┴──────────────────────────────────────┘
+```
+
+Durch die Auslagerung des Rechenschiebers auf die Rückseite gewinnt die Vorderseite **fast 40 % mehr Zeichenfläche**. Die Polarkurven sind deutlich größer und bei Seegang im Cockpit ermüdungsfrei ablesbar.
+
+---
+
+## ⛵ Vorderseite: Taktik, Polaren & Echte AWA-Fasskreise
+
+### 1. Skalen auf dem Stator (fester Außenring)
+* **Äußere Skala ($360^\circ$-Kompassrose):**  
+  Vollkreis-Skala vom geometrischen Mittelpunkt $(0, 0)$. Dient zum direkten Einstellen und Anpeilen von Kurs über Grund ($COG$), True Heading ($HDG$) oder Wahrem Windwinkel ($TWA$).
+* **Nautische Orientierung:** $0^\circ / 360^\circ$ (True Wind / Im Wind) steht exakt oben auf 12 Uhr.
+
+### 2. Die Polardrehscheibe (Front Rotor)
+* **Zentrum $(0, 0)$:** Schiffsposition mit Voraus-Pfeil (Heading / Bug nach oben).
+* **Windfußpunkt $P_1(0, -Y_{AWA})$:** Exzentrischer Pol des Wahren Windes.
+* **Echte AWA-Fasskreisbögen (Peripheriewinkelsatz):**  
+  Die AWA-Linien sind Kreisbögen, die exakt durch das Zentrum $O(0,0)$ und den Windfußpunkt $P_1(0, -Y_0)$ verlaufen. Jeder dieser Bögen ist der geometrische Ort aller Betriebspunkte mit **konstantem scheinbarem Windwinkel ($AWA$)**:
+  * Für $AWA = 90^\circ$: Thaleskreis über $O P_1$.
+  * Für $AWA = 25^\circ, 35^\circ, 45^\circ, 55^\circ, 65^\circ, 75^\circ, 90^\circ, 110^\circ, 130^\circ, 155^\circ$: Harmonisch geschwungene Bögen für Am-Wind-, Halbwind- und Raumschots-Kurse.
+  * **Praxis-Vorteil:** Du liest am Verklicker $AWA = 65^\circ$ ab $\rightarrow$ folgst dem $65^\circ$-Bogen bis zur aktuellen Windstärke-Polare $\rightarrow$ liest direkt deinen wahren Windwinkel ($TWA$), deine Target-Bootsgeschwindigkeit und die scheinbare Windstärke ab!
+* **8 ORC-Polarkurven der JPK 1080:** Für $6, 8, 10, 12, 14, 16, 20, 24\text{ kn}$ Wind.
+* **VMG-Ziele:** Rote Rauten (optimaler Beat-Wendewinkel) und grüne Rauten (optimaler Run-Halsenwinkel).
+
+### 3. Der zentrale Ratio-Zeiger (`rechenscheibe_zeiger_lineal.stl`)
+Das Lineal ist **im Mittelpunkt $(0, 0)$** drehbar gelagert:
+* **Physikalische Ratio-Skala:** Da die Polaren auf den wahren Wind normiert sind, wächst der Radius proportional zu:
+  $$\text{Ratio} = \frac{V_{BS}}{TWS}$$
+* Das Lineal trägt eine gravierte Teilung von **$0.0$ bis $1.20$** (mit $0.05$-Zwischenteilung).
+* **Bedienung:** Zeiger auf den Wahren Windwinkel ($TWA$, z. B. $110^\circ$) drehen. An der Polarkurve (z. B. $16\text{ kn}$) an der Peilkante direkt das Verhältnis ablesen (z. B. **$0.54$**). Genau an dieser Stelle kreuzt im unterliegenden Gitter der scheinbare Windwinkel $AWA$ und die scheinbare Windstärke $AWS/TWS$.
+
+---
+
+## 🔢 Rückseite: Logarithmischer Rechenschieber mit Sinus-Skala (S-Skala)
+
+Auf der Rückseite arbeiten drei konzentrische Skalen für Multiplikation, Division und Winkelfunktionen:
+* **Stator (D-Skala, fester Außenring):** Äußere logarithmische Skala ($1 \dots 10$).
+* **Rotor (C-Skala, drehbare Innenscheibe):** Innere logarithmische Skala ($1 \dots 10$) mit hoher Zehnteldichte von $1.0$ bis $2.0$.
+* **Rotor (S-Skala, Sinus-Skala):** Logarithmische Sinusskala für Winkel von $\mathbf{6^\circ}$ bis $\mathbf{90^\circ}$ ($\theta = 360^\circ \cdot \log_{10}(10 \sin\alpha)$).
+  * $90^\circ$ steht exakt unter der $1 / 10$ auf 12 Uhr.
+  * $30^\circ$ steht exakt radial unter der $5$ ($\sin 30^\circ = 0.5$).
+  * $11.5^\circ$ steht exakt radial unter der $2$ ($\sin 11.5^\circ \approx 0.2$).
+
+### Direkte Rechenoperationen:
+1. **Lösung des Winddreiecks über den Sinussatz:**
+   Im Winddreieck gilt:
+   $$\sin(D) = \frac{BS}{TWS} \cdot \sin(AWA) \quad \text{mit} \quad TWA = AWA + D$$
+   * Stelle die $1$ der C-Skala auf die Geschwindigkeit $\frac{BS}{TWS}$ der D-Skala.
+   * Suche deinen Verklicker-Winkel $AWA$ auf der S-Skala.
+   * Lies den resultierenden Driftwinkel $D$ auf der S-Skala ab!
+   * Wahrer Windwinkel: $TWA = AWA + D$.
+2. **Ratio in Knoten umrechnen:**
+   * Stelle die **$1$** der Innenscheibe auf die abgelesene Ratio (z. B. **$0.54$**).
+   * Lies gegenüber von $TWS = 16\text{ kn}$ direkt die **Bootsgeschwindigkeit ($8.64\text{ kn}$)** ab!
+3. **Geschwindigkeit, Weg und Zeit ($Distanz = Speed \times Zeit$):**
+   * Stelle die Geschwindigkeit in Knoten ein $\rightarrow$ lies für jede beliebige Fahrzeit direkt die zurückgelegte Distanz in Seemeilen ab.
+
+---
+
+## 🛠️ Hardware-Fertigung (3D-Druck & Lasergravur)
+
+### Schritt 1: 3D-Druck (STL)
+Alle STL-Dateien liegen druckfertig im Ordner `output/`:
+* `rechenscheibe_stator_basis.stl`: Doppelseitiger Basiskörper mit zentraler Trennwand ($1.6\text{ mm}$) sowie vorderer und hinterer Pass-Tasche ($1.8\text{ mm}$ Tiefe).
+* `rechenscheibe_rotor_vorderseite.stl`: Vordere Drehscheibe für die Polaren ($46.75\text{ mm}$ Radius, $1.8\text{ mm}$ Dicke).
+* `rechenscheibe_rotor_rueckseite.stl`: Hintere Drehscheibe für den Rechenschieber ($46.75\text{ mm}$ Radius, $1.8\text{ mm}$ Dicke).
+* `rechenscheibe_zeiger_lineal.stl`: Zentraler Zeigerarm mit radialer Peilkante und Indexspitze ($62\text{ mm}$ Länge).
+* `rechenscheibe_achsstift.stl`: Zentraler Achsbolzen ($\varnothing 3.0\text{ mm} \times 6.8\text{ mm}$ Länge mit $1.0\text{ mm}$ Flachkopf).
+
+**Druckempfehlungen:**
+* **Material:** Helles PETG oder mattes PLA (Weiß oder Elfenbein) für besten Kontrast.
+* **Infill:** 100% (konzentrisch).
+* **Glätten (Ironing):** Auf den obersten Schichten aktivieren für eine absolut plane Gravurfläche.
+
+### Schritt 2: Lasergravur (DXF)
+Dateien im Ordner `output/`:
+* **Vorderseite:** `laser_rotor_vorderseite.dxf`, `laser_stator_vorderseite.dxf`, `rechenscheibe_vorderseite_komplett.dxf`
+* **Rückseite:** `laser_rotor_rueckseite.dxf`, `laser_stator_rueckseite.dxf`, `rechenscheibe_rueckseite_komplett.dxf`
+* **Zeiger:** `laser_zeiger_lineal.dxf` (Zuschnitt und gravierte Ratio-Skala)
+
+---
+
+## ⚙️ Parametrische Steuerung über `config.json`
+
+Alle Dimensionen sind in [`config.json`](config.json) hinterlegt:
+```json
+{
+  "dimensions": {
+    "outer_radius_mm": 57.5,
+    "split_radius_mm": 47.0,
+    "true_wind_scale_factor": 1.00,
+    "rotor_clearance_mm": 0.25,
+    "pocket_clearance_mm": 0.15,
+    "pin_clearance_mm": 0.10,
+    "center_hole_radius_mm": 1.60
+  },
+  "thicknesses": {
+    "stator_core_wall_mm": 1.6,
+    "front_rim_height_mm": 1.8,
+    "back_rim_height_mm": 1.8,
+    "front_rotor_disc_mm": 1.8,
+    "back_rotor_disc_mm": 1.8,
+    "pointer_arm_mm": 1.2
+  },
+  "pointer": {
+    "width_mm": 6.0,
+    "hub_radius_mm": 4.5,
+    "thumb_tab_extension_mm": 4.5,
+    "max_ratio": 1.20
+  }
+}
+```
+
+---
+
+## 💻 CLI-Tools & Software-Module
+
+### 1. Rechenscheibe generieren (STL + DXF + PNG):
+```bash
+./.venv/bin/python rechenscheibe.py
+```
+*Tipp: Mit `--sail-layers` werden zusätzliche DXF-Ebenen für Einzelsegel (Jib, Gennaker, Spi) generiert.*
+
+### 2. Taktischen Bordcomputer abfragen:
+```bash
+./.venv/bin/python tactical_advisor.py --hdg 235 --twd 345 --tws 16
+```
+*Gibt Soll-Speed, Krängung und das Geschwindigkeitspotenzial aller Segel aus (Fock $8.03\text{ kn}$ vs. Gennaker $8.61\text{ kn}$).*
+
+### 3. GPX-Regattakurs optimieren:
+```bash
+./.venv/bin/python route_optimizer.py --gpx data/Kursdaten.gpx --twd 345 --tws 16
+```
+*Berechnet für alle Schenkel Distanzen, VMG-Schläge, ETE und Segelwechsel.*
+
+---
+
+## ⛵ Praxis-Bedienungsanleitung auf See
+
+```
+┌──────────────────────────────────────┐       ┌──────────────────────────────────────┐
+│       1. VORDERSEITE (Taktik)        │       │       2. RÜCKSEITE (Rechnen)         │
+├──────────────────────────────────────┤       ├──────────────────────────────────────┤
+│ 1. Zeiger auf Kurs/TWA drehen        │       │ 1. 1 auf abgelesene Ratio stellen    │
+│ 2. An Polare Ratio ablesen (z.B. 0.54│       │ 2. Bei TWS Speed in kn ablesen       │
+│ 3. Im Gitter AWA & AWS/TWS prüfen    │       │ 3. Zeit x Speed = Distanz berechnen  │
+└──────────────────────────────────────┘       └──────────────────────────────────────┘
+```
+
+1. **Windstärke:** Aktuellen wahren Wind $TWS$ bestimmen (z. B. $16\text{ kn}$).
+2. **Kurs einstellen:** Den zentralen Zeiger auf den Wahren Windwinkel ($TWA$, z. B. $110^\circ$) stellen.
+3. **Ratio ablesen:** Am Schnittpunkt mit der 16-kn-Polare liest du auf der Linealskala das Verhältnis ab (z. B. **$0.54$**).
+4. **AWA & AWS prüfen:** Unter dem Schnittpunkt kreuzt die cyanfarbene AWA-Linie ($78^\circ$) und der AWS-Bogen ($15.4\text{ kn}$).
+5. **Umdrehen & Rechnen:** Scheibe umdrehen. Auf dem Rechenschieber $0.54 \times 16\text{ kn} = 8.64\text{ kn}$ Target Speed berechnen.
+
+---
+
+**Entwickelt für:** JPK 1080 *TRUE GRIT* (GER 7447)  
+**Lizenz:** Open Source für Rennyachten & Navigator-Crews.

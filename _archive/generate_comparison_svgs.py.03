@@ -1,0 +1,362 @@
+"""
+generate_comparison_svgs.py - Generiert zwei maßhaltige 1:1 SVGs für den Konzeptvergleich:
+Weg A: Normierte Polaren (Ratio V_BS / TWS) mit Windpol im Zentrum (0,0) und Fasskreisen im unteren Bereich
+Weg B: Absolute Polaren (in Knoten) mit AWA-Isolinien aus dem JPK 1080 ORC-Datensatz
+"""
+
+import math
+from pathlib import Path
+from typing import List, Dict, Tuple, Any
+import numpy as np
+from polar_parser import PolarData, catmull_rom_spline
+
+
+def polar_to_svg(r: float, angle_deg: float, origin_y: float = 0.0) -> Tuple[float, float]:
+    """
+    Konvertiert Polarkoordinaten in SVG-Koordinaten (0° = 12 Uhr / Norden).
+    Im SVG zeigt +Y nach unten, daher y = -r * cos(angle).
+    """
+    rad = math.radians(angle_deg)
+    x = r * math.sin(rad)
+    y = -r * math.cos(rad) + origin_y
+    return x, y
+
+
+def generate_svg_header(width_mm: float = 180.0, height_mm: float = 180.0) -> str:
+    half_w = width_mm / 2.0
+    half_h = height_mm / 2.0
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'width="{width_mm}mm" height="{height_mm}mm" '
+        f'viewBox="{-half_w:.2f} {-half_h:.2f} {width_mm:.2f} {height_mm:.2f}">\n'
+        f'  <defs>\n'
+        f'    <style>\n'
+        f'      .bg {{ fill: #FFFFFF; }}\n'
+        f'      .boundary {{ stroke: #BDC3C7; stroke-width: 0.5; fill: none; stroke-dasharray: 2,2; }}\n'
+        f'      .rotor-edge {{ stroke: #2C3E50; stroke-width: 0.8; fill: none; }}\n'
+        f'      .center-hole {{ stroke: #E74C3C; stroke-width: 0.5; fill: none; }}\n'
+        f'      .grid-line {{ stroke: #E0E0E0; stroke-width: 0.35; fill: none; }}\n'
+        f'      .grid-text {{ font-family: sans-serif; font-size: 2.2px; fill: #7F8C8D; text-anchor: middle; }}\n'
+        f'      .sector-beat {{ fill: #2ECC71; fill-opacity: 0.18; stroke: #27AE60; stroke-width: 0.4; }}\n'
+        f'      .sector-gybe {{ fill: #E74C3C; fill-opacity: 0.18; stroke: #C0392B; stroke-width: 0.4; }}\n'
+        f'      .compass-tick {{ stroke: #2C3E50; stroke-width: 0.4; }}\n'
+        f'      .compass-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.6px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .polar-curve {{ fill: none; stroke-width: 0.65; }}\n'
+        f'      .polar-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; dominant-baseline: central; }}\n'
+        f'      .awa-line {{ fill: none; stroke: #2980B9; stroke-width: 0.45; stroke-dasharray: 2.5,1.2; }}\n'
+        f'      .awa-label {{ font-family: sans-serif; font-size: 2.0px; fill: #1B4F72; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .title-text {{ font-family: sans-serif; font-weight: bold; font-size: 3.0px; fill: #2C3E50; text-anchor: middle; }}\n'
+        f'      .sub-text {{ font-family: sans-serif; font-size: 1.9px; fill: #7F8C8D; text-anchor: middle; }}\n'
+        f'      .tack-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: #27AE60; text-anchor: middle; }}\n'
+        f'      .gybe-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: #C0392B; text-anchor: middle; }}\n'
+        f'    </style>\n'
+        f'  </defs>\n'
+        f'  <!-- Hintergrund & Begrenzungen -->\n'
+        f'  <circle cx="0" cy="0" r="75.0" class="bg" />\n'
+        f'  <circle cx="0" cy="0" r="75.0" class="rotor-edge" />\n'
+        f'  <circle cx="0" cy="0" r="1.5" class="center-hole" />\n'
+    )
+
+
+def generate_outer_tactical_rim() -> str:
+    """Zeichnet Kompassmarkierungen, TRUE WIND Pfeil und TACK/GYBE Sektoren."""
+    elements = []
+    r_outer = 75.0
+    r_inner = 66.0
+
+    # 1. TRUE WIND Pfeil bei 0° (12 Uhr)
+    p_tip = (0.0, -r_outer + 0.5)
+    p_l = (-2.5, -r_outer + 6.0)
+    p_r = (2.5, -r_outer + 6.0)
+    p_c = (0.0, -r_outer + 4.5)
+    elements.append(
+        f'  <polygon points="{p_tip[0]:.2f},{p_tip[1]:.2f} {p_l[0]:.2f},{p_l[1]:.2f} {p_c[0]:.2f},{p_c[1]:.2f} {p_r[0]:.2f},{p_r[1]:.2f}" '
+        f'fill="#C0392B" stroke="#962D22" stroke-width="0.3" />'
+    )
+    elements.append(f'  <text x="0" y="{-r_outer + 8.5:.2f}" class="compass-text" fill="#C0392B">TRUE WIND</text>')
+
+    # 2. TACK-Korridore (38° bis 42° beidseitig)
+    for side in [1, -1]:
+        a1, a2 = 38.0 * side, 42.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+        x1_in, y1_in = polar_to_svg(r_inner, a1)
+        x2_in, y2_in = polar_to_svg(r_inner, a2)
+        x1_out, y1_out = polar_to_svg(r_outer, a1)
+        x2_out, y2_out = polar_to_svg(r_outer, a2)
+
+        sweep = 1 if side > 0 else 0
+        path = (
+            f"M {x1_in:.2f} {y1_in:.2f} "
+            f"L {x1_out:.2f} {y1_out:.2f} "
+            f"A {r_outer} {r_outer} 0 0 {sweep} {x2_out:.2f} {y2_out:.2f} "
+            f"L {x2_in:.2f} {y2_in:.2f} "
+            f"A {r_inner} {r_inner} 0 0 {1 - sweep} {x1_in:.2f} {y1_in:.2f} Z"
+        )
+        elements.append(f'  <path d="{path}" class="sector-beat" />')
+        
+        lbl_x, lbl_y = polar_to_svg(r_inner + 4.5, 40.0 * side)
+        rot = (40.0 * side) - 90 if side > 0 else (40.0 * side) + 90
+        elements.append(
+            f'  <text x="{lbl_x:.2f}" y="{lbl_y:.2f}" class="tack-label" transform="rotate({rot:.1f} {lbl_x:.2f} {lbl_y:.2f})">TACK 40°</text>'
+        )
+
+    # 3. GYBE-Korridore (145° bis 165° beidseitig)
+    for side in [1, -1]:
+        a1, a2 = 145.0 * side, 165.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+        x1_in, y1_in = polar_to_svg(r_inner, a1)
+        x2_in, y2_in = polar_to_svg(r_inner, a2)
+        x1_out, y1_out = polar_to_svg(r_outer, a1)
+        x2_out, y2_out = polar_to_svg(r_outer, a2)
+
+        sweep = 1 if side > 0 else 0
+        path = (
+            f"M {x1_in:.2f} {y1_in:.2f} "
+            f"L {x1_out:.2f} {y1_out:.2f} "
+            f"A {r_outer} {r_outer} 0 0 {sweep} {x2_out:.2f} {y2_out:.2f} "
+            f"L {x2_in:.2f} {y2_in:.2f} "
+            f"A {r_inner} {r_inner} 0 0 {1 - sweep} {x1_in:.2f} {y1_in:.2f} Z"
+        )
+        elements.append(f'  <path d="{path}" class="sector-gybe" />')
+
+        lbl_x, lbl_y = polar_to_svg(r_inner + 4.5, 155.0 * side)
+        rot = (155.0 * side) - 90 if side > 0 else (155.0 * side) + 90
+        elements.append(
+            f'  <text x="{lbl_x:.2f}" y="{lbl_y:.2f}" class="gybe-label" transform="rotate({rot:.1f} {lbl_x:.2f} {lbl_y:.2f})">GYBE 155°</text>'
+        )
+
+    # 4. Gradteilung alle 10° am Rand
+    for deg in range(10, 180, 10):
+        for side in [1, -1]:
+            d = deg * side
+            is_30 = (deg % 30 == 0)
+            t_len = 3.2 if is_30 else 1.8
+            p1 = polar_to_svg(r_outer, d)
+            p2 = polar_to_svg(r_outer - t_len, d)
+            elements.append(f'  <line x1="{p1[0]:.2f}" y1="{p1[1]:.2f}" x2="{p2[0]:.2f}" y2="{p2[1]:.2f}" class="compass-tick" />')
+            if is_30 and deg < 170:
+                pt = polar_to_svg(r_outer - 5.0, d)
+                elements.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="compass-text">{deg}°</text>')
+
+    return "\n".join(elements)
+
+
+def generate_weg_a_svg(polar: PolarData, output_file: Path):
+    """
+    Generiert Weg A:
+    - Windpol W liegt im ZENTRUM (0,0)
+    - Basissehne L verläuft nach UNTEN (0, +L) entlang 6 Uhr (180°)
+    - Fasskreisbögen spannen sich im UNTEREN Bereich auf
+    - Normierte Polaren (Ratio V_BS/TWS) mit L = 52.0 mm
+    """
+    L = 52.0  # Basissehne in mm vom Zentrum (0,0) nach unten (0, +L)
+    svg_parts = [generate_svg_header()]
+    svg_parts.append(generate_outer_tactical_rim())
+
+    # Dezenter Infotext im oberen Bereich (ca. y = -35 bis -40), um den unteren Fasskreisbereich frei zu halten
+    svg_parts.append('  <text x="0" y="-38.0" class="title-text">WEG A: NORMIERTE POLAREN (RATIO)</text>')
+    svg_parts.append('  <text x="0" y="-34.0" class="sub-text">Windpol im Zentrum | Fasskreise im unteren Bereich | JPK 1080 TRUE GRIT</text>')
+
+    # 1. Konzentrische Ratio-Ringe um das Zentrum (0,0)
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
+        r = ratio * L
+        svg_parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="grid-line" />')
+        # Beschriftung auf horizontaler Achse
+        svg_parts.append(f'  <text x="{r - 1.0:.2f}" y="-1.5" class="grid-text">{ratio:.1f}</text>')
+
+    # 2. Windpol im ZENTRUM (0,0) & Basissehne nach UNTEN (0, +L)
+    svg_parts.append(f'  <line x1="0" y1="0" x2="0" y2="{L:.2f}" stroke="#C0392B" stroke-width="1.0" stroke-linecap="round" />')
+    svg_parts.append(f'  <circle cx="0" cy="{L:.2f}" r="1.3" fill="#C0392B" />')
+    svg_parts.append(f'  <text x="0" y="{L + 3.2:.2f}" class="awa-label" font-weight="bold" fill="#C0392B">P1 (Fußpunkt / 180°)</text>')
+    svg_parts.append(f'  <text x="0" y="-3.0" class="awa-label" font-weight="bold" fill="#C0392B">Windpol (0,0)</text>')
+
+    # 3. Fasskreise im UNTEREN BEREICH
+    # Basissehne von (0,0) nach (0, +L).
+    # Mittelpunkt: ym = L / 2 = +26.0 mm, xm = ± (L / 2) * cot(alpha)
+    # Radius: r_c = L / (2 * sin(alpha))
+    # Winkelparameter t von -(180° - alpha) bis +(180° - alpha):
+    # Bei t = -(180°-alpha): x=0, y=0 (Zentrum)
+    # Bei t = +(180°-alpha): x=0, y=L (Fußpunkt unten)
+    # Bei t = 0: x = xm + rc = (L/2) * cot(alpha/2) > 0, y = L/2 (unterer rechter Bereich)
+    awa_angles = [25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0, 155.0]
+    r_clip = 65.5
+
+    for alpha in awa_angles:
+        rad = math.radians(alpha)
+        sin_a = math.sin(rad)
+        cos_a = math.cos(rad)
+        if sin_a == 0:
+            continue
+
+        r_c = L / (2.0 * sin_a)
+        ym = L / 2.0
+        xc_stb = (L / 2.0) * (cos_a / sin_a)
+
+        theta_limit = 180.0 - alpha
+        n_pts = 50
+        thetas = np.linspace(-math.radians(theta_limit), math.radians(theta_limit), n_pts)
+
+        # Stb Punkte
+        pts_stb = []
+        for t in thetas:
+            px = xc_stb + r_c * math.cos(t)
+            py = ym + r_c * math.sin(t)
+            pts_stb.append((px, py))
+
+        # Filtern / Cliping auf sichtbaren Radius
+        # Wir zerlegen in Segmente, die innerhalb des Rotors liegen
+        for side in [1, -1]:
+            pts_side = [(side * p[0], p[1]) for p in pts_stb]
+            valid_pts = [p for p in pts_side if math.hypot(p[0], p[1]) <= r_clip]
+            if len(valid_pts) >= 2:
+                d_str = "M " + " ".join([f"{p[0]:.2f} {p[1]:.2f}" for p in valid_pts])
+                svg_parts.append(f'  <path d="{d_str}" class="awa-line" />')
+
+                # Label platzieren
+                if side > 0 and alpha in [30.0, 40.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]:
+                    if alpha <= 50.0:
+                        lbl_p = valid_pts[len(valid_pts) // 2]
+                    elif alpha <= 90.0:
+                        lbl_p = valid_pts[len(valid_pts) * 3 // 5]
+                    else:
+                        lbl_p = valid_pts[len(valid_pts) * 4 // 5]
+                    svg_parts.append(f'  <text x="{lbl_p[0]:.2f}" y="{lbl_p[1]:.2f}" class="awa-label">{int(alpha)}°</text>')
+
+    # 4. ORC-Polarkurven (normiert: r = (bsp / tws) * L)
+    colors = [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ]
+
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        curve = polar.curves_raw[idx]
+        pts_complex = []
+
+        for pt in curve:
+            twa = pt["twa"]
+            ratio = pt["bsp"] / tws
+            r_mm = ratio * L
+            rad = math.radians(twa)
+            pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+
+        smooth_pts = catmull_rom_spline(pts_complex, num_points=8)
+
+        d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+        d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+
+        svg_parts.append(f'  <path d="{d_stb}" class="polar-curve" stroke="{col}" />')
+        svg_parts.append(f'  <path d="{d_bb}" class="polar-curve" stroke="{col}" />')
+
+        # Beschriftung am äußeren Bogen
+        if smooth_pts:
+            end_p = smooth_pts[int(len(smooth_pts) * 0.65)]
+            svg_parts.append(f'  <text x="{end_p.real + 1.2:.2f}" y="{end_p.imag:.2f}" class="polar-label" fill="{col}">{int(tws)}k</text>')
+
+    svg_parts.append('</svg>')
+    output_file.write_text("\n".join(svg_parts), encoding="utf-8")
+
+
+def generate_weg_b_svg(polar: PolarData, output_file: Path):
+    """Generiert Weg B: Absolute Polaren (in Knoten, z.B. 4.8 mm/kn) + echte AWA-Isolinien."""
+    SCALE = 4.8  # mm pro Knoten (12 kn = 57.6 mm)
+    svg_parts = [generate_svg_header()]
+    svg_parts.append(generate_outer_tactical_rim())
+
+    svg_parts.append('  <text x="0" y="24.0" class="title-text">WEG B: ABSOLUTE POLAREN (KNOTEN)</text>')
+    svg_parts.append('  <text x="0" y="28.0" class="sub-text">Maßstab 4.8 mm/kn mit AWA-Isolinien | JPK 1080 TRUE GRIT</text>')
+
+    for bsp in [2, 4, 6, 8, 10, 12]:
+        r = bsp * SCALE
+        svg_parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="grid-line" />')
+        svg_parts.append(f'  <text x="{r - 1.0:.2f}" y="2.5" class="grid-text">{bsp} kn</text>')
+
+    colors = [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ]
+
+    for idx, tws in enumerate(polar.tws_list):
+        col = colors[idx % len(colors)]
+        curve = polar.curves_raw[idx]
+        pts_complex = []
+
+        for pt in curve:
+            twa = pt["twa"]
+            r_mm = pt["bsp"] * SCALE
+            rad = math.radians(twa)
+            pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+
+        smooth_pts = catmull_rom_spline(pts_complex, num_points=8)
+
+        d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+        d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
+
+        svg_parts.append(f'  <path d="{d_stb}" class="polar-curve" stroke="{col}" />')
+        svg_parts.append(f'  <path d="{d_bb}" class="polar-curve" stroke="{col}" />')
+
+        if smooth_pts:
+            end_p = smooth_pts[int(len(smooth_pts) * 0.65)]
+            svg_parts.append(f'  <text x="{end_p.real + 1.2:.2f}" y="{end_p.imag:.2f}" class="polar-label" fill="{col}">{int(tws)}k</text>')
+
+    target_awas = [30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0]
+
+    for awa_target in target_awas:
+        awa_pts_stb = []
+
+        for idx, tws in enumerate(polar.tws_list):
+            curve = polar.curves_raw[idx]
+            for i in range(len(curve) - 1):
+                p1, p2 = curve[i], curve[i + 1]
+                a1, a2 = p1["awa"], p2["awa"]
+                if (a1 <= awa_target <= a2) or (a2 <= awa_target <= a1):
+                    if abs(a2 - a1) > 1e-4:
+                        t = (awa_target - a1) / (a2 - a1)
+                    else:
+                        t = 0.0
+                    interp_twa = p1["twa"] + t * (p2["twa"] - p1["twa"])
+                    interp_bsp = p1["bsp"] + t * (p2["bsp"] - p1["bsp"])
+                    r_mm = interp_bsp * SCALE
+                    rad = math.radians(interp_twa)
+                    awa_pts_stb.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
+                    break
+
+        if len(awa_pts_stb) >= 2:
+            smooth_awa = catmull_rom_spline(awa_pts_stb, num_points=6)
+            d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_awa])
+            d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_awa])
+            svg_parts.append(f'  <path d="{d_stb}" class="awa-line" />')
+            svg_parts.append(f'  <path d="{d_bb}" class="awa-line" />')
+
+            lbl_pt = smooth_awa[-1]
+            svg_parts.append(f'  <text x="{lbl_pt.real:.2f}" y="{lbl_pt.imag - 1.5:.2f}" class="awa-label">{int(awa_target)}°</text>')
+
+    svg_parts.append('</svg>')
+    output_file.write_text("\n".join(svg_parts), encoding="utf-8")
+
+
+def main():
+    slk_path = Path("data/249116.slk")
+    print(f"Lade ORC-Polaren aus {slk_path}...")
+    polar = PolarData(slk_path)
+    print(f"Erfolgreich geladen: {polar.boat_name} ({polar.boat_class}, {polar.sail_number}) mit {len(polar.tws_list)} Windstärken.")
+
+    out_dir = Path("output")
+    out_dir.mkdir(exist_ok=True)
+
+    file_a = out_dir / "vergleich_weg_a_normiert.svg"
+    file_b = out_dir / "vergleich_weg_b_knoten.svg"
+
+    print(f"Generiere Weg A (Windpol in Mitte, Fasskreise unten) -> {file_a}")
+    generate_weg_a_svg(polar, file_a)
+
+    print(f"Generiere Weg B (Absolute Knoten + AWA-Isolinien) -> {file_b}")
+    generate_weg_b_svg(polar, file_b)
+
+    print("Beide SVGs erfolgreich generiert!")
+
+
+if __name__ == "__main__":
+    main()
