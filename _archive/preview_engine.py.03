@@ -447,8 +447,8 @@ def render_assembled_seite_b(
         lbl = f"{pct:+d}%"
         ax.text(xt, yt, lbl, color=col, fontsize=3.6, fontweight="bold", ha="center", va="center", zorder=10)
 
-    # S-Scale (Sinus) at r = 63.0 mm (V1.1: larger, inward ticks & digits)
-    r_s = 63.0
+    # S-Scale (Sinus) at r = 48.0 mm
+    r_s = 48.0
     c_s = plt.Circle((0, 0), r_s, color="#BDC3C7", fill=False, lw=0.7, ls="--", zorder=6)
     ax.add_patch(c_s)
 
@@ -463,16 +463,16 @@ def render_assembled_seite_b(
         is_maj = alpha in s_labeled
         t_len = 3.2 if is_maj else 1.6
         x1, y1 = polar_to_cart(r_s, deg)
-        x2, y2 = polar_to_cart(r_s - t_len, deg)
+        x2, y2 = polar_to_cart(r_s + t_len, deg)
         ax.plot([x1, x2], [y1, y2], color="#2980B9", lw=0.7 if is_maj else 0.35, zorder=7)
 
         if is_maj:
-            xt, yt = polar_to_cart(r_s - 5.5, deg)
+            xt, yt = polar_to_cart(r_s + 5.2, deg)
             rot = calc_readable_rotation(deg)
             ax.text(xt, yt, f"{int(alpha)}°", color="#2980B9", fontsize=3.8, fontweight="bold", ha="center", va="center", rotation=rot, zorder=8)
 
     # S-Scale Title located cleanly inside S-circle
-    ax.text(0, 45.0, "S (SINUS-SKALA FÜR WINDDREIECK)", color="#2980B9", fontsize=5.2, fontweight="bold", ha="center", va="center", zorder=10)
+    ax.text(0, 35.0, "S (SINUS-SKALA FÜR WINDDREIECK)", color="#2980B9", fontsize=5.2, fontweight="bold", ha="center", va="center", zorder=10)
 
     # Center Titles & Information
     ax.text(0, 18.0, "RÜCKSEITE: RECHENSCHIEBER & S-SKALA", fontsize=7.5, fontweight="bold", color="#2C3E50", ha="center", va="center", zorder=12)
@@ -481,33 +481,11 @@ def render_assembled_seite_b(
     ax.text(0, -12.0, "Trennfuge C/D: R = 75.0 mm (Ø 150 mm)", fontsize=5.0, color="#7F8C8D", ha="center", va="center", zorder=12)
     ax.text(0, -16.0, "Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)", fontsize=4.6, color="#2C3E50", fontstyle="italic", ha="center", va="center", zorder=12)
 
-    # 4. ROTATING CURSOR / LÄUFER (Zentralzeiger Rückseite)
-    # Aligned with 30° on S-Scale (sin(30°) = 0.5 -> C/D value 5.0)
-    cursor_angle_deg = math.log10(10.0 * math.sin(math.radians(30.0))) * 360.0 # ~251.64°
-    p_len = 86.0
-    c_rad = math.radians(cursor_angle_deg)
-    cos_c = math.cos(c_rad)
-    sin_c = math.sin(c_rad)
-
-    cx_tip, cy_tip = p_len * sin_c, p_len * cos_c
-    w_ptr = 7.0
-    # Symmetric cursor arm
-    nx, ny = -cos_c * (w_ptr / 2.0), sin_c * (w_ptr / 2.0)
-    poly_cx = [nx, cx_tip + nx, cx_tip - nx, -nx]
-    poly_cy = [ny, cy_tip + ny, cy_tip - ny, -ny]
-    ax.fill(poly_cx, poly_cy, color="#EBF5FB", alpha=0.55, ec="#2980B9", lw=0.9, zorder=15)
-    # Red hairline along center axis of cursor
-    ax.plot([0, cx_tip], [0, cy_tip], color="#E74C3C", lw=1.2, zorder=16)
-
     # Center Hub & Pin
     hub = plt.Circle((0, 0), 5.0, color="#BDC3C7", ec="#2C3E50", lw=1.0, zorder=18)
     ax.add_patch(hub)
-    pin = plt.Circle((0, 0), 2.2, color="#E74C3C", ec="#962D22", lw=0.8, zorder=19)
+    pin = plt.Circle((0, 0), 2.2, color="#2C3E50", ec="#1A252F", lw=0.8, zorder=19)
     ax.add_patch(pin)
-
-    # Cursor annotation outside Stator
-    lbl_cx, lbl_cy = polar_to_cart(p_len + 5.0, cursor_angle_deg)
-    ax.text(lbl_cx, lbl_cy, "Läufer: 30° S -> 5.0 (C/D)", color="#C0392B", fontsize=5.5, fontweight="bold", ha="center", va="center", zorder=20)
 
     outfile.parent.mkdir(parents=True, exist_ok=True)
     plt.savefig(outfile, dpi=dpi, bbox_inches="tight", pad_inches=0.1)

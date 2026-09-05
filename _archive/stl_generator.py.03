@@ -249,12 +249,12 @@ def generate_pointer_stl(
 def generate_achspin_stl(
     filepath: Path,
     shaft_radius: float = 1.5,
-    shaft_length: float = 8.8,
+    shaft_length: float = 7.2,
     head_radius: float = 4.5,
     head_thickness: float = 1.2,
     segments: int = 60
 ):
-    """Generates central axle pin with retaining head (shaft length 8.8 mm for dual pointers)."""
+    """Generates central axle pin with retaining head."""
     triangles = []
     # Shaft
     triangles.extend(_gen_annulus_mesh(0.0, shaft_radius, 0.0, shaft_length, segments))
@@ -266,7 +266,7 @@ def generate_achspin_stl(
 
 
 def generate_all_stl_models(out_dir: Path):
-    """Generates all 6 watertight STL parts for the 180 mm Rechenscheibe V1.1."""
+    """Generates all 5 watertight STL parts for the 180 mm Rechenscheibe."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -274,9 +274,8 @@ def generate_all_stl_models(out_dir: Path):
         "gehaeuse_deckel_180mm.stl": lambda p: generate_deckel_stl(p),
         "gehaeuse_boden_180mm.stl": lambda p: generate_boden_stl(p),
         "mittelscheibe_rotor_180mm.stl": lambda p: generate_rotor_stl(p),
-        "zentralzeiger_lineal.stl": lambda p: generate_pointer_stl(p, length=85.0),
-        "zentralzeiger_rueckseite.stl": lambda p: generate_pointer_stl(p, length=86.0),
-        "achspin_mittelbolzen.stl": lambda p: generate_achspin_stl(p, shaft_length=8.8),
+        "zentralzeiger_lineal.stl": lambda p: generate_pointer_stl(p),
+        "achspin_mittelbolzen.stl": lambda p: generate_achspin_stl(p),
     }
 
     generated = []

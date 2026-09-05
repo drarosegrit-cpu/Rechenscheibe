@@ -536,10 +536,10 @@ def generate_laser_seite_b_rotor(output_file: Path):
             txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
             parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
 
-    # 2. Logarithmic S-Scale (Sinus) at r = 63.0 mm (V1.1: larger, inward ticks & digits)
-    r_s = 63.0
-    parts.append(f'  <circle cx="0" cy="0" r="{r_s:.2f}" class="grid-line" stroke="#2980B9" stroke-width="0.3" />')
-    parts.append(f'  <text x="0" y="{-r_s + 18.0:.2f}" class="title-text" font-size="2.6px" fill="#2980B9">S (SINUS)</text>')
+    # 2. Logarithmic S-Scale (Sinus) at r = 48.0 mm
+    r_s = 48.0
+    parts.append(f'  <circle cx="0" cy="0" r="{r_s:.2f}" class="grid-line" />')
+    parts.append(f'  <text x="0" y="{-r_s + 4.5:.2f}" class="title-text" font-size="2.6px">S (SINUS)</text>')
 
     s_labeled = [6.0, 7.0, 8.0, 9.0, 10.0, 12.0, 15.0, 20.0, 25.0, 30.0, 35.0, 40.0, 50.0, 60.0, 70.0, 90.0]
     for alpha_int in range(60, 901, 5):
@@ -550,15 +550,14 @@ def generate_laser_seite_b_rotor(output_file: Path):
         deg = math.log10(val) * 360.0
 
         is_maj = alpha in s_labeled
-        t_len = 3.2 if is_maj else 1.6
+        t_len = 3.0 if is_maj else 1.5
         p1 = polar_to_cart(r_s, deg)
-        p2 = polar_to_cart(r_s - t_len, deg)
+        p2 = polar_to_cart(r_s + t_len, deg)
         parts.append(f'  <line x1="{p1[0]:.2f}" y1="{p1[1]:.2f}" x2="{p2[0]:.2f}" y2="{p2[1]:.2f}" class="laser-engrave" stroke="#2980B9" />')
 
         if is_maj:
-            pt = polar_to_cart(r_s - 5.5, deg)
-            rot = deg if deg <= 180 else deg - 180
-            parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="awa-label" font-size="2.0px" fill="#2980B9" transform="rotate({rot} {pt[0]:.2f} {pt[1]:.2f})">{int(alpha)}°</text>')
+            pt = polar_to_cart(r_s + 4.5, deg)
+            parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="awa-label" font-size="2.0px">{int(alpha)}°</text>')
 
     # 3. Performance Nonius at 1.0 (0°)
     for pct in [-15, -10, -5, 5]:
@@ -658,39 +657,8 @@ def generate_laser_zeiger(output_file: Path):
         f.write("\n".join(parts))
 
 
-def generate_laser_zeiger_rueckseite(output_file: Path):
-    """Generates Central Cursor / Läufer for Back Side (S, C, and D scale projection)."""
-    length = 86.0
-    width = 7.0
-    hub_r = 5.0
-
-    parts = [svg_header(40.0, 100.0)]
-    # Red Cut outline - symmetric cursor with reading edge / index tip
-    path = (
-        f"M {-width/2.0:.2f} {hub_r * 0.8:.2f} "
-        f"L {-width/2.0:.2f} 80.0 "
-        f"L 0.0 {length:.2f} "
-        f"L {width/2.0:.2f} 80.0 "
-        f"L {width/2.0:.2f} {hub_r * 0.8:.2f} "
-        f"A {hub_r} {hub_r} 0 0 1 {hub_r} 0.0 "
-        f"A {hub_r} {hub_r} 0 1 1 {-hub_r} 0.0 "
-        f"A {hub_r} {hub_r} 0 0 1 {-width/2.0:.2f} {hub_r * 0.8:.2f} Z"
-    )
-    parts.append(f'  <path d="{path}" class="laser-cut" />')
-    parts.append('  <circle cx="0" cy="0" r="1.6" class="laser-cut" />')
-
-    # Razor-thin red hairline along x = 0 (from hub out to tip)
-    parts.append(f'  <line x1="0" y1="{hub_r:.2f}" x2="0" y2="{length - 1.0:.2f}" stroke="#C0392B" stroke-width="0.2" />')
-    parts.append(f'  <text x="0" y="35.0" font-family="sans-serif" font-size="2.2px" fill="#2980B9" font-weight="bold" text-anchor="middle" transform="rotate(90 0 35.0)">CURSOR · S/C/D</text>')
-
-    parts.append('</svg>\n')
-    output_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write("\n".join(parts))
-
-
 def generate_all_laser_svgs(polar: PolarData, out_dir: Path):
-    """Generates all 6 manufacturing SVGs for laser cut & engrave."""
+    """Generates all 5 manufacturing SVGs for laser cut & engrave."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -700,7 +668,6 @@ def generate_all_laser_svgs(polar: PolarData, out_dir: Path):
         "laser_seite_b_rotor_rueckseite.svg": lambda p: generate_laser_seite_b_rotor(p),
         "laser_seite_b_boden_d_skala.svg": lambda p: generate_laser_seite_b_boden(p),
         "laser_zentralzeiger.svg": lambda p: generate_laser_zeiger(p),
-        "laser_zentralzeiger_rueckseite.svg": lambda p: generate_laser_zeiger_rueckseite(p),
     }
 
     generated = []
