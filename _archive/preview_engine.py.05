@@ -225,7 +225,7 @@ def render_assembled_montage(
         ax.plot([rx, rx], [-tick_h, tick_h], color="#2C3E50", lw=0.7 if is_major else 0.4, zorder=6)
         lbl_txt = f"{ratio:.1f}" if is_major else f".{r_idx}"
         ax.text(rx, 2.5, lbl_txt, color="#2C3E50", fontsize=4.2 if is_major else 3.5, ha="center", va="bottom", zorder=7)
-    ax.text(L / 2.0, 5.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="bottom", zorder=7)
+    ax.text(L / 2.0, -3.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="top", zorder=7)
 
     # Baseline
     ax.plot([0, 0], [0, -L], color="#C0392B", lw=1.5, zorder=8)
@@ -682,7 +682,7 @@ def render_rotor_face(
         ax.plot([rx, rx], [-tick_h, tick_h], color="#2C3E50", lw=0.7 if is_major else 0.4, zorder=6)
         lbl_txt = f"{ratio:.1f}" if is_major else f".{r_idx}"
         ax.text(rx, 2.5, lbl_txt, color="#2C3E50", fontsize=4.2 if is_major else 3.5, ha="center", va="bottom", zorder=7)
-    ax.text(L / 2.0, 5.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="bottom", zorder=7)
+    ax.text(L / 2.0, -3.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="top", zorder=7)
 
     # Baseline
     ax.plot([0, 0], [0, -L], color="#C0392B", lw=1.5, zorder=8)

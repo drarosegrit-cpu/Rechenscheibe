@@ -112,8 +112,7 @@ def svg_header(width_mm: float = 180.0, height_mm: float = 180.0) -> str:
         f'      .laser-cut {{ fill: none; stroke: #FF0000; stroke-width: 0.15; }}\n'
         f'      .laser-engrave {{ fill: none; stroke: #000000; stroke-width: 0.25; }}\n'
         f'      .bg {{ fill: #FFFFFF; }}\n'
-        f'      .grid-line {{ stroke: #BDC3C7; stroke-width: 0.35; fill: none; stroke-dasharray: 2.5,1.5; }}\n'
-        f'      .grid-line-minor {{ stroke: #D5D8DC; stroke-width: 0.20; fill: none; stroke-dasharray: 1.2,1.2; }}\n'
+        f'      .grid-line {{ stroke: #BDC3C7; stroke-width: 0.30; fill: none; stroke-dasharray: 2,2; }}\n'
         f'      .grid-text {{ font-family: sans-serif; font-size: 2.2px; fill: #7F8C8D; text-anchor: middle; }}\n'
         f'      .sector-beat-stbd {{ fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }}\n'
         f'      .sector-beat-port {{ fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }}\n'
@@ -335,26 +334,11 @@ def generate_laser_seite_a_rotor(polar: PolarData, output_file: Path):
     parts.append('  <text x="0" y="-42.5" class="sub-text">Windpol (0,0) | L = 64 mm | JPK 1080 TRUE GRIT</text>')
     parts.append('  <text x="0" y="-39.5" class="bias-text">Taktik: TWD · Shift/Lift · Tack · Start Line Bias · Gybe</text>')
 
-    # Concentric Ratio circles (spacing 0.1)
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
+    # Concentric Ratio circles
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
         r = ratio * L
-        is_major = (r_idx % 2 == 0)
-        cls_circle = "grid-line" if is_major else "grid-line-minor"
-        parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="{cls_circle}" />')
-
-    # BoatSPD / TWS scale engraved on Rotor along 90° Starboard axis
-    parts.append('  <!-- BoatSPD / TWS Scale on Rotor (90° Starboard) -->')
-    parts.append(f'  <line x1="5.0" y1="0" x2="{L:.2f}" y2="0" stroke="#2C3E50" stroke-width="0.45" />')
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
-        rx = ratio * L
-        is_major = (r_idx % 2 == 0)
-        tick_len = 2.0 if is_major else 1.2
-        parts.append(f'  <line x1="{rx:.2f}" y1="{-tick_len:.2f}" x2="{rx:.2f}" y2="{tick_len:.2f}" stroke="#2C3E50" stroke-width="0.35" />')
-        lbl_txt = f"{ratio:.1f}" if is_major else f".{r_idx}"
-        parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px" fill="#2C3E50">{lbl_txt}</text>')
-    parts.append(f'  <text x="{L/2.0:.2f}" y="-5.2" class="grid-text" font-size="2.0px" font-weight="bold" fill="#2C3E50">BoatSPD / TWS</text>')
+        parts.append(f'  <circle cx="0" cy="0" r="{r:.2f}" class="grid-line" />')
+        parts.append(f'  <text x="{r - 1.2:.2f}" y="-1.5" class="grid-text">{ratio:.1f}</text>')
 
     # Baseline OP1 down to (0, L)
     parts.append(f'  <line x1="0" y1="0" x2="0" y2="{L:.2f}" stroke="#C0392B" stroke-width="1.1" stroke-linecap="round" />')
@@ -407,31 +391,22 @@ def generate_laser_seite_a_rotor(polar: PolarData, output_file: Path):
         curve = polar.curves_raw[idx]
         pts_complex = []
 
-        # Filter and interpolate to 175.0° TWA (omitting > 175°)
-        for i, pt in enumerate(curve):
+        for pt in curve:
             twa = pt["twa"]
-            if twa <= 175.0:
-                ratio = pt["bsp"] / tws
-                r_mm = ratio * L
-                rad = math.radians(twa)
-                pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
-            else:
-                if i > 0:
-                    prev_pt = curve[i - 1]
-                    if prev_pt["twa"] < 175.0:
-                        frac = (175.0 - prev_pt["twa"]) / (twa - prev_pt["twa"])
-                        bsp_175 = prev_pt["bsp"] + frac * (pt["bsp"] - prev_pt["bsp"])
-                        ratio_175 = bsp_175 / tws
-                        r_mm_175 = ratio_175 * L
-                        rad_175 = math.radians(175.0)
-                        pts_complex.append(complex(r_mm_175 * math.sin(rad_175), -r_mm_175 * math.cos(rad_175)))
-                break
+            ratio = pt["bsp"] / tws
+            r_mm = ratio * L
+            rad = math.radians(twa)
+            pts_complex.append(complex(r_mm * math.sin(rad), -r_mm * math.cos(rad)))
 
         smooth_pts = catmull_rom_spline(pts_complex, num_points=12)
         d_stb = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
         d_bb = "M " + " ".join([f"{-p.real:.2f} {p.imag:.2f}" for p in smooth_pts])
         parts.append(f'  <path d="{d_stb}" class="polar-curve" stroke="{col}" />')
         parts.append(f'  <path d="{d_bb}" class="polar-curve" stroke="{col}" />')
+
+        if smooth_pts:
+            end_p = smooth_pts[int(len(smooth_pts) * 0.65)]
+            parts.append(f'  <text x="{end_p.real + 1.2:.2f}" y="{end_p.imag:.2f}" class="polar-label" fill="{col}">{int(tws)}k</text>')
 
         # VMG TARGETS: Beat & Run
         tgt = polar.vmg_targets[idx]
@@ -441,10 +416,6 @@ def generate_laser_seite_a_rotor(polar: PolarData, output_file: Path):
             parts.append(
                 f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />'
             )
-
-        # Symmetrical TWS labels at Upwind Beat Targets (1mm inside towards centerline)
-        parts.append(f'  <text x="{bx_stb - 2.1:.2f}" y="{by_stb:.2f}" class="polar-label" text-anchor="end" fill="{col}">{int(tws)}</text>')
-        parts.append(f'  <text x="{-bx_stb + 2.1:.2f}" y="{by_stb:.2f}" class="polar-label" text-anchor="start" fill="{col}">{int(tws)}</text>')
 
         run_r = (tgt["run_sog"] / tws) * L
         rx_stb, ry_stb = polar_to_cart(run_r, tgt["gybe_angle"])
@@ -510,7 +481,7 @@ def generate_laser_seite_a_deckel(output_file: Path):
         parts.append(f'  <circle cx="{sx:.2f}" cy="{sy:.2f}" r="1.6" class="laser-cut" />')
 
     # 360° Compass Rose graduation
-    r_outer = 83.5
+    r_outer = 87.5
     for deg in range(360):
         is_10 = (deg % 10 == 0)
         is_5 = (deg % 5 == 0)
@@ -521,7 +492,7 @@ def generate_laser_seite_a_deckel(output_file: Path):
         parts.append(f'  <line x1="{p1[0]:.2f}" y1="{p1[1]:.2f}" x2="{p2[0]:.2f}" y2="{p2[1]:.2f}" class="laser-engrave" />')
 
         if is_10:
-            pt = polar_to_cart(77.8, deg)
+            pt = polar_to_cart(r_outer - 5.5, deg)
             lbl = f"{deg:03d}°" if deg > 0 else "000°"
             rot = deg if deg <= 180 else deg - 180
             parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="compass-text" font-size="2.4px" transform="rotate({rot} {pt[0]:.2f} {pt[1]:.2f})">{lbl}</text>')
@@ -565,8 +536,8 @@ def generate_laser_seite_b_rotor(output_file: Path):
             txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
             parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
 
-    # 2. Logarithmic S-Scale (Sinus) at r = 65.0 mm (V1.11: enlarged to r = 65.0 mm, inward ticks & digits)
-    r_s = 65.0
+    # 2. Logarithmic S-Scale (Sinus) at r = 63.0 mm (V1.1: larger, inward ticks & digits)
+    r_s = 63.0
     parts.append(f'  <circle cx="0" cy="0" r="{r_s:.2f}" class="grid-line" stroke="#2980B9" stroke-width="0.3" />')
     parts.append(f'  <text x="0" y="{-r_s + 18.0:.2f}" class="title-text" font-size="2.6px" fill="#2980B9">S (SINUS)</text>')
 
@@ -585,7 +556,7 @@ def generate_laser_seite_b_rotor(output_file: Path):
         parts.append(f'  <line x1="{p1[0]:.2f}" y1="{p1[1]:.2f}" x2="{p2[0]:.2f}" y2="{p2[1]:.2f}" class="laser-engrave" stroke="#2980B9" />')
 
         if is_maj:
-            pt = polar_to_cart(r_s - 6.5, deg)
+            pt = polar_to_cart(r_s - 5.5, deg)
             rot = deg if deg <= 180 else deg - 180
             parts.append(f'  <text x="{pt[0]:.2f}" y="{pt[1]:.2f}" class="awa-label" font-size="2.0px" fill="#2980B9" transform="rotate({rot} {pt[0]:.2f} {pt[1]:.2f})">{int(alpha)}°</text>')
 

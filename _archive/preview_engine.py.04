@@ -88,20 +88,20 @@ def render_assembled_montage(
         ax.plot([sx - 1.2, sx + 1.2], [sy, sy], color="#2C3E50", lw=0.6, zorder=6)
         ax.plot([sx, sx], [sy - 1.2, sy + 1.2], color="#2C3E50", lw=0.6, zorder=6)
 
-    # 360° Compass Rose on Stator Ring (r in [76.0, 84.0])
+    # 360° Compass Rose on Stator Ring (r in [76.0, 88.0])
     for deg in range(360):
         is_10 = (deg % 10 == 0)
         is_5 = (deg % 5 == 0)
         t_len = 3.5 if is_10 else (2.0 if is_5 else 1.0)
-        x1, y1 = polar_to_cart(83.5, deg)
-        x2, y2 = polar_to_cart(83.5 - t_len, deg)
+        x1, y1 = polar_to_cart(86.5, deg)
+        x2, y2 = polar_to_cart(86.5 - t_len, deg)
         ax.plot([x1, x2], [y1, y2], color="#2C3E50", lw=0.6 if is_10 else 0.3, zorder=5)
 
         if is_10:
-            xt, yt = polar_to_cart(77.8, deg)
+            xt, yt = polar_to_cart(80.5, deg)
             lbl = f"{deg:03d}°" if deg > 0 else "000°"
             rot = calc_readable_rotation(deg)
-            ax.text(xt, yt, lbl, color="#2C3E50", fontsize=4.0, fontweight="bold", ha="center", va="center", rotation=rot, zorder=6)
+            ax.text(xt, yt, lbl, color="#2C3E50", fontsize=4.2, fontweight="bold", ha="center", va="center", rotation=rot, zorder=6)
 
     # 3. ROTOR (Ø 150 mm) - TackingMaster Rim & Polars
     # TRUE WIND Arrow
@@ -206,26 +206,13 @@ def render_assembled_montage(
     ax.text(0, 42.5, "Windpol (0,0) | L = 64 mm | JPK 1080 TRUE GRIT", fontsize=5.8, color="#7F8C8D", ha="center", va="center", zorder=12)
     ax.text(0, 39.5, "Taktik: TWD · Shift/Lift · Tack · Start Line Bias · Gybe", fontsize=4.8, color="#2980B9", ha="center", va="center", zorder=12)
 
-    # Ratio concentric circles (spacing 0.1)
+    # Ratio concentric circles
     L = 64.0
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
         r = ratio * L
-        is_major = (r_idx % 2 == 0)
-        c = plt.Circle((0, 0), r, color="#BDC3C7" if is_major else "#E5E7E9", fill=False, lw=0.6 if is_major else 0.35, ls="--" if is_major else ":", zorder=5)
+        c = plt.Circle((0, 0), r, color="#E0E0E0", fill=False, lw=0.6, ls="--", zorder=5)
         ax.add_patch(c)
-
-    # BoatSPD / TWS scale along horizontal 90° Starboard axis
-    ax.plot([5.0, L], [0, 0], color="#2C3E50", lw=0.8, zorder=6)
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
-        rx = ratio * L
-        is_major = (r_idx % 2 == 0)
-        tick_h = 1.8 if is_major else 1.0
-        ax.plot([rx, rx], [-tick_h, tick_h], color="#2C3E50", lw=0.7 if is_major else 0.4, zorder=6)
-        lbl_txt = f"{ratio:.1f}" if is_major else f".{r_idx}"
-        ax.text(rx, 2.5, lbl_txt, color="#2C3E50", fontsize=4.2 if is_major else 3.5, ha="center", va="bottom", zorder=7)
-    ax.text(L / 2.0, 5.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="bottom", zorder=7)
+        ax.text(r - 1.0, 1.8, f"{ratio:.1f}", color="#95A5A6", fontsize=5.0, ha="right", va="center", zorder=6)
 
     # Baseline
     ax.plot([0, 0], [0, -L], color="#C0392B", lw=1.5, zorder=8)
@@ -262,19 +249,7 @@ def render_assembled_montage(
     for idx, tws in enumerate(polar.tws_list):
         col = colors[idx % len(colors)]
         curve = polar.curves_raw[idx]
-        pts_complex = []
-        for i, pt in enumerate(curve):
-            twa = pt["twa"]
-            if twa <= 175.0:
-                pts_complex.append(complex((pt["bsp"] / tws) * L * math.sin(math.radians(twa)), (pt["bsp"] / tws) * L * math.cos(math.radians(twa))))
-            else:
-                if i > 0:
-                    prev_pt = curve[i - 1]
-                    if prev_pt["twa"] < 175.0:
-                        frac = (175.0 - prev_pt["twa"]) / (twa - prev_pt["twa"])
-                        bsp_175 = prev_pt["bsp"] + frac * (pt["bsp"] - prev_pt["bsp"])
-                        pts_complex.append(complex((bsp_175 / tws) * L * math.sin(math.radians(175.0)), (bsp_175 / tws) * L * math.cos(math.radians(175.0))))
-                break
+        pts_complex = [complex((pt["bsp"] / tws) * L * math.sin(math.radians(pt["twa"])), (pt["bsp"] / tws) * L * math.cos(math.radians(pt["twa"]))) for pt in curve]
         smooth_pts = catmull_rom_spline(pts_complex, num_points=12)
 
         stb_pts = [(p.real, p.imag) for p in smooth_pts]
@@ -291,10 +266,6 @@ def render_assembled_montage(
         beat_r = (tgt["beat_sog"] / tws) * L
         bx, by = polar_to_cart(beat_r, tgt["beat_angle"])
         ax.scatter([bx, -bx], [by, by], color="#E74C3C", edgecolors="#962D22", marker="D", s=18, zorder=11)
-
-        # Symmetrical TWS text labels at Beat diamonds (1mm inside towards centerline)
-        ax.text(bx - 1.8, by, f"{int(tws)}", color=col, fontsize=4.8, fontweight="bold", ha="right", va="center", zorder=12)
-        ax.text(-bx + 1.8, by, f"{int(tws)}", color=col, fontsize=4.8, fontweight="bold", ha="left", va="center", zorder=12)
 
         run_r = (tgt["run_sog"] / tws) * L
         rx, ry = polar_to_cart(run_r, tgt["gybe_angle"])
@@ -476,8 +447,8 @@ def render_assembled_seite_b(
         lbl = f"{pct:+d}%"
         ax.text(xt, yt, lbl, color=col, fontsize=3.6, fontweight="bold", ha="center", va="center", zorder=10)
 
-    # S-Scale (Sinus) at r = 65.0 mm (V1.11: enlarged to r = 65.0 mm, inward ticks & digits)
-    r_s = 65.0
+    # S-Scale (Sinus) at r = 63.0 mm (V1.1: larger, inward ticks & digits)
+    r_s = 63.0
     c_s = plt.Circle((0, 0), r_s, color="#BDC3C7", fill=False, lw=0.7, ls="--", zorder=6)
     ax.add_patch(c_s)
 
@@ -496,7 +467,7 @@ def render_assembled_seite_b(
         ax.plot([x1, x2], [y1, y2], color="#2980B9", lw=0.7 if is_maj else 0.35, zorder=7)
 
         if is_maj:
-            xt, yt = polar_to_cart(r_s - 6.5, deg)
+            xt, yt = polar_to_cart(r_s - 5.5, deg)
             rot = calc_readable_rotation(deg)
             ax.text(xt, yt, f"{int(alpha)}°", color="#2980B9", fontsize=3.8, fontweight="bold", ha="center", va="center", rotation=rot, zorder=8)
 
@@ -663,26 +634,13 @@ def render_rotor_face(
     ax.text(0, 42.5, "Windpol (0,0) | L = 64 mm | JPK 1080 TRUE GRIT", fontsize=5.8, color="#7F8C8D", ha="center", va="center", zorder=12)
     ax.text(0, 39.5, "Taktik: TWD · Shift/Lift · Tack · Start Line Bias · Gybe", fontsize=4.8, color="#2980B9", ha="center", va="center", zorder=12)
 
-    # Ratio concentric circles (spacing 0.1)
+    # Ratio concentric circles
     L = 64.0
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
+    for ratio in [0.2, 0.4, 0.6, 0.8, 1.0]:
         r = ratio * L
-        is_major = (r_idx % 2 == 0)
-        c = plt.Circle((0, 0), r, color="#BDC3C7" if is_major else "#E5E7E9", fill=False, lw=0.6 if is_major else 0.35, ls="--" if is_major else ":", zorder=5)
+        c = plt.Circle((0, 0), r, color="#E0E0E0", fill=False, lw=0.6, ls="--", zorder=5)
         ax.add_patch(c)
-
-    # BoatSPD / TWS scale along horizontal 90° Starboard axis
-    ax.plot([5.0, L], [0, 0], color="#2C3E50", lw=0.8, zorder=6)
-    for r_idx in range(1, 11):
-        ratio = r_idx * 0.1
-        rx = ratio * L
-        is_major = (r_idx % 2 == 0)
-        tick_h = 1.8 if is_major else 1.0
-        ax.plot([rx, rx], [-tick_h, tick_h], color="#2C3E50", lw=0.7 if is_major else 0.4, zorder=6)
-        lbl_txt = f"{ratio:.1f}" if is_major else f".{r_idx}"
-        ax.text(rx, 2.5, lbl_txt, color="#2C3E50", fontsize=4.2 if is_major else 3.5, ha="center", va="bottom", zorder=7)
-    ax.text(L / 2.0, 5.8, "BoatSPD / TWS", color="#2C3E50", fontsize=4.5, fontweight="bold", ha="center", va="bottom", zorder=7)
+        ax.text(r - 1.0, 1.8, f"{ratio:.1f}", color="#95A5A6", fontsize=5.0, ha="right", va="center", zorder=6)
 
     # Baseline
     ax.plot([0, 0], [0, -L], color="#C0392B", lw=1.5, zorder=8)
@@ -719,19 +677,7 @@ def render_rotor_face(
     for idx, tws in enumerate(polar.tws_list):
         col = colors[idx % len(colors)]
         curve = polar.curves_raw[idx]
-        pts_complex = []
-        for i, pt in enumerate(curve):
-            twa = pt["twa"]
-            if twa <= 175.0:
-                pts_complex.append(complex((pt["bsp"] / tws) * L * math.sin(math.radians(twa)), (pt["bsp"] / tws) * L * math.cos(math.radians(twa))))
-            else:
-                if i > 0:
-                    prev_pt = curve[i - 1]
-                    if prev_pt["twa"] < 175.0:
-                        frac = (175.0 - prev_pt["twa"]) / (twa - prev_pt["twa"])
-                        bsp_175 = prev_pt["bsp"] + frac * (pt["bsp"] - prev_pt["bsp"])
-                        pts_complex.append(complex((bsp_175 / tws) * L * math.sin(math.radians(175.0)), (bsp_175 / tws) * L * math.cos(math.radians(175.0))))
-                break
+        pts_complex = [complex((pt["bsp"] / tws) * L * math.sin(math.radians(pt["twa"])), (pt["bsp"] / tws) * L * math.cos(math.radians(pt["twa"]))) for pt in curve]
         smooth_pts = catmull_rom_spline(pts_complex, num_points=12)
 
         stb_pts = [(p.real, p.imag) for p in smooth_pts]
@@ -748,10 +694,6 @@ def render_rotor_face(
         beat_r = (tgt["beat_sog"] / tws) * L
         bx, by = polar_to_cart(beat_r, tgt["beat_angle"])
         ax.scatter([bx, -bx], [by, by], color="#E74C3C", edgecolors="#962D22", marker="D", s=18, zorder=11)
-
-        # Symmetrical TWS text labels at Beat diamonds (1mm inside towards centerline)
-        ax.text(bx - 1.8, by, f"{int(tws)}", color=col, fontsize=4.8, fontweight="bold", ha="right", va="center", zorder=12)
-        ax.text(-bx + 1.8, by, f"{int(tws)}", color=col, fontsize=4.8, fontweight="bold", ha="left", va="center", zorder=12)
 
         run_r = (tgt["run_sog"] / tws) * L
         rx, ry = polar_to_cart(run_r, tgt["gybe_angle"])

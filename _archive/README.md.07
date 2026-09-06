@@ -1,4 +1,4 @@
-# 🧭 Nautische Rechenscheibe & Taktik-Suite V1.11 – JPK 1080 (*TRUE GRIT*, GER 7447)
+# 🧭 Nautische Rechenscheibe & Taktik-Suite V1.1 – JPK 1080 (*TRUE GRIT*, GER 7447)
 
 Professionelles, analog-digitales Regatta-, Navigations- und Taktiksystem für die Yacht **JPK 1080 (*TRUE GRIT*, GER 7447)**.  
 Dieses System verbindet die offiziellen **ORC-VPP-Polardaten** (ORC International / Club, Run-ID `249116`) mit:
@@ -77,8 +77,6 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
 
 ### 1. Der äußere Stator-Kompassring ($\varnothing 150$ bis $\varnothing 180\,\text{mm}$)
 * Vollständige **$360^\circ$-Kompassrose** mit $1^\circ$-Feinteilung, $5^\circ$-Teilung und $10^\circ$-Beschriftung.
-* **V1.11 Optimierung:** Der Skalenring wurde nach innen auf $R_{\text{außen}} = 83.5\,\text{mm}$ versetzt, sodass die 6 M3-Befestigungsschrauben bei $R = 88.0\,\text{mm}$ völlig frei und unberührt bleiben.
-* Die Gradzahlen (`000°` bis `350°`) stehen übersichtlich auf der **Innenseite** bei $R = 77.8\,\text{mm}$, unmittelbar an der $\varnothing 150\,\text{mm}$ Sichtfensterkante.
 * Bleibt starr am Gehäuse ausgerichtet; dient zur Peilung von Windrichtung ($TWD$), Kurs über Grund ($COG$) und Landmarken.
 
 ### 2. Der integrierte TackingMaster-Taktikring (Rotor-Rand $\varnothing 132$ bis $\varnothing 150\,\text{mm}$)
@@ -96,14 +94,11 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
 ### 3. Normierte ORC-Geschwindigkeitspolaren (Weg A, $L = 64\,\text{mm}$)
 * **Windpol im geometrischen Zentrum $(0,0)$:**  
   Der wahre Windvektor entspringt direkt im Drehpunkt der Scheibe.
-* **Basislinie & 175°-Freistellung:** Rote Vertikallinie vom Windpol $(0,0)$ nach unten zum Gegenpol $P_1(180^\circ)$ bei $(0, -64\,\text{mm})$. In V1.11 werden die Polarkurven für $|TWA| > 175.0^\circ$ ausgespart, wodurch die rote Referenzlinie absolut sauber und ungestört bleibt.
+* **Basislinie:** Rote Vertikallinie vom Windpol $(0,0)$ nach unten zum Gegenpol $P_1(180^\circ)$ bei $(0, -64\,\text{mm})$.
 * **8 Windgeschwindigkeiten:** Kurven für $6, 8, 10, 12, 14, 16, 20, 24\,\text{kt}$ True Wind Speed ($TWS$).
-* **10 Konzentrische Ratio-Kreise:** Feines Koordinatengitter mit 0.1-Schrittweite ($0.1, 0.2, \dots, 1.0$) für direktes Ablesen der normierten Bootsgeschwindigkeit.
-* **Feste BoatSPD / TWS-Skala auf der Drehscheibe:** Entlang der horizontalen $90^\circ$-Steuerbordachse eingravierte Skala ($0.1$ bis $1.0$) mit Teilstrichbeschriftung und zentrierter Kennzeichnung.
 * **Physikalische Normierung:** Der Radius entspricht dem Geschwindigkeitsverhältnis $\text{Ratio} = \frac{V_{BS}}{TWS}$.
-* **VMG-Targets & Symmetrische TWS-Beschriftung:**  
+* **VMG-Targets:**  
   * Rote Rauten: Optimale Am-Wind-Punkte ($VMG_{upwind}$ Beat Angles zwischen $42.3^\circ$ und $40.7^\circ$).
-  * **Symmetrische Beschriftung:** Die Windstärken ($6$ bis $24\,\text{kt}$) sind jeweils $1.0\,\text{mm}$ nach innen versetzt neben den Rauten platziert (Steuerbord: links der Raute; Backbord: rechts der Raute).
   * Grüne Rauten: Optimale Vorwind-Punkte ($VMG_{downwind}$ Run Angles zwischen $142^\circ$ und $165^\circ$).
 * **Segel-Crossover (Jib vs. Asymmetrischer Gennaker):**  
   Violette Dreiecke und gestrichelte Grenzlinie markieren exakt den wahren Windwinkel ($TWA$), bei dem das Setzen des Gennakers schneller ist als die Genua/Fock.
@@ -125,8 +120,8 @@ Die Rückseite verwandelt die Rechenscheibe in einen hochpräzisen Navigationsre
   Identische logarithmische Skala von $1.0$ bis $10.0$ entlang des Radius $67.0\,\text{mm}$ bis $74.5\,\text{mm}$ (Teilstriche weisen nach innen).
 * **Haarfeine Trennfuge bei $R = 75.0\,\text{mm}$:**  
   C- und D-Skala gleiten unmittelbar aneinander vorbei, was parallaxenfreies Ablesen ermöglicht.
-* **S-Skala (Vergrößerte Sinusskala bei $R = 65.0\,\text{mm}$):**  
-  In Release V1.11 um weitere $2\,\text{mm}$ nach außen vergrößert auf Radius $R_S = 65.0\,\text{mm}$ (Umfangslänge $408.4\,\text{mm}$). Logarithmische Teilung für Winkel von $6^\circ$ bis $90^\circ$ gemäss $\theta = 360^\circ \cdot \log_{10}(10 \cdot \sin\alpha)$. Die Skalenstriche weisen nach innen ($R = 65.0 \rightarrow 61.8\,\text{mm}$), die Winkelbeschriftungen liegen übersichtlich bei $R = 58.5\,\text{mm}$ mit komfortablen $5.0\,\text{mm}$ Freiraum zur C-Skala.
+* **S-Skala (Vergrößerte Sinusskala bei $R = 63.0\,\text{mm}$):**  
+  In Release V1.1 deutlich vergrößert (+31% Umfangslänge auf $395.8\,\text{mm}$). Logarithmische Teilung für Winkel von $6^\circ$ bis $90^\circ$ gemäss $\theta = 360^\circ \cdot \log_{10}(10 \cdot \sin\alpha)$. Die Skalenstriche weisen nach innen ($R = 63.0 \rightarrow 59.8\,\text{mm}$), die Winkelbeschriftungen liegen geschützt und übersichtlich bei $R = 56.5\,\text{mm}$.
 * **Transparenter Dreh-Läufer (Cursor):**  
   Ein drehbar gelagerter Zeigerarm ($86\,\text{mm}$) mit feiner, durchgehender roter Haarlinie verbindet die innenliegende S-Skala direkt mit der C- und D-Skala – unverzichtbar für trigonometrische Berechnungen und Peilungsübertragungen ohne Parallaxenfehler.
 * **Performance-Nonius (bei der $1.0$-Marke):**  
