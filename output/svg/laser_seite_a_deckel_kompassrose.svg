@@ -1,32 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="190.0mm" height="190.0mm" viewBox="-95.00 -95.00 190.00 190.00">
   <defs>
     <style>
-      .laser-cut { fill: none; stroke: #FF0000; stroke-width: 0.15; }
-      .laser-engrave { fill: none; stroke: #000000; stroke-width: 0.25; }
-      .bg { fill: #FFFFFF; }
-      .grid-line { stroke: #BDC3C7; stroke-width: 0.35; fill: none; stroke-dasharray: 2.5,1.5; }
-      .grid-line-minor { stroke: #D5D8DC; stroke-width: 0.20; fill: none; stroke-dasharray: 1.2,1.2; }
-      .grid-text { font-family: sans-serif; font-size: 2.2px; fill: #7F8C8D; text-anchor: middle; }
-      .sector-beat-stbd { fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }
-      .sector-beat-port { fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }
-      .sector-gybe-stbd { fill: #2ECC71; fill-opacity: 0.16; stroke: #27AE60; stroke-width: 0.40; }
-      .sector-gybe-port { fill: #E74C3C; fill-opacity: 0.16; stroke: #C0392B; stroke-width: 0.40; }
-      .start-line { stroke: #2980B9; stroke-width: 1.1; stroke-linecap: round; }
-      .bias-tick { stroke: #2980B9; stroke-width: 0.45; }
-      .bias-text { font-family: sans-serif; font-size: 1.7px; fill: #2980B9; text-anchor: middle; dominant-baseline: central; }
-      .bias-subtext-green { font-family: sans-serif; font-weight: bold; font-size: 1.6px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }
-      .bias-subtext-red { font-family: sans-serif; font-weight: bold; font-size: 1.6px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }
-      .shift-tick { stroke: #2C3E50; stroke-width: 0.45; }
-      .shift-indicator { font-family: sans-serif; font-weight: bold; font-size: 1.8px; text-anchor: middle; dominant-baseline: central; }
-      .shift-subtext { font-family: sans-serif; font-weight: bold; font-size: 1.7px; text-anchor: middle; dominant-baseline: central; }
-      .compass-tick { stroke: #2C3E50; stroke-width: 0.4; }
-      .compass-text { font-family: sans-serif; font-weight: bold; font-size: 2.6px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }
-      .polar-curve { fill: none; stroke-width: 0.70; }
+      .laser-cut { fill: none; stroke: #E74C3C; stroke-width: 0.2; stroke-linecap: round; }
+      .laser-cut-inner { fill: none; stroke: #C0392B; stroke-width: 0.2; stroke-linecap: round; }
+      .laser-engrave { fill: none; stroke: #2C3E50; stroke-width: 0.35; }
+      .grid-line { fill: none; stroke: #BDC3C7; stroke-width: 0.5; stroke-dasharray: 2.0,1.5; }
+      .grid-line-minor { fill: none; stroke: #E5E7E9; stroke-width: 0.3; stroke-dasharray: 1.0,1.2; }
+      .grid-text { font-family: sans-serif; font-size: 1.9px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }
+      .compass-tick { stroke: #2C3E50; stroke-width: 0.35; }
+      .compass-text { font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }
+      .polar-curve { fill: none; stroke-width: 0.7; }
       .polar-label { font-family: sans-serif; font-weight: bold; font-size: 2.3px; dominant-baseline: central; }
-      .awa-line { fill: none; stroke: #2980B9; stroke-width: 0.40; stroke-dasharray: 2.5,1.2; }
+      .awa-line { fill: none; stroke: #2980B9; stroke-width: 0.4; stroke-dasharray: 2.5,1.2; }
       .awa-label { font-family: sans-serif; font-size: 2.0px; fill: #1B4F72; text-anchor: middle; dominant-baseline: central; }
       .title-text { font-family: sans-serif; font-weight: bold; font-size: 2.8px; fill: #2C3E50; text-anchor: middle; }
       .sub-text { font-family: sans-serif; font-size: 1.8px; fill: #7F8C8D; text-anchor: middle; }
+      .shift-indicator { font-family: sans-serif; font-weight: bold; font-size: 2.2px; dominant-baseline: central; text-anchor: middle; }
+      .sector-beat-stbd { fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }
+      .sector-beat-port { fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }
+      .sector-gybe-stbd { fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }
+      .sector-gybe-port { fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }
+      .start-line { stroke: #2980B9; stroke-width: 1.2; }
+      .bias-tick { stroke: #2980B9; stroke-width: 0.4; }
+      .bias-text { font-family: sans-serif; font-size: 1.9px; fill: #2980B9; text-anchor: middle; dominant-baseline: central; }
+      .bias-subtext-green { font-family: sans-serif; font-weight: bold; font-size: 1.9px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }
+      .bias-subtext-red { font-family: sans-serif; font-weight: bold; font-size: 1.9px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }
       .tack-label-stbd { font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }
       .tack-label-port { font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }
       .gybe-label-stbd { font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }
@@ -41,409 +39,410 @@
     </style>
   </defs>
 
-  <!-- Cut lines (Red) -->
-  <circle cx="0" cy="0" r="90.0" class="laser-cut" />
-  <circle cx="0" cy="0" r="75.0" class="laser-cut" />
-  <circle cx="88.00" cy="0.00" r="1.6" class="laser-cut" />
-  <circle cx="44.00" cy="76.21" r="1.6" class="laser-cut" />
-  <circle cx="-44.00" cy="76.21" r="1.6" class="laser-cut" />
-  <circle cx="-88.00" cy="0.00" r="1.6" class="laser-cut" />
-  <circle cx="-44.00" cy="-76.21" r="1.6" class="laser-cut" />
-  <circle cx="44.00" cy="-76.21" r="1.6" class="laser-cut" />
-  <line x1="0.00" y1="-83.50" x2="0.00" y2="-80.00" class="laser-engrave" />
-  <text x="0.00" y="-77.80" class="compass-text" font-size="2.4px" transform="rotate(0 0.00 -77.80)">000°</text>
-  <line x1="1.46" y1="-83.49" x2="1.44" y2="-82.29" class="laser-engrave" />
-  <line x1="2.91" y1="-83.45" x2="2.87" y2="-82.25" class="laser-engrave" />
-  <line x1="4.37" y1="-83.39" x2="4.31" y2="-82.19" class="laser-engrave" />
-  <line x1="5.82" y1="-83.30" x2="5.74" y2="-82.10" class="laser-engrave" />
-  <line x1="7.28" y1="-83.18" x2="7.09" y2="-80.99" class="laser-engrave" />
-  <line x1="8.73" y1="-83.04" x2="8.60" y2="-81.85" class="laser-engrave" />
-  <line x1="10.18" y1="-82.88" x2="10.03" y2="-81.69" class="laser-engrave" />
-  <line x1="11.62" y1="-82.69" x2="11.45" y2="-81.50" class="laser-engrave" />
-  <line x1="13.06" y1="-82.47" x2="12.87" y2="-81.29" class="laser-engrave" />
-  <line x1="14.50" y1="-82.23" x2="13.89" y2="-78.78" class="laser-engrave" />
-  <text x="13.51" y="-76.62" class="compass-text" font-size="2.4px" transform="rotate(10 13.51 -76.62)">010°</text>
-  <line x1="15.93" y1="-81.97" x2="15.70" y2="-80.79" class="laser-engrave" />
-  <line x1="17.36" y1="-81.68" x2="17.11" y2="-80.50" class="laser-engrave" />
-  <line x1="18.78" y1="-81.36" x2="18.51" y2="-80.19" class="laser-engrave" />
-  <line x1="20.20" y1="-81.02" x2="19.91" y2="-79.86" class="laser-engrave" />
-  <line x1="21.61" y1="-80.65" x2="21.04" y2="-78.53" class="laser-engrave" />
-  <line x1="23.02" y1="-80.27" x2="22.68" y2="-79.11" class="laser-engrave" />
-  <line x1="24.41" y1="-79.85" x2="24.06" y2="-78.70" class="laser-engrave" />
-  <line x1="25.80" y1="-79.41" x2="25.43" y2="-78.27" class="laser-engrave" />
-  <line x1="27.18" y1="-78.95" x2="26.79" y2="-77.82" class="laser-engrave" />
-  <line x1="28.56" y1="-78.46" x2="27.36" y2="-75.18" class="laser-engrave" />
-  <text x="26.61" y="-73.11" class="compass-text" font-size="2.4px" transform="rotate(20 26.61 -73.11)">020°</text>
-  <line x1="29.92" y1="-77.95" x2="29.49" y2="-76.83" class="laser-engrave" />
-  <line x1="31.28" y1="-77.42" x2="30.83" y2="-76.31" class="laser-engrave" />
-  <line x1="32.63" y1="-76.86" x2="32.16" y2="-75.76" class="laser-engrave" />
-  <line x1="33.96" y1="-76.28" x2="33.47" y2="-75.18" class="laser-engrave" />
-  <line x1="35.29" y1="-75.68" x2="34.36" y2="-73.68" class="laser-engrave" />
-  <line x1="36.60" y1="-75.05" x2="36.08" y2="-73.97" class="laser-engrave" />
-  <line x1="37.91" y1="-74.40" x2="37.36" y2="-73.33" class="laser-engrave" />
-  <line x1="39.20" y1="-73.73" x2="38.64" y2="-72.67" class="laser-engrave" />
-  <line x1="40.48" y1="-73.03" x2="39.90" y2="-71.98" class="laser-engrave" />
-  <line x1="41.75" y1="-72.31" x2="40.00" y2="-69.28" class="laser-engrave" />
-  <text x="38.90" y="-67.38" class="compass-text" font-size="2.4px" transform="rotate(30 38.90 -67.38)">030°</text>
-  <line x1="43.01" y1="-71.57" x2="42.39" y2="-70.54" class="laser-engrave" />
-  <line x1="44.25" y1="-70.81" x2="43.61" y2="-69.79" class="laser-engrave" />
-  <line x1="45.48" y1="-70.03" x2="44.82" y2="-69.02" class="laser-engrave" />
-  <line x1="46.69" y1="-69.22" x2="46.02" y2="-68.23" class="laser-engrave" />
-  <line x1="47.89" y1="-68.40" x2="46.63" y2="-66.60" class="laser-engrave" />
-  <line x1="49.08" y1="-67.55" x2="48.37" y2="-66.58" class="laser-engrave" />
-  <line x1="50.25" y1="-66.69" x2="49.53" y2="-65.73" class="laser-engrave" />
-  <line x1="51.41" y1="-65.80" x2="50.67" y2="-64.85" class="laser-engrave" />
-  <line x1="52.55" y1="-64.89" x2="51.79" y2="-63.96" class="laser-engrave" />
-  <line x1="53.67" y1="-63.96" x2="51.42" y2="-61.28" class="laser-engrave" />
-  <text x="50.01" y="-59.60" class="compass-text" font-size="2.4px" transform="rotate(40 50.01 -59.60)">040°</text>
-  <line x1="54.78" y1="-63.02" x2="53.99" y2="-62.11" class="laser-engrave" />
-  <line x1="55.87" y1="-62.05" x2="55.07" y2="-61.16" class="laser-engrave" />
-  <line x1="56.95" y1="-61.07" x2="56.13" y2="-60.19" class="laser-engrave" />
-  <line x1="58.00" y1="-60.06" x2="57.17" y2="-59.20" class="laser-engrave" />
-  <line x1="59.04" y1="-59.04" x2="57.49" y2="-57.49" class="laser-engrave" />
-  <line x1="60.06" y1="-58.00" x2="59.20" y2="-57.17" class="laser-engrave" />
-  <line x1="61.07" y1="-56.95" x2="60.19" y2="-56.13" class="laser-engrave" />
-  <line x1="62.05" y1="-55.87" x2="61.16" y2="-55.07" class="laser-engrave" />
-  <line x1="63.02" y1="-54.78" x2="62.11" y2="-53.99" class="laser-engrave" />
-  <line x1="63.96" y1="-53.67" x2="61.28" y2="-51.42" class="laser-engrave" />
-  <text x="59.60" y="-50.01" class="compass-text" font-size="2.4px" transform="rotate(50 59.60 -50.01)">050°</text>
-  <line x1="64.89" y1="-52.55" x2="63.96" y2="-51.79" class="laser-engrave" />
-  <line x1="65.80" y1="-51.41" x2="64.85" y2="-50.67" class="laser-engrave" />
-  <line x1="66.69" y1="-50.25" x2="65.73" y2="-49.53" class="laser-engrave" />
-  <line x1="67.55" y1="-49.08" x2="66.58" y2="-48.37" class="laser-engrave" />
-  <line x1="68.40" y1="-47.89" x2="66.60" y2="-46.63" class="laser-engrave" />
-  <line x1="69.22" y1="-46.69" x2="68.23" y2="-46.02" class="laser-engrave" />
-  <line x1="70.03" y1="-45.48" x2="69.02" y2="-44.82" class="laser-engrave" />
-  <line x1="70.81" y1="-44.25" x2="69.79" y2="-43.61" class="laser-engrave" />
-  <line x1="71.57" y1="-43.01" x2="70.54" y2="-42.39" class="laser-engrave" />
-  <line x1="72.31" y1="-41.75" x2="69.28" y2="-40.00" class="laser-engrave" />
-  <text x="67.38" y="-38.90" class="compass-text" font-size="2.4px" transform="rotate(60 67.38 -38.90)">060°</text>
-  <line x1="73.03" y1="-40.48" x2="71.98" y2="-39.90" class="laser-engrave" />
-  <line x1="73.73" y1="-39.20" x2="72.67" y2="-38.64" class="laser-engrave" />
-  <line x1="74.40" y1="-37.91" x2="73.33" y2="-37.36" class="laser-engrave" />
-  <line x1="75.05" y1="-36.60" x2="73.97" y2="-36.08" class="laser-engrave" />
-  <line x1="75.68" y1="-35.29" x2="73.68" y2="-34.36" class="laser-engrave" />
-  <line x1="76.28" y1="-33.96" x2="75.18" y2="-33.47" class="laser-engrave" />
-  <line x1="76.86" y1="-32.63" x2="75.76" y2="-32.16" class="laser-engrave" />
-  <line x1="77.42" y1="-31.28" x2="76.31" y2="-30.83" class="laser-engrave" />
-  <line x1="77.95" y1="-29.92" x2="76.83" y2="-29.49" class="laser-engrave" />
-  <line x1="78.46" y1="-28.56" x2="75.18" y2="-27.36" class="laser-engrave" />
-  <text x="73.11" y="-26.61" class="compass-text" font-size="2.4px" transform="rotate(70 73.11 -26.61)">070°</text>
-  <line x1="78.95" y1="-27.18" x2="77.82" y2="-26.79" class="laser-engrave" />
-  <line x1="79.41" y1="-25.80" x2="78.27" y2="-25.43" class="laser-engrave" />
-  <line x1="79.85" y1="-24.41" x2="78.70" y2="-24.06" class="laser-engrave" />
-  <line x1="80.27" y1="-23.02" x2="79.11" y2="-22.68" class="laser-engrave" />
-  <line x1="80.65" y1="-21.61" x2="78.53" y2="-21.04" class="laser-engrave" />
-  <line x1="81.02" y1="-20.20" x2="79.86" y2="-19.91" class="laser-engrave" />
-  <line x1="81.36" y1="-18.78" x2="80.19" y2="-18.51" class="laser-engrave" />
-  <line x1="81.68" y1="-17.36" x2="80.50" y2="-17.11" class="laser-engrave" />
-  <line x1="81.97" y1="-15.93" x2="80.79" y2="-15.70" class="laser-engrave" />
-  <line x1="82.23" y1="-14.50" x2="78.78" y2="-13.89" class="laser-engrave" />
-  <text x="76.62" y="-13.51" class="compass-text" font-size="2.4px" transform="rotate(80 76.62 -13.51)">080°</text>
-  <line x1="82.47" y1="-13.06" x2="81.29" y2="-12.87" class="laser-engrave" />
-  <line x1="82.69" y1="-11.62" x2="81.50" y2="-11.45" class="laser-engrave" />
-  <line x1="82.88" y1="-10.18" x2="81.69" y2="-10.03" class="laser-engrave" />
-  <line x1="83.04" y1="-8.73" x2="81.85" y2="-8.60" class="laser-engrave" />
-  <line x1="83.18" y1="-7.28" x2="80.99" y2="-7.09" class="laser-engrave" />
-  <line x1="83.30" y1="-5.82" x2="82.10" y2="-5.74" class="laser-engrave" />
-  <line x1="83.39" y1="-4.37" x2="82.19" y2="-4.31" class="laser-engrave" />
-  <line x1="83.45" y1="-2.91" x2="82.25" y2="-2.87" class="laser-engrave" />
-  <line x1="83.49" y1="-1.46" x2="82.29" y2="-1.44" class="laser-engrave" />
-  <line x1="83.50" y1="-0.00" x2="80.00" y2="-0.00" class="laser-engrave" />
-  <text x="77.80" y="-0.00" class="compass-text" font-size="2.4px" transform="rotate(90 77.80 -0.00)">090°</text>
-  <line x1="83.49" y1="1.46" x2="82.29" y2="1.44" class="laser-engrave" />
-  <line x1="83.45" y1="2.91" x2="82.25" y2="2.87" class="laser-engrave" />
-  <line x1="83.39" y1="4.37" x2="82.19" y2="4.31" class="laser-engrave" />
-  <line x1="83.30" y1="5.82" x2="82.10" y2="5.74" class="laser-engrave" />
-  <line x1="83.18" y1="7.28" x2="80.99" y2="7.09" class="laser-engrave" />
-  <line x1="83.04" y1="8.73" x2="81.85" y2="8.60" class="laser-engrave" />
-  <line x1="82.88" y1="10.18" x2="81.69" y2="10.03" class="laser-engrave" />
-  <line x1="82.69" y1="11.62" x2="81.50" y2="11.45" class="laser-engrave" />
-  <line x1="82.47" y1="13.06" x2="81.29" y2="12.87" class="laser-engrave" />
-  <line x1="82.23" y1="14.50" x2="78.78" y2="13.89" class="laser-engrave" />
-  <text x="76.62" y="13.51" class="compass-text" font-size="2.4px" transform="rotate(100 76.62 13.51)">100°</text>
-  <line x1="81.97" y1="15.93" x2="80.79" y2="15.70" class="laser-engrave" />
-  <line x1="81.68" y1="17.36" x2="80.50" y2="17.11" class="laser-engrave" />
-  <line x1="81.36" y1="18.78" x2="80.19" y2="18.51" class="laser-engrave" />
-  <line x1="81.02" y1="20.20" x2="79.86" y2="19.91" class="laser-engrave" />
-  <line x1="80.65" y1="21.61" x2="78.53" y2="21.04" class="laser-engrave" />
-  <line x1="80.27" y1="23.02" x2="79.11" y2="22.68" class="laser-engrave" />
-  <line x1="79.85" y1="24.41" x2="78.70" y2="24.06" class="laser-engrave" />
-  <line x1="79.41" y1="25.80" x2="78.27" y2="25.43" class="laser-engrave" />
-  <line x1="78.95" y1="27.18" x2="77.82" y2="26.79" class="laser-engrave" />
-  <line x1="78.46" y1="28.56" x2="75.18" y2="27.36" class="laser-engrave" />
-  <text x="73.11" y="26.61" class="compass-text" font-size="2.4px" transform="rotate(110 73.11 26.61)">110°</text>
-  <line x1="77.95" y1="29.92" x2="76.83" y2="29.49" class="laser-engrave" />
-  <line x1="77.42" y1="31.28" x2="76.31" y2="30.83" class="laser-engrave" />
-  <line x1="76.86" y1="32.63" x2="75.76" y2="32.16" class="laser-engrave" />
-  <line x1="76.28" y1="33.96" x2="75.18" y2="33.47" class="laser-engrave" />
-  <line x1="75.68" y1="35.29" x2="73.68" y2="34.36" class="laser-engrave" />
-  <line x1="75.05" y1="36.60" x2="73.97" y2="36.08" class="laser-engrave" />
-  <line x1="74.40" y1="37.91" x2="73.33" y2="37.36" class="laser-engrave" />
-  <line x1="73.73" y1="39.20" x2="72.67" y2="38.64" class="laser-engrave" />
-  <line x1="73.03" y1="40.48" x2="71.98" y2="39.90" class="laser-engrave" />
-  <line x1="72.31" y1="41.75" x2="69.28" y2="40.00" class="laser-engrave" />
-  <text x="67.38" y="38.90" class="compass-text" font-size="2.4px" transform="rotate(120 67.38 38.90)">120°</text>
-  <line x1="71.57" y1="43.01" x2="70.54" y2="42.39" class="laser-engrave" />
-  <line x1="70.81" y1="44.25" x2="69.79" y2="43.61" class="laser-engrave" />
-  <line x1="70.03" y1="45.48" x2="69.02" y2="44.82" class="laser-engrave" />
-  <line x1="69.22" y1="46.69" x2="68.23" y2="46.02" class="laser-engrave" />
-  <line x1="68.40" y1="47.89" x2="66.60" y2="46.63" class="laser-engrave" />
-  <line x1="67.55" y1="49.08" x2="66.58" y2="48.37" class="laser-engrave" />
-  <line x1="66.69" y1="50.25" x2="65.73" y2="49.53" class="laser-engrave" />
-  <line x1="65.80" y1="51.41" x2="64.85" y2="50.67" class="laser-engrave" />
-  <line x1="64.89" y1="52.55" x2="63.96" y2="51.79" class="laser-engrave" />
-  <line x1="63.96" y1="53.67" x2="61.28" y2="51.42" class="laser-engrave" />
-  <text x="59.60" y="50.01" class="compass-text" font-size="2.4px" transform="rotate(130 59.60 50.01)">130°</text>
-  <line x1="63.02" y1="54.78" x2="62.11" y2="53.99" class="laser-engrave" />
-  <line x1="62.05" y1="55.87" x2="61.16" y2="55.07" class="laser-engrave" />
-  <line x1="61.07" y1="56.95" x2="60.19" y2="56.13" class="laser-engrave" />
-  <line x1="60.06" y1="58.00" x2="59.20" y2="57.17" class="laser-engrave" />
-  <line x1="59.04" y1="59.04" x2="57.49" y2="57.49" class="laser-engrave" />
-  <line x1="58.00" y1="60.06" x2="57.17" y2="59.20" class="laser-engrave" />
-  <line x1="56.95" y1="61.07" x2="56.13" y2="60.19" class="laser-engrave" />
-  <line x1="55.87" y1="62.05" x2="55.07" y2="61.16" class="laser-engrave" />
-  <line x1="54.78" y1="63.02" x2="53.99" y2="62.11" class="laser-engrave" />
-  <line x1="53.67" y1="63.96" x2="51.42" y2="61.28" class="laser-engrave" />
-  <text x="50.01" y="59.60" class="compass-text" font-size="2.4px" transform="rotate(140 50.01 59.60)">140°</text>
-  <line x1="52.55" y1="64.89" x2="51.79" y2="63.96" class="laser-engrave" />
-  <line x1="51.41" y1="65.80" x2="50.67" y2="64.85" class="laser-engrave" />
-  <line x1="50.25" y1="66.69" x2="49.53" y2="65.73" class="laser-engrave" />
-  <line x1="49.08" y1="67.55" x2="48.37" y2="66.58" class="laser-engrave" />
-  <line x1="47.89" y1="68.40" x2="46.63" y2="66.60" class="laser-engrave" />
-  <line x1="46.69" y1="69.22" x2="46.02" y2="68.23" class="laser-engrave" />
-  <line x1="45.48" y1="70.03" x2="44.82" y2="69.02" class="laser-engrave" />
-  <line x1="44.25" y1="70.81" x2="43.61" y2="69.79" class="laser-engrave" />
-  <line x1="43.01" y1="71.57" x2="42.39" y2="70.54" class="laser-engrave" />
-  <line x1="41.75" y1="72.31" x2="40.00" y2="69.28" class="laser-engrave" />
-  <text x="38.90" y="67.38" class="compass-text" font-size="2.4px" transform="rotate(150 38.90 67.38)">150°</text>
-  <line x1="40.48" y1="73.03" x2="39.90" y2="71.98" class="laser-engrave" />
-  <line x1="39.20" y1="73.73" x2="38.64" y2="72.67" class="laser-engrave" />
-  <line x1="37.91" y1="74.40" x2="37.36" y2="73.33" class="laser-engrave" />
-  <line x1="36.60" y1="75.05" x2="36.08" y2="73.97" class="laser-engrave" />
-  <line x1="35.29" y1="75.68" x2="34.36" y2="73.68" class="laser-engrave" />
-  <line x1="33.96" y1="76.28" x2="33.47" y2="75.18" class="laser-engrave" />
-  <line x1="32.63" y1="76.86" x2="32.16" y2="75.76" class="laser-engrave" />
-  <line x1="31.28" y1="77.42" x2="30.83" y2="76.31" class="laser-engrave" />
-  <line x1="29.92" y1="77.95" x2="29.49" y2="76.83" class="laser-engrave" />
-  <line x1="28.56" y1="78.46" x2="27.36" y2="75.18" class="laser-engrave" />
-  <text x="26.61" y="73.11" class="compass-text" font-size="2.4px" transform="rotate(160 26.61 73.11)">160°</text>
-  <line x1="27.18" y1="78.95" x2="26.79" y2="77.82" class="laser-engrave" />
-  <line x1="25.80" y1="79.41" x2="25.43" y2="78.27" class="laser-engrave" />
-  <line x1="24.41" y1="79.85" x2="24.06" y2="78.70" class="laser-engrave" />
-  <line x1="23.02" y1="80.27" x2="22.68" y2="79.11" class="laser-engrave" />
-  <line x1="21.61" y1="80.65" x2="21.04" y2="78.53" class="laser-engrave" />
-  <line x1="20.20" y1="81.02" x2="19.91" y2="79.86" class="laser-engrave" />
-  <line x1="18.78" y1="81.36" x2="18.51" y2="80.19" class="laser-engrave" />
-  <line x1="17.36" y1="81.68" x2="17.11" y2="80.50" class="laser-engrave" />
-  <line x1="15.93" y1="81.97" x2="15.70" y2="80.79" class="laser-engrave" />
-  <line x1="14.50" y1="82.23" x2="13.89" y2="78.78" class="laser-engrave" />
-  <text x="13.51" y="76.62" class="compass-text" font-size="2.4px" transform="rotate(170 13.51 76.62)">170°</text>
-  <line x1="13.06" y1="82.47" x2="12.87" y2="81.29" class="laser-engrave" />
-  <line x1="11.62" y1="82.69" x2="11.45" y2="81.50" class="laser-engrave" />
-  <line x1="10.18" y1="82.88" x2="10.03" y2="81.69" class="laser-engrave" />
-  <line x1="8.73" y1="83.04" x2="8.60" y2="81.85" class="laser-engrave" />
-  <line x1="7.28" y1="83.18" x2="7.09" y2="80.99" class="laser-engrave" />
-  <line x1="5.82" y1="83.30" x2="5.74" y2="82.10" class="laser-engrave" />
-  <line x1="4.37" y1="83.39" x2="4.31" y2="82.19" class="laser-engrave" />
-  <line x1="2.91" y1="83.45" x2="2.87" y2="82.25" class="laser-engrave" />
-  <line x1="1.46" y1="83.49" x2="1.44" y2="82.29" class="laser-engrave" />
-  <line x1="0.00" y1="83.50" x2="0.00" y2="80.00" class="laser-engrave" />
-  <text x="0.00" y="77.80" class="compass-text" font-size="2.4px" transform="rotate(180 0.00 77.80)">180°</text>
-  <line x1="-1.46" y1="83.49" x2="-1.44" y2="82.29" class="laser-engrave" />
-  <line x1="-2.91" y1="83.45" x2="-2.87" y2="82.25" class="laser-engrave" />
-  <line x1="-4.37" y1="83.39" x2="-4.31" y2="82.19" class="laser-engrave" />
-  <line x1="-5.82" y1="83.30" x2="-5.74" y2="82.10" class="laser-engrave" />
-  <line x1="-7.28" y1="83.18" x2="-7.09" y2="80.99" class="laser-engrave" />
-  <line x1="-8.73" y1="83.04" x2="-8.60" y2="81.85" class="laser-engrave" />
-  <line x1="-10.18" y1="82.88" x2="-10.03" y2="81.69" class="laser-engrave" />
-  <line x1="-11.62" y1="82.69" x2="-11.45" y2="81.50" class="laser-engrave" />
-  <line x1="-13.06" y1="82.47" x2="-12.87" y2="81.29" class="laser-engrave" />
-  <line x1="-14.50" y1="82.23" x2="-13.89" y2="78.78" class="laser-engrave" />
-  <text x="-13.51" y="76.62" class="compass-text" font-size="2.4px" transform="rotate(10 -13.51 76.62)">190°</text>
-  <line x1="-15.93" y1="81.97" x2="-15.70" y2="80.79" class="laser-engrave" />
-  <line x1="-17.36" y1="81.68" x2="-17.11" y2="80.50" class="laser-engrave" />
-  <line x1="-18.78" y1="81.36" x2="-18.51" y2="80.19" class="laser-engrave" />
-  <line x1="-20.20" y1="81.02" x2="-19.91" y2="79.86" class="laser-engrave" />
-  <line x1="-21.61" y1="80.65" x2="-21.04" y2="78.53" class="laser-engrave" />
-  <line x1="-23.02" y1="80.27" x2="-22.68" y2="79.11" class="laser-engrave" />
-  <line x1="-24.41" y1="79.85" x2="-24.06" y2="78.70" class="laser-engrave" />
-  <line x1="-25.80" y1="79.41" x2="-25.43" y2="78.27" class="laser-engrave" />
-  <line x1="-27.18" y1="78.95" x2="-26.79" y2="77.82" class="laser-engrave" />
-  <line x1="-28.56" y1="78.46" x2="-27.36" y2="75.18" class="laser-engrave" />
-  <text x="-26.61" y="73.11" class="compass-text" font-size="2.4px" transform="rotate(20 -26.61 73.11)">200°</text>
-  <line x1="-29.92" y1="77.95" x2="-29.49" y2="76.83" class="laser-engrave" />
-  <line x1="-31.28" y1="77.42" x2="-30.83" y2="76.31" class="laser-engrave" />
-  <line x1="-32.63" y1="76.86" x2="-32.16" y2="75.76" class="laser-engrave" />
-  <line x1="-33.96" y1="76.28" x2="-33.47" y2="75.18" class="laser-engrave" />
-  <line x1="-35.29" y1="75.68" x2="-34.36" y2="73.68" class="laser-engrave" />
-  <line x1="-36.60" y1="75.05" x2="-36.08" y2="73.97" class="laser-engrave" />
-  <line x1="-37.91" y1="74.40" x2="-37.36" y2="73.33" class="laser-engrave" />
-  <line x1="-39.20" y1="73.73" x2="-38.64" y2="72.67" class="laser-engrave" />
-  <line x1="-40.48" y1="73.03" x2="-39.90" y2="71.98" class="laser-engrave" />
-  <line x1="-41.75" y1="72.31" x2="-40.00" y2="69.28" class="laser-engrave" />
-  <text x="-38.90" y="67.38" class="compass-text" font-size="2.4px" transform="rotate(30 -38.90 67.38)">210°</text>
-  <line x1="-43.01" y1="71.57" x2="-42.39" y2="70.54" class="laser-engrave" />
-  <line x1="-44.25" y1="70.81" x2="-43.61" y2="69.79" class="laser-engrave" />
-  <line x1="-45.48" y1="70.03" x2="-44.82" y2="69.02" class="laser-engrave" />
-  <line x1="-46.69" y1="69.22" x2="-46.02" y2="68.23" class="laser-engrave" />
-  <line x1="-47.89" y1="68.40" x2="-46.63" y2="66.60" class="laser-engrave" />
-  <line x1="-49.08" y1="67.55" x2="-48.37" y2="66.58" class="laser-engrave" />
-  <line x1="-50.25" y1="66.69" x2="-49.53" y2="65.73" class="laser-engrave" />
-  <line x1="-51.41" y1="65.80" x2="-50.67" y2="64.85" class="laser-engrave" />
-  <line x1="-52.55" y1="64.89" x2="-51.79" y2="63.96" class="laser-engrave" />
-  <line x1="-53.67" y1="63.96" x2="-51.42" y2="61.28" class="laser-engrave" />
-  <text x="-50.01" y="59.60" class="compass-text" font-size="2.4px" transform="rotate(40 -50.01 59.60)">220°</text>
-  <line x1="-54.78" y1="63.02" x2="-53.99" y2="62.11" class="laser-engrave" />
-  <line x1="-55.87" y1="62.05" x2="-55.07" y2="61.16" class="laser-engrave" />
-  <line x1="-56.95" y1="61.07" x2="-56.13" y2="60.19" class="laser-engrave" />
-  <line x1="-58.00" y1="60.06" x2="-57.17" y2="59.20" class="laser-engrave" />
-  <line x1="-59.04" y1="59.04" x2="-57.49" y2="57.49" class="laser-engrave" />
-  <line x1="-60.06" y1="58.00" x2="-59.20" y2="57.17" class="laser-engrave" />
-  <line x1="-61.07" y1="56.95" x2="-60.19" y2="56.13" class="laser-engrave" />
-  <line x1="-62.05" y1="55.87" x2="-61.16" y2="55.07" class="laser-engrave" />
-  <line x1="-63.02" y1="54.78" x2="-62.11" y2="53.99" class="laser-engrave" />
-  <line x1="-63.96" y1="53.67" x2="-61.28" y2="51.42" class="laser-engrave" />
-  <text x="-59.60" y="50.01" class="compass-text" font-size="2.4px" transform="rotate(50 -59.60 50.01)">230°</text>
-  <line x1="-64.89" y1="52.55" x2="-63.96" y2="51.79" class="laser-engrave" />
-  <line x1="-65.80" y1="51.41" x2="-64.85" y2="50.67" class="laser-engrave" />
-  <line x1="-66.69" y1="50.25" x2="-65.73" y2="49.53" class="laser-engrave" />
-  <line x1="-67.55" y1="49.08" x2="-66.58" y2="48.37" class="laser-engrave" />
-  <line x1="-68.40" y1="47.89" x2="-66.60" y2="46.63" class="laser-engrave" />
-  <line x1="-69.22" y1="46.69" x2="-68.23" y2="46.02" class="laser-engrave" />
-  <line x1="-70.03" y1="45.48" x2="-69.02" y2="44.82" class="laser-engrave" />
-  <line x1="-70.81" y1="44.25" x2="-69.79" y2="43.61" class="laser-engrave" />
-  <line x1="-71.57" y1="43.01" x2="-70.54" y2="42.39" class="laser-engrave" />
-  <line x1="-72.31" y1="41.75" x2="-69.28" y2="40.00" class="laser-engrave" />
-  <text x="-67.38" y="38.90" class="compass-text" font-size="2.4px" transform="rotate(60 -67.38 38.90)">240°</text>
-  <line x1="-73.03" y1="40.48" x2="-71.98" y2="39.90" class="laser-engrave" />
-  <line x1="-73.73" y1="39.20" x2="-72.67" y2="38.64" class="laser-engrave" />
-  <line x1="-74.40" y1="37.91" x2="-73.33" y2="37.36" class="laser-engrave" />
-  <line x1="-75.05" y1="36.60" x2="-73.97" y2="36.08" class="laser-engrave" />
-  <line x1="-75.68" y1="35.29" x2="-73.68" y2="34.36" class="laser-engrave" />
-  <line x1="-76.28" y1="33.96" x2="-75.18" y2="33.47" class="laser-engrave" />
-  <line x1="-76.86" y1="32.63" x2="-75.76" y2="32.16" class="laser-engrave" />
-  <line x1="-77.42" y1="31.28" x2="-76.31" y2="30.83" class="laser-engrave" />
-  <line x1="-77.95" y1="29.92" x2="-76.83" y2="29.49" class="laser-engrave" />
-  <line x1="-78.46" y1="28.56" x2="-75.18" y2="27.36" class="laser-engrave" />
-  <text x="-73.11" y="26.61" class="compass-text" font-size="2.4px" transform="rotate(70 -73.11 26.61)">250°</text>
-  <line x1="-78.95" y1="27.18" x2="-77.82" y2="26.79" class="laser-engrave" />
-  <line x1="-79.41" y1="25.80" x2="-78.27" y2="25.43" class="laser-engrave" />
-  <line x1="-79.85" y1="24.41" x2="-78.70" y2="24.06" class="laser-engrave" />
-  <line x1="-80.27" y1="23.02" x2="-79.11" y2="22.68" class="laser-engrave" />
-  <line x1="-80.65" y1="21.61" x2="-78.53" y2="21.04" class="laser-engrave" />
-  <line x1="-81.02" y1="20.20" x2="-79.86" y2="19.91" class="laser-engrave" />
-  <line x1="-81.36" y1="18.78" x2="-80.19" y2="18.51" class="laser-engrave" />
-  <line x1="-81.68" y1="17.36" x2="-80.50" y2="17.11" class="laser-engrave" />
-  <line x1="-81.97" y1="15.93" x2="-80.79" y2="15.70" class="laser-engrave" />
-  <line x1="-82.23" y1="14.50" x2="-78.78" y2="13.89" class="laser-engrave" />
-  <text x="-76.62" y="13.51" class="compass-text" font-size="2.4px" transform="rotate(80 -76.62 13.51)">260°</text>
-  <line x1="-82.47" y1="13.06" x2="-81.29" y2="12.87" class="laser-engrave" />
-  <line x1="-82.69" y1="11.62" x2="-81.50" y2="11.45" class="laser-engrave" />
-  <line x1="-82.88" y1="10.18" x2="-81.69" y2="10.03" class="laser-engrave" />
-  <line x1="-83.04" y1="8.73" x2="-81.85" y2="8.60" class="laser-engrave" />
-  <line x1="-83.18" y1="7.28" x2="-80.99" y2="7.09" class="laser-engrave" />
-  <line x1="-83.30" y1="5.82" x2="-82.10" y2="5.74" class="laser-engrave" />
-  <line x1="-83.39" y1="4.37" x2="-82.19" y2="4.31" class="laser-engrave" />
-  <line x1="-83.45" y1="2.91" x2="-82.25" y2="2.87" class="laser-engrave" />
-  <line x1="-83.49" y1="1.46" x2="-82.29" y2="1.44" class="laser-engrave" />
-  <line x1="-83.50" y1="0.00" x2="-80.00" y2="0.00" class="laser-engrave" />
-  <text x="-77.80" y="0.00" class="compass-text" font-size="2.4px" transform="rotate(90 -77.80 0.00)">270°</text>
-  <line x1="-83.49" y1="-1.46" x2="-82.29" y2="-1.44" class="laser-engrave" />
-  <line x1="-83.45" y1="-2.91" x2="-82.25" y2="-2.87" class="laser-engrave" />
-  <line x1="-83.39" y1="-4.37" x2="-82.19" y2="-4.31" class="laser-engrave" />
-  <line x1="-83.30" y1="-5.82" x2="-82.10" y2="-5.74" class="laser-engrave" />
-  <line x1="-83.18" y1="-7.28" x2="-80.99" y2="-7.09" class="laser-engrave" />
-  <line x1="-83.04" y1="-8.73" x2="-81.85" y2="-8.60" class="laser-engrave" />
-  <line x1="-82.88" y1="-10.18" x2="-81.69" y2="-10.03" class="laser-engrave" />
-  <line x1="-82.69" y1="-11.62" x2="-81.50" y2="-11.45" class="laser-engrave" />
-  <line x1="-82.47" y1="-13.06" x2="-81.29" y2="-12.87" class="laser-engrave" />
-  <line x1="-82.23" y1="-14.50" x2="-78.78" y2="-13.89" class="laser-engrave" />
-  <text x="-76.62" y="-13.51" class="compass-text" font-size="2.4px" transform="rotate(100 -76.62 -13.51)">280°</text>
-  <line x1="-81.97" y1="-15.93" x2="-80.79" y2="-15.70" class="laser-engrave" />
-  <line x1="-81.68" y1="-17.36" x2="-80.50" y2="-17.11" class="laser-engrave" />
-  <line x1="-81.36" y1="-18.78" x2="-80.19" y2="-18.51" class="laser-engrave" />
-  <line x1="-81.02" y1="-20.20" x2="-79.86" y2="-19.91" class="laser-engrave" />
-  <line x1="-80.65" y1="-21.61" x2="-78.53" y2="-21.04" class="laser-engrave" />
-  <line x1="-80.27" y1="-23.02" x2="-79.11" y2="-22.68" class="laser-engrave" />
-  <line x1="-79.85" y1="-24.41" x2="-78.70" y2="-24.06" class="laser-engrave" />
-  <line x1="-79.41" y1="-25.80" x2="-78.27" y2="-25.43" class="laser-engrave" />
-  <line x1="-78.95" y1="-27.18" x2="-77.82" y2="-26.79" class="laser-engrave" />
-  <line x1="-78.46" y1="-28.56" x2="-75.18" y2="-27.36" class="laser-engrave" />
-  <text x="-73.11" y="-26.61" class="compass-text" font-size="2.4px" transform="rotate(110 -73.11 -26.61)">290°</text>
-  <line x1="-77.95" y1="-29.92" x2="-76.83" y2="-29.49" class="laser-engrave" />
-  <line x1="-77.42" y1="-31.28" x2="-76.31" y2="-30.83" class="laser-engrave" />
-  <line x1="-76.86" y1="-32.63" x2="-75.76" y2="-32.16" class="laser-engrave" />
-  <line x1="-76.28" y1="-33.96" x2="-75.18" y2="-33.47" class="laser-engrave" />
-  <line x1="-75.68" y1="-35.29" x2="-73.68" y2="-34.36" class="laser-engrave" />
-  <line x1="-75.05" y1="-36.60" x2="-73.97" y2="-36.08" class="laser-engrave" />
-  <line x1="-74.40" y1="-37.91" x2="-73.33" y2="-37.36" class="laser-engrave" />
-  <line x1="-73.73" y1="-39.20" x2="-72.67" y2="-38.64" class="laser-engrave" />
-  <line x1="-73.03" y1="-40.48" x2="-71.98" y2="-39.90" class="laser-engrave" />
-  <line x1="-72.31" y1="-41.75" x2="-69.28" y2="-40.00" class="laser-engrave" />
-  <text x="-67.38" y="-38.90" class="compass-text" font-size="2.4px" transform="rotate(120 -67.38 -38.90)">300°</text>
-  <line x1="-71.57" y1="-43.01" x2="-70.54" y2="-42.39" class="laser-engrave" />
-  <line x1="-70.81" y1="-44.25" x2="-69.79" y2="-43.61" class="laser-engrave" />
-  <line x1="-70.03" y1="-45.48" x2="-69.02" y2="-44.82" class="laser-engrave" />
-  <line x1="-69.22" y1="-46.69" x2="-68.23" y2="-46.02" class="laser-engrave" />
-  <line x1="-68.40" y1="-47.89" x2="-66.60" y2="-46.63" class="laser-engrave" />
-  <line x1="-67.55" y1="-49.08" x2="-66.58" y2="-48.37" class="laser-engrave" />
-  <line x1="-66.69" y1="-50.25" x2="-65.73" y2="-49.53" class="laser-engrave" />
-  <line x1="-65.80" y1="-51.41" x2="-64.85" y2="-50.67" class="laser-engrave" />
-  <line x1="-64.89" y1="-52.55" x2="-63.96" y2="-51.79" class="laser-engrave" />
-  <line x1="-63.96" y1="-53.67" x2="-61.28" y2="-51.42" class="laser-engrave" />
-  <text x="-59.60" y="-50.01" class="compass-text" font-size="2.4px" transform="rotate(130 -59.60 -50.01)">310°</text>
-  <line x1="-63.02" y1="-54.78" x2="-62.11" y2="-53.99" class="laser-engrave" />
-  <line x1="-62.05" y1="-55.87" x2="-61.16" y2="-55.07" class="laser-engrave" />
-  <line x1="-61.07" y1="-56.95" x2="-60.19" y2="-56.13" class="laser-engrave" />
-  <line x1="-60.06" y1="-58.00" x2="-59.20" y2="-57.17" class="laser-engrave" />
-  <line x1="-59.04" y1="-59.04" x2="-57.49" y2="-57.49" class="laser-engrave" />
-  <line x1="-58.00" y1="-60.06" x2="-57.17" y2="-59.20" class="laser-engrave" />
-  <line x1="-56.95" y1="-61.07" x2="-56.13" y2="-60.19" class="laser-engrave" />
-  <line x1="-55.87" y1="-62.05" x2="-55.07" y2="-61.16" class="laser-engrave" />
-  <line x1="-54.78" y1="-63.02" x2="-53.99" y2="-62.11" class="laser-engrave" />
-  <line x1="-53.67" y1="-63.96" x2="-51.42" y2="-61.28" class="laser-engrave" />
-  <text x="-50.01" y="-59.60" class="compass-text" font-size="2.4px" transform="rotate(140 -50.01 -59.60)">320°</text>
-  <line x1="-52.55" y1="-64.89" x2="-51.79" y2="-63.96" class="laser-engrave" />
-  <line x1="-51.41" y1="-65.80" x2="-50.67" y2="-64.85" class="laser-engrave" />
-  <line x1="-50.25" y1="-66.69" x2="-49.53" y2="-65.73" class="laser-engrave" />
-  <line x1="-49.08" y1="-67.55" x2="-48.37" y2="-66.58" class="laser-engrave" />
-  <line x1="-47.89" y1="-68.40" x2="-46.63" y2="-66.60" class="laser-engrave" />
-  <line x1="-46.69" y1="-69.22" x2="-46.02" y2="-68.23" class="laser-engrave" />
-  <line x1="-45.48" y1="-70.03" x2="-44.82" y2="-69.02" class="laser-engrave" />
-  <line x1="-44.25" y1="-70.81" x2="-43.61" y2="-69.79" class="laser-engrave" />
-  <line x1="-43.01" y1="-71.57" x2="-42.39" y2="-70.54" class="laser-engrave" />
-  <line x1="-41.75" y1="-72.31" x2="-40.00" y2="-69.28" class="laser-engrave" />
-  <text x="-38.90" y="-67.38" class="compass-text" font-size="2.4px" transform="rotate(150 -38.90 -67.38)">330°</text>
-  <line x1="-40.48" y1="-73.03" x2="-39.90" y2="-71.98" class="laser-engrave" />
-  <line x1="-39.20" y1="-73.73" x2="-38.64" y2="-72.67" class="laser-engrave" />
-  <line x1="-37.91" y1="-74.40" x2="-37.36" y2="-73.33" class="laser-engrave" />
-  <line x1="-36.60" y1="-75.05" x2="-36.08" y2="-73.97" class="laser-engrave" />
-  <line x1="-35.29" y1="-75.68" x2="-34.36" y2="-73.68" class="laser-engrave" />
-  <line x1="-33.96" y1="-76.28" x2="-33.47" y2="-75.18" class="laser-engrave" />
-  <line x1="-32.63" y1="-76.86" x2="-32.16" y2="-75.76" class="laser-engrave" />
-  <line x1="-31.28" y1="-77.42" x2="-30.83" y2="-76.31" class="laser-engrave" />
-  <line x1="-29.92" y1="-77.95" x2="-29.49" y2="-76.83" class="laser-engrave" />
-  <line x1="-28.56" y1="-78.46" x2="-27.36" y2="-75.18" class="laser-engrave" />
-  <text x="-26.61" y="-73.11" class="compass-text" font-size="2.4px" transform="rotate(160 -26.61 -73.11)">340°</text>
-  <line x1="-27.18" y1="-78.95" x2="-26.79" y2="-77.82" class="laser-engrave" />
-  <line x1="-25.80" y1="-79.41" x2="-25.43" y2="-78.27" class="laser-engrave" />
-  <line x1="-24.41" y1="-79.85" x2="-24.06" y2="-78.70" class="laser-engrave" />
-  <line x1="-23.02" y1="-80.27" x2="-22.68" y2="-79.11" class="laser-engrave" />
-  <line x1="-21.61" y1="-80.65" x2="-21.04" y2="-78.53" class="laser-engrave" />
-  <line x1="-20.20" y1="-81.02" x2="-19.91" y2="-79.86" class="laser-engrave" />
-  <line x1="-18.78" y1="-81.36" x2="-18.51" y2="-80.19" class="laser-engrave" />
-  <line x1="-17.36" y1="-81.68" x2="-17.11" y2="-80.50" class="laser-engrave" />
-  <line x1="-15.93" y1="-81.97" x2="-15.70" y2="-80.79" class="laser-engrave" />
-  <line x1="-14.50" y1="-82.23" x2="-13.89" y2="-78.78" class="laser-engrave" />
-  <text x="-13.51" y="-76.62" class="compass-text" font-size="2.4px" transform="rotate(170 -13.51 -76.62)">350°</text>
-  <line x1="-13.06" y1="-82.47" x2="-12.87" y2="-81.29" class="laser-engrave" />
-  <line x1="-11.62" y1="-82.69" x2="-11.45" y2="-81.50" class="laser-engrave" />
-  <line x1="-10.18" y1="-82.88" x2="-10.03" y2="-81.69" class="laser-engrave" />
-  <line x1="-8.73" y1="-83.04" x2="-8.60" y2="-81.85" class="laser-engrave" />
-  <line x1="-7.28" y1="-83.18" x2="-7.09" y2="-80.99" class="laser-engrave" />
-  <line x1="-5.82" y1="-83.30" x2="-5.74" y2="-82.10" class="laser-engrave" />
-  <line x1="-4.37" y1="-83.39" x2="-4.31" y2="-82.19" class="laser-engrave" />
-  <line x1="-2.91" y1="-83.45" x2="-2.87" y2="-82.25" class="laser-engrave" />
-  <line x1="-1.46" y1="-83.49" x2="-1.44" y2="-82.29" class="laser-engrave" />
+  <!-- Schnittlinien (Laser-Cut) -->
+  <circle cx="0" cy="0" r="90.00" class="laser-cut" />
+  <circle cx="0" cy="0" r="75.00" class="laser-cut-inner" />
+  <circle cx="0.00" cy="-88.00" r="1.60" class="laser-cut" />
+  <circle cx="76.21" cy="-44.00" r="1.60" class="laser-cut" />
+  <circle cx="76.21" cy="44.00" r="1.60" class="laser-cut" />
+  <circle cx="0.00" cy="88.00" r="1.60" class="laser-cut" />
+  <circle cx="-76.21" cy="44.00" r="1.60" class="laser-cut" />
+  <circle cx="-76.21" cy="-44.00" r="1.60" class="laser-cut" />
+  <!-- 360° Kompassrose auf Stator (Ticks innen, Ziffern außen) -->
+  <line x1="0.00" y1="-75.80" x2="0.00" y2="-79.20" class="laser-engrave" />
+  <text x="0.00" y="-82.50" class="compass-text" transform="rotate(0.0 0.00 -82.50)">000°</text>
+  <line x1="1.36" y1="-77.99" x2="1.38" y2="-79.19" class="laser-engrave" />
+  <line x1="2.72" y1="-77.95" x2="2.76" y2="-79.15" class="laser-engrave" />
+  <line x1="4.08" y1="-77.89" x2="4.15" y2="-79.09" class="laser-engrave" />
+  <line x1="5.44" y1="-77.81" x2="5.52" y2="-79.01" class="laser-engrave" />
+  <line x1="6.71" y1="-76.71" x2="6.90" y2="-78.90" class="laser-engrave" />
+  <line x1="8.15" y1="-77.57" x2="8.28" y2="-78.77" class="laser-engrave" />
+  <line x1="9.51" y1="-77.42" x2="9.65" y2="-78.61" class="laser-engrave" />
+  <line x1="10.86" y1="-77.24" x2="11.02" y2="-78.43" class="laser-engrave" />
+  <line x1="12.20" y1="-77.04" x2="12.39" y2="-78.22" class="laser-engrave" />
+  <line x1="13.16" y1="-74.65" x2="13.75" y2="-78.00" class="laser-engrave" />
+  <text x="14.33" y="-81.25" class="compass-text" transform="rotate(10.0 14.33 -81.25)">010°</text>
+  <line x1="14.88" y1="-76.57" x2="15.11" y2="-77.74" class="laser-engrave" />
+  <line x1="16.22" y1="-76.30" x2="16.47" y2="-77.47" class="laser-engrave" />
+  <line x1="17.55" y1="-76.00" x2="17.82" y2="-77.17" class="laser-engrave" />
+  <line x1="18.87" y1="-75.68" x2="19.16" y2="-76.85" class="laser-engrave" />
+  <line x1="19.93" y1="-74.38" x2="20.50" y2="-76.50" class="laser-engrave" />
+  <line x1="21.50" y1="-74.98" x2="21.83" y2="-76.13" class="laser-engrave" />
+  <line x1="22.80" y1="-74.59" x2="23.16" y2="-75.74" class="laser-engrave" />
+  <line x1="24.10" y1="-74.18" x2="24.47" y2="-75.32" class="laser-engrave" />
+  <line x1="25.39" y1="-73.75" x2="25.78" y2="-74.89" class="laser-engrave" />
+  <line x1="25.93" y1="-71.23" x2="27.09" y2="-74.42" class="laser-engrave" />
+  <text x="28.22" y="-77.52" class="compass-text" transform="rotate(20.0 28.22 -77.52)">020°</text>
+  <line x1="27.95" y1="-72.82" x2="28.38" y2="-73.94" class="laser-engrave" />
+  <line x1="29.22" y1="-72.32" x2="29.67" y2="-73.43" class="laser-engrave" />
+  <line x1="30.48" y1="-71.80" x2="30.95" y2="-72.90" class="laser-engrave" />
+  <line x1="31.73" y1="-71.26" x2="32.21" y2="-72.35" class="laser-engrave" />
+  <line x1="32.54" y1="-69.79" x2="33.47" y2="-71.78" class="laser-engrave" />
+  <line x1="34.19" y1="-70.11" x2="34.72" y2="-71.18" class="laser-engrave" />
+  <line x1="35.41" y1="-69.50" x2="35.96" y2="-70.57" class="laser-engrave" />
+  <line x1="36.62" y1="-68.87" x2="37.18" y2="-69.93" class="laser-engrave" />
+  <line x1="37.82" y1="-68.22" x2="38.40" y2="-69.27" class="laser-engrave" />
+  <line x1="37.90" y1="-65.64" x2="39.60" y2="-68.59" class="laser-engrave" />
+  <text x="41.25" y="-71.45" class="compass-text" transform="rotate(30.0 41.25 -71.45)">030°</text>
+  <line x1="40.17" y1="-66.86" x2="40.79" y2="-67.89" class="laser-engrave" />
+  <line x1="41.33" y1="-66.15" x2="41.97" y2="-67.17" class="laser-engrave" />
+  <line x1="42.48" y1="-65.42" x2="43.14" y2="-66.42" class="laser-engrave" />
+  <line x1="43.62" y1="-64.66" x2="44.29" y2="-65.66" class="laser-engrave" />
+  <line x1="44.17" y1="-63.07" x2="45.43" y2="-64.88" class="laser-engrave" />
+  <line x1="45.85" y1="-63.10" x2="46.55" y2="-64.07" class="laser-engrave" />
+  <line x1="46.94" y1="-62.29" x2="47.66" y2="-63.25" class="laser-engrave" />
+  <line x1="48.02" y1="-61.46" x2="48.76" y2="-62.41" class="laser-engrave" />
+  <line x1="49.09" y1="-60.62" x2="49.84" y2="-61.55" class="laser-engrave" />
+  <line x1="48.72" y1="-58.07" x2="50.91" y2="-60.67" class="laser-engrave" />
+  <text x="53.03" y="-63.20" class="compass-text" transform="rotate(40.0 53.03 -63.20)">040°</text>
+  <line x1="51.17" y1="-58.87" x2="51.96" y2="-59.77" class="laser-engrave" />
+  <line x1="52.19" y1="-57.97" x2="53.00" y2="-58.86" class="laser-engrave" />
+  <line x1="53.20" y1="-57.05" x2="54.01" y2="-57.92" class="laser-engrave" />
+  <line x1="54.18" y1="-56.11" x2="55.02" y2="-56.97" class="laser-engrave" />
+  <line x1="54.45" y1="-54.45" x2="56.00" y2="-56.00" class="laser-engrave" />
+  <line x1="56.11" y1="-54.18" x2="56.97" y2="-55.02" class="laser-engrave" />
+  <line x1="57.05" y1="-53.20" x2="57.92" y2="-54.01" class="laser-engrave" />
+  <line x1="57.97" y1="-52.19" x2="58.86" y2="-53.00" class="laser-engrave" />
+  <line x1="58.87" y1="-51.17" x2="59.77" y2="-51.96" class="laser-engrave" />
+  <line x1="58.07" y1="-48.72" x2="60.67" y2="-50.91" class="laser-engrave" />
+  <text x="63.20" y="-53.03" class="compass-text" transform="rotate(50.0 63.20 -53.03)">050°</text>
+  <line x1="60.62" y1="-49.09" x2="61.55" y2="-49.84" class="laser-engrave" />
+  <line x1="61.46" y1="-48.02" x2="62.41" y2="-48.76" class="laser-engrave" />
+  <line x1="62.29" y1="-46.94" x2="63.25" y2="-47.66" class="laser-engrave" />
+  <line x1="63.10" y1="-45.85" x2="64.07" y2="-46.55" class="laser-engrave" />
+  <line x1="63.07" y1="-44.17" x2="64.88" y2="-45.43" class="laser-engrave" />
+  <line x1="64.66" y1="-43.62" x2="65.66" y2="-44.29" class="laser-engrave" />
+  <line x1="65.42" y1="-42.48" x2="66.42" y2="-43.14" class="laser-engrave" />
+  <line x1="66.15" y1="-41.33" x2="67.17" y2="-41.97" class="laser-engrave" />
+  <line x1="66.86" y1="-40.17" x2="67.89" y2="-40.79" class="laser-engrave" />
+  <line x1="65.64" y1="-37.90" x2="68.59" y2="-39.60" class="laser-engrave" />
+  <text x="71.45" y="-41.25" class="compass-text" transform="rotate(60.0 71.45 -41.25)">060°</text>
+  <line x1="68.22" y1="-37.82" x2="69.27" y2="-38.40" class="laser-engrave" />
+  <line x1="68.87" y1="-36.62" x2="69.93" y2="-37.18" class="laser-engrave" />
+  <line x1="69.50" y1="-35.41" x2="70.57" y2="-35.96" class="laser-engrave" />
+  <line x1="70.11" y1="-34.19" x2="71.18" y2="-34.72" class="laser-engrave" />
+  <line x1="69.79" y1="-32.54" x2="71.78" y2="-33.47" class="laser-engrave" />
+  <line x1="71.26" y1="-31.73" x2="72.35" y2="-32.21" class="laser-engrave" />
+  <line x1="71.80" y1="-30.48" x2="72.90" y2="-30.95" class="laser-engrave" />
+  <line x1="72.32" y1="-29.22" x2="73.43" y2="-29.67" class="laser-engrave" />
+  <line x1="72.82" y1="-27.95" x2="73.94" y2="-28.38" class="laser-engrave" />
+  <line x1="71.23" y1="-25.93" x2="74.42" y2="-27.09" class="laser-engrave" />
+  <text x="77.52" y="-28.22" class="compass-text" transform="rotate(70.0 77.52 -28.22)">070°</text>
+  <line x1="73.75" y1="-25.39" x2="74.89" y2="-25.78" class="laser-engrave" />
+  <line x1="74.18" y1="-24.10" x2="75.32" y2="-24.47" class="laser-engrave" />
+  <line x1="74.59" y1="-22.80" x2="75.74" y2="-23.16" class="laser-engrave" />
+  <line x1="74.98" y1="-21.50" x2="76.13" y2="-21.83" class="laser-engrave" />
+  <line x1="74.38" y1="-19.93" x2="76.50" y2="-20.50" class="laser-engrave" />
+  <line x1="75.68" y1="-18.87" x2="76.85" y2="-19.16" class="laser-engrave" />
+  <line x1="76.00" y1="-17.55" x2="77.17" y2="-17.82" class="laser-engrave" />
+  <line x1="76.30" y1="-16.22" x2="77.47" y2="-16.47" class="laser-engrave" />
+  <line x1="76.57" y1="-14.88" x2="77.74" y2="-15.11" class="laser-engrave" />
+  <line x1="74.65" y1="-13.16" x2="78.00" y2="-13.75" class="laser-engrave" />
+  <text x="81.25" y="-14.33" class="compass-text" transform="rotate(80.0 81.25 -14.33)">080°</text>
+  <line x1="77.04" y1="-12.20" x2="78.22" y2="-12.39" class="laser-engrave" />
+  <line x1="77.24" y1="-10.86" x2="78.43" y2="-11.02" class="laser-engrave" />
+  <line x1="77.42" y1="-9.51" x2="78.61" y2="-9.65" class="laser-engrave" />
+  <line x1="77.57" y1="-8.15" x2="78.77" y2="-8.28" class="laser-engrave" />
+  <line x1="76.71" y1="-6.71" x2="78.90" y2="-6.90" class="laser-engrave" />
+  <line x1="77.81" y1="-5.44" x2="79.01" y2="-5.52" class="laser-engrave" />
+  <line x1="77.89" y1="-4.08" x2="79.09" y2="-4.15" class="laser-engrave" />
+  <line x1="77.95" y1="-2.72" x2="79.15" y2="-2.76" class="laser-engrave" />
+  <line x1="77.99" y1="-1.36" x2="79.19" y2="-1.38" class="laser-engrave" />
+  <line x1="75.80" y1="-0.00" x2="79.20" y2="-0.00" class="laser-engrave" />
+  <text x="82.50" y="-0.00" class="compass-text" transform="rotate(90.0 82.50 -0.00)">090°</text>
+  <line x1="77.99" y1="1.36" x2="79.19" y2="1.38" class="laser-engrave" />
+  <line x1="77.95" y1="2.72" x2="79.15" y2="2.76" class="laser-engrave" />
+  <line x1="77.89" y1="4.08" x2="79.09" y2="4.15" class="laser-engrave" />
+  <line x1="77.81" y1="5.44" x2="79.01" y2="5.52" class="laser-engrave" />
+  <line x1="76.71" y1="6.71" x2="78.90" y2="6.90" class="laser-engrave" />
+  <line x1="77.57" y1="8.15" x2="78.77" y2="8.28" class="laser-engrave" />
+  <line x1="77.42" y1="9.51" x2="78.61" y2="9.65" class="laser-engrave" />
+  <line x1="77.24" y1="10.86" x2="78.43" y2="11.02" class="laser-engrave" />
+  <line x1="77.04" y1="12.20" x2="78.22" y2="12.39" class="laser-engrave" />
+  <line x1="74.65" y1="13.16" x2="78.00" y2="13.75" class="laser-engrave" />
+  <text x="81.25" y="14.33" class="compass-text" transform="rotate(-80.0 81.25 14.33)">100°</text>
+  <line x1="76.57" y1="14.88" x2="77.74" y2="15.11" class="laser-engrave" />
+  <line x1="76.30" y1="16.22" x2="77.47" y2="16.47" class="laser-engrave" />
+  <line x1="76.00" y1="17.55" x2="77.17" y2="17.82" class="laser-engrave" />
+  <line x1="75.68" y1="18.87" x2="76.85" y2="19.16" class="laser-engrave" />
+  <line x1="74.38" y1="19.93" x2="76.50" y2="20.50" class="laser-engrave" />
+  <line x1="74.98" y1="21.50" x2="76.13" y2="21.83" class="laser-engrave" />
+  <line x1="74.59" y1="22.80" x2="75.74" y2="23.16" class="laser-engrave" />
+  <line x1="74.18" y1="24.10" x2="75.32" y2="24.47" class="laser-engrave" />
+  <line x1="73.75" y1="25.39" x2="74.89" y2="25.78" class="laser-engrave" />
+  <line x1="71.23" y1="25.93" x2="74.42" y2="27.09" class="laser-engrave" />
+  <text x="77.52" y="28.22" class="compass-text" transform="rotate(-70.0 77.52 28.22)">110°</text>
+  <line x1="72.82" y1="27.95" x2="73.94" y2="28.38" class="laser-engrave" />
+  <line x1="72.32" y1="29.22" x2="73.43" y2="29.67" class="laser-engrave" />
+  <line x1="71.80" y1="30.48" x2="72.90" y2="30.95" class="laser-engrave" />
+  <line x1="71.26" y1="31.73" x2="72.35" y2="32.21" class="laser-engrave" />
+  <line x1="69.79" y1="32.54" x2="71.78" y2="33.47" class="laser-engrave" />
+  <line x1="70.11" y1="34.19" x2="71.18" y2="34.72" class="laser-engrave" />
+  <line x1="69.50" y1="35.41" x2="70.57" y2="35.96" class="laser-engrave" />
+  <line x1="68.87" y1="36.62" x2="69.93" y2="37.18" class="laser-engrave" />
+  <line x1="68.22" y1="37.82" x2="69.27" y2="38.40" class="laser-engrave" />
+  <line x1="65.64" y1="37.90" x2="68.59" y2="39.60" class="laser-engrave" />
+  <text x="71.45" y="41.25" class="compass-text" transform="rotate(-60.0 71.45 41.25)">120°</text>
+  <line x1="66.86" y1="40.17" x2="67.89" y2="40.79" class="laser-engrave" />
+  <line x1="66.15" y1="41.33" x2="67.17" y2="41.97" class="laser-engrave" />
+  <line x1="65.42" y1="42.48" x2="66.42" y2="43.14" class="laser-engrave" />
+  <line x1="64.66" y1="43.62" x2="65.66" y2="44.29" class="laser-engrave" />
+  <line x1="63.07" y1="44.17" x2="64.88" y2="45.43" class="laser-engrave" />
+  <line x1="63.10" y1="45.85" x2="64.07" y2="46.55" class="laser-engrave" />
+  <line x1="62.29" y1="46.94" x2="63.25" y2="47.66" class="laser-engrave" />
+  <line x1="61.46" y1="48.02" x2="62.41" y2="48.76" class="laser-engrave" />
+  <line x1="60.62" y1="49.09" x2="61.55" y2="49.84" class="laser-engrave" />
+  <line x1="58.07" y1="48.72" x2="60.67" y2="50.91" class="laser-engrave" />
+  <text x="63.20" y="53.03" class="compass-text" transform="rotate(-50.0 63.20 53.03)">130°</text>
+  <line x1="58.87" y1="51.17" x2="59.77" y2="51.96" class="laser-engrave" />
+  <line x1="57.97" y1="52.19" x2="58.86" y2="53.00" class="laser-engrave" />
+  <line x1="57.05" y1="53.20" x2="57.92" y2="54.01" class="laser-engrave" />
+  <line x1="56.11" y1="54.18" x2="56.97" y2="55.02" class="laser-engrave" />
+  <line x1="54.45" y1="54.45" x2="56.00" y2="56.00" class="laser-engrave" />
+  <line x1="54.18" y1="56.11" x2="55.02" y2="56.97" class="laser-engrave" />
+  <line x1="53.20" y1="57.05" x2="54.01" y2="57.92" class="laser-engrave" />
+  <line x1="52.19" y1="57.97" x2="53.00" y2="58.86" class="laser-engrave" />
+  <line x1="51.17" y1="58.87" x2="51.96" y2="59.77" class="laser-engrave" />
+  <line x1="48.72" y1="58.07" x2="50.91" y2="60.67" class="laser-engrave" />
+  <text x="53.03" y="63.20" class="compass-text" transform="rotate(-40.0 53.03 63.20)">140°</text>
+  <line x1="49.09" y1="60.62" x2="49.84" y2="61.55" class="laser-engrave" />
+  <line x1="48.02" y1="61.46" x2="48.76" y2="62.41" class="laser-engrave" />
+  <line x1="46.94" y1="62.29" x2="47.66" y2="63.25" class="laser-engrave" />
+  <line x1="45.85" y1="63.10" x2="46.55" y2="64.07" class="laser-engrave" />
+  <line x1="44.17" y1="63.07" x2="45.43" y2="64.88" class="laser-engrave" />
+  <line x1="43.62" y1="64.66" x2="44.29" y2="65.66" class="laser-engrave" />
+  <line x1="42.48" y1="65.42" x2="43.14" y2="66.42" class="laser-engrave" />
+  <line x1="41.33" y1="66.15" x2="41.97" y2="67.17" class="laser-engrave" />
+  <line x1="40.17" y1="66.86" x2="40.79" y2="67.89" class="laser-engrave" />
+  <line x1="37.90" y1="65.64" x2="39.60" y2="68.59" class="laser-engrave" />
+  <text x="41.25" y="71.45" class="compass-text" transform="rotate(-30.0 41.25 71.45)">150°</text>
+  <line x1="37.82" y1="68.22" x2="38.40" y2="69.27" class="laser-engrave" />
+  <line x1="36.62" y1="68.87" x2="37.18" y2="69.93" class="laser-engrave" />
+  <line x1="35.41" y1="69.50" x2="35.96" y2="70.57" class="laser-engrave" />
+  <line x1="34.19" y1="70.11" x2="34.72" y2="71.18" class="laser-engrave" />
+  <line x1="32.54" y1="69.79" x2="33.47" y2="71.78" class="laser-engrave" />
+  <line x1="31.73" y1="71.26" x2="32.21" y2="72.35" class="laser-engrave" />
+  <line x1="30.48" y1="71.80" x2="30.95" y2="72.90" class="laser-engrave" />
+  <line x1="29.22" y1="72.32" x2="29.67" y2="73.43" class="laser-engrave" />
+  <line x1="27.95" y1="72.82" x2="28.38" y2="73.94" class="laser-engrave" />
+  <line x1="25.93" y1="71.23" x2="27.09" y2="74.42" class="laser-engrave" />
+  <text x="28.22" y="77.52" class="compass-text" transform="rotate(-20.0 28.22 77.52)">160°</text>
+  <line x1="25.39" y1="73.75" x2="25.78" y2="74.89" class="laser-engrave" />
+  <line x1="24.10" y1="74.18" x2="24.47" y2="75.32" class="laser-engrave" />
+  <line x1="22.80" y1="74.59" x2="23.16" y2="75.74" class="laser-engrave" />
+  <line x1="21.50" y1="74.98" x2="21.83" y2="76.13" class="laser-engrave" />
+  <line x1="19.93" y1="74.38" x2="20.50" y2="76.50" class="laser-engrave" />
+  <line x1="18.87" y1="75.68" x2="19.16" y2="76.85" class="laser-engrave" />
+  <line x1="17.55" y1="76.00" x2="17.82" y2="77.17" class="laser-engrave" />
+  <line x1="16.22" y1="76.30" x2="16.47" y2="77.47" class="laser-engrave" />
+  <line x1="14.88" y1="76.57" x2="15.11" y2="77.74" class="laser-engrave" />
+  <line x1="13.16" y1="74.65" x2="13.75" y2="78.00" class="laser-engrave" />
+  <text x="14.33" y="81.25" class="compass-text" transform="rotate(-10.0 14.33 81.25)">170°</text>
+  <line x1="12.20" y1="77.04" x2="12.39" y2="78.22" class="laser-engrave" />
+  <line x1="10.86" y1="77.24" x2="11.02" y2="78.43" class="laser-engrave" />
+  <line x1="9.51" y1="77.42" x2="9.65" y2="78.61" class="laser-engrave" />
+  <line x1="8.15" y1="77.57" x2="8.28" y2="78.77" class="laser-engrave" />
+  <line x1="6.71" y1="76.71" x2="6.90" y2="78.90" class="laser-engrave" />
+  <line x1="5.44" y1="77.81" x2="5.52" y2="79.01" class="laser-engrave" />
+  <line x1="4.08" y1="77.89" x2="4.15" y2="79.09" class="laser-engrave" />
+  <line x1="2.72" y1="77.95" x2="2.76" y2="79.15" class="laser-engrave" />
+  <line x1="1.36" y1="77.99" x2="1.38" y2="79.19" class="laser-engrave" />
+  <line x1="0.00" y1="75.80" x2="0.00" y2="79.20" class="laser-engrave" />
+  <text x="0.00" y="82.50" class="compass-text" transform="rotate(0.0 0.00 82.50)">180°</text>
+  <line x1="-1.36" y1="77.99" x2="-1.38" y2="79.19" class="laser-engrave" />
+  <line x1="-2.72" y1="77.95" x2="-2.76" y2="79.15" class="laser-engrave" />
+  <line x1="-4.08" y1="77.89" x2="-4.15" y2="79.09" class="laser-engrave" />
+  <line x1="-5.44" y1="77.81" x2="-5.52" y2="79.01" class="laser-engrave" />
+  <line x1="-6.71" y1="76.71" x2="-6.90" y2="78.90" class="laser-engrave" />
+  <line x1="-8.15" y1="77.57" x2="-8.28" y2="78.77" class="laser-engrave" />
+  <line x1="-9.51" y1="77.42" x2="-9.65" y2="78.61" class="laser-engrave" />
+  <line x1="-10.86" y1="77.24" x2="-11.02" y2="78.43" class="laser-engrave" />
+  <line x1="-12.20" y1="77.04" x2="-12.39" y2="78.22" class="laser-engrave" />
+  <line x1="-13.16" y1="74.65" x2="-13.75" y2="78.00" class="laser-engrave" />
+  <text x="-14.33" y="81.25" class="compass-text" transform="rotate(10.0 -14.33 81.25)">190°</text>
+  <line x1="-14.88" y1="76.57" x2="-15.11" y2="77.74" class="laser-engrave" />
+  <line x1="-16.22" y1="76.30" x2="-16.47" y2="77.47" class="laser-engrave" />
+  <line x1="-17.55" y1="76.00" x2="-17.82" y2="77.17" class="laser-engrave" />
+  <line x1="-18.87" y1="75.68" x2="-19.16" y2="76.85" class="laser-engrave" />
+  <line x1="-19.93" y1="74.38" x2="-20.50" y2="76.50" class="laser-engrave" />
+  <line x1="-21.50" y1="74.98" x2="-21.83" y2="76.13" class="laser-engrave" />
+  <line x1="-22.80" y1="74.59" x2="-23.16" y2="75.74" class="laser-engrave" />
+  <line x1="-24.10" y1="74.18" x2="-24.47" y2="75.32" class="laser-engrave" />
+  <line x1="-25.39" y1="73.75" x2="-25.78" y2="74.89" class="laser-engrave" />
+  <line x1="-25.93" y1="71.23" x2="-27.09" y2="74.42" class="laser-engrave" />
+  <text x="-28.22" y="77.52" class="compass-text" transform="rotate(20.0 -28.22 77.52)">200°</text>
+  <line x1="-27.95" y1="72.82" x2="-28.38" y2="73.94" class="laser-engrave" />
+  <line x1="-29.22" y1="72.32" x2="-29.67" y2="73.43" class="laser-engrave" />
+  <line x1="-30.48" y1="71.80" x2="-30.95" y2="72.90" class="laser-engrave" />
+  <line x1="-31.73" y1="71.26" x2="-32.21" y2="72.35" class="laser-engrave" />
+  <line x1="-32.54" y1="69.79" x2="-33.47" y2="71.78" class="laser-engrave" />
+  <line x1="-34.19" y1="70.11" x2="-34.72" y2="71.18" class="laser-engrave" />
+  <line x1="-35.41" y1="69.50" x2="-35.96" y2="70.57" class="laser-engrave" />
+  <line x1="-36.62" y1="68.87" x2="-37.18" y2="69.93" class="laser-engrave" />
+  <line x1="-37.82" y1="68.22" x2="-38.40" y2="69.27" class="laser-engrave" />
+  <line x1="-37.90" y1="65.64" x2="-39.60" y2="68.59" class="laser-engrave" />
+  <text x="-41.25" y="71.45" class="compass-text" transform="rotate(30.0 -41.25 71.45)">210°</text>
+  <line x1="-40.17" y1="66.86" x2="-40.79" y2="67.89" class="laser-engrave" />
+  <line x1="-41.33" y1="66.15" x2="-41.97" y2="67.17" class="laser-engrave" />
+  <line x1="-42.48" y1="65.42" x2="-43.14" y2="66.42" class="laser-engrave" />
+  <line x1="-43.62" y1="64.66" x2="-44.29" y2="65.66" class="laser-engrave" />
+  <line x1="-44.17" y1="63.07" x2="-45.43" y2="64.88" class="laser-engrave" />
+  <line x1="-45.85" y1="63.10" x2="-46.55" y2="64.07" class="laser-engrave" />
+  <line x1="-46.94" y1="62.29" x2="-47.66" y2="63.25" class="laser-engrave" />
+  <line x1="-48.02" y1="61.46" x2="-48.76" y2="62.41" class="laser-engrave" />
+  <line x1="-49.09" y1="60.62" x2="-49.84" y2="61.55" class="laser-engrave" />
+  <line x1="-48.72" y1="58.07" x2="-50.91" y2="60.67" class="laser-engrave" />
+  <text x="-53.03" y="63.20" class="compass-text" transform="rotate(40.0 -53.03 63.20)">220°</text>
+  <line x1="-51.17" y1="58.87" x2="-51.96" y2="59.77" class="laser-engrave" />
+  <line x1="-52.19" y1="57.97" x2="-53.00" y2="58.86" class="laser-engrave" />
+  <line x1="-53.20" y1="57.05" x2="-54.01" y2="57.92" class="laser-engrave" />
+  <line x1="-54.18" y1="56.11" x2="-55.02" y2="56.97" class="laser-engrave" />
+  <line x1="-54.45" y1="54.45" x2="-56.00" y2="56.00" class="laser-engrave" />
+  <line x1="-56.11" y1="54.18" x2="-56.97" y2="55.02" class="laser-engrave" />
+  <line x1="-57.05" y1="53.20" x2="-57.92" y2="54.01" class="laser-engrave" />
+  <line x1="-57.97" y1="52.19" x2="-58.86" y2="53.00" class="laser-engrave" />
+  <line x1="-58.87" y1="51.17" x2="-59.77" y2="51.96" class="laser-engrave" />
+  <line x1="-58.07" y1="48.72" x2="-60.67" y2="50.91" class="laser-engrave" />
+  <text x="-63.20" y="53.03" class="compass-text" transform="rotate(50.0 -63.20 53.03)">230°</text>
+  <line x1="-60.62" y1="49.09" x2="-61.55" y2="49.84" class="laser-engrave" />
+  <line x1="-61.46" y1="48.02" x2="-62.41" y2="48.76" class="laser-engrave" />
+  <line x1="-62.29" y1="46.94" x2="-63.25" y2="47.66" class="laser-engrave" />
+  <line x1="-63.10" y1="45.85" x2="-64.07" y2="46.55" class="laser-engrave" />
+  <line x1="-63.07" y1="44.17" x2="-64.88" y2="45.43" class="laser-engrave" />
+  <line x1="-64.66" y1="43.62" x2="-65.66" y2="44.29" class="laser-engrave" />
+  <line x1="-65.42" y1="42.48" x2="-66.42" y2="43.14" class="laser-engrave" />
+  <line x1="-66.15" y1="41.33" x2="-67.17" y2="41.97" class="laser-engrave" />
+  <line x1="-66.86" y1="40.17" x2="-67.89" y2="40.79" class="laser-engrave" />
+  <line x1="-65.64" y1="37.90" x2="-68.59" y2="39.60" class="laser-engrave" />
+  <text x="-71.45" y="41.25" class="compass-text" transform="rotate(60.0 -71.45 41.25)">240°</text>
+  <line x1="-68.22" y1="37.82" x2="-69.27" y2="38.40" class="laser-engrave" />
+  <line x1="-68.87" y1="36.62" x2="-69.93" y2="37.18" class="laser-engrave" />
+  <line x1="-69.50" y1="35.41" x2="-70.57" y2="35.96" class="laser-engrave" />
+  <line x1="-70.11" y1="34.19" x2="-71.18" y2="34.72" class="laser-engrave" />
+  <line x1="-69.79" y1="32.54" x2="-71.78" y2="33.47" class="laser-engrave" />
+  <line x1="-71.26" y1="31.73" x2="-72.35" y2="32.21" class="laser-engrave" />
+  <line x1="-71.80" y1="30.48" x2="-72.90" y2="30.95" class="laser-engrave" />
+  <line x1="-72.32" y1="29.22" x2="-73.43" y2="29.67" class="laser-engrave" />
+  <line x1="-72.82" y1="27.95" x2="-73.94" y2="28.38" class="laser-engrave" />
+  <line x1="-71.23" y1="25.93" x2="-74.42" y2="27.09" class="laser-engrave" />
+  <text x="-77.52" y="28.22" class="compass-text" transform="rotate(70.0 -77.52 28.22)">250°</text>
+  <line x1="-73.75" y1="25.39" x2="-74.89" y2="25.78" class="laser-engrave" />
+  <line x1="-74.18" y1="24.10" x2="-75.32" y2="24.47" class="laser-engrave" />
+  <line x1="-74.59" y1="22.80" x2="-75.74" y2="23.16" class="laser-engrave" />
+  <line x1="-74.98" y1="21.50" x2="-76.13" y2="21.83" class="laser-engrave" />
+  <line x1="-74.38" y1="19.93" x2="-76.50" y2="20.50" class="laser-engrave" />
+  <line x1="-75.68" y1="18.87" x2="-76.85" y2="19.16" class="laser-engrave" />
+  <line x1="-76.00" y1="17.55" x2="-77.17" y2="17.82" class="laser-engrave" />
+  <line x1="-76.30" y1="16.22" x2="-77.47" y2="16.47" class="laser-engrave" />
+  <line x1="-76.57" y1="14.88" x2="-77.74" y2="15.11" class="laser-engrave" />
+  <line x1="-74.65" y1="13.16" x2="-78.00" y2="13.75" class="laser-engrave" />
+  <text x="-81.25" y="14.33" class="compass-text" transform="rotate(80.0 -81.25 14.33)">260°</text>
+  <line x1="-77.04" y1="12.20" x2="-78.22" y2="12.39" class="laser-engrave" />
+  <line x1="-77.24" y1="10.86" x2="-78.43" y2="11.02" class="laser-engrave" />
+  <line x1="-77.42" y1="9.51" x2="-78.61" y2="9.65" class="laser-engrave" />
+  <line x1="-77.57" y1="8.15" x2="-78.77" y2="8.28" class="laser-engrave" />
+  <line x1="-76.71" y1="6.71" x2="-78.90" y2="6.90" class="laser-engrave" />
+  <line x1="-77.81" y1="5.44" x2="-79.01" y2="5.52" class="laser-engrave" />
+  <line x1="-77.89" y1="4.08" x2="-79.09" y2="4.15" class="laser-engrave" />
+  <line x1="-77.95" y1="2.72" x2="-79.15" y2="2.76" class="laser-engrave" />
+  <line x1="-77.99" y1="1.36" x2="-79.19" y2="1.38" class="laser-engrave" />
+  <line x1="-75.80" y1="0.00" x2="-79.20" y2="0.00" class="laser-engrave" />
+  <text x="-82.50" y="0.00" class="compass-text" transform="rotate(270.0 -82.50 0.00)">270°</text>
+  <line x1="-77.99" y1="-1.36" x2="-79.19" y2="-1.38" class="laser-engrave" />
+  <line x1="-77.95" y1="-2.72" x2="-79.15" y2="-2.76" class="laser-engrave" />
+  <line x1="-77.89" y1="-4.08" x2="-79.09" y2="-4.15" class="laser-engrave" />
+  <line x1="-77.81" y1="-5.44" x2="-79.01" y2="-5.52" class="laser-engrave" />
+  <line x1="-76.71" y1="-6.71" x2="-78.90" y2="-6.90" class="laser-engrave" />
+  <line x1="-77.57" y1="-8.15" x2="-78.77" y2="-8.28" class="laser-engrave" />
+  <line x1="-77.42" y1="-9.51" x2="-78.61" y2="-9.65" class="laser-engrave" />
+  <line x1="-77.24" y1="-10.86" x2="-78.43" y2="-11.02" class="laser-engrave" />
+  <line x1="-77.04" y1="-12.20" x2="-78.22" y2="-12.39" class="laser-engrave" />
+  <line x1="-74.65" y1="-13.16" x2="-78.00" y2="-13.75" class="laser-engrave" />
+  <text x="-81.25" y="-14.33" class="compass-text" transform="rotate(280.0 -81.25 -14.33)">280°</text>
+  <line x1="-76.57" y1="-14.88" x2="-77.74" y2="-15.11" class="laser-engrave" />
+  <line x1="-76.30" y1="-16.22" x2="-77.47" y2="-16.47" class="laser-engrave" />
+  <line x1="-76.00" y1="-17.55" x2="-77.17" y2="-17.82" class="laser-engrave" />
+  <line x1="-75.68" y1="-18.87" x2="-76.85" y2="-19.16" class="laser-engrave" />
+  <line x1="-74.38" y1="-19.93" x2="-76.50" y2="-20.50" class="laser-engrave" />
+  <line x1="-74.98" y1="-21.50" x2="-76.13" y2="-21.83" class="laser-engrave" />
+  <line x1="-74.59" y1="-22.80" x2="-75.74" y2="-23.16" class="laser-engrave" />
+  <line x1="-74.18" y1="-24.10" x2="-75.32" y2="-24.47" class="laser-engrave" />
+  <line x1="-73.75" y1="-25.39" x2="-74.89" y2="-25.78" class="laser-engrave" />
+  <line x1="-71.23" y1="-25.93" x2="-74.42" y2="-27.09" class="laser-engrave" />
+  <text x="-77.52" y="-28.22" class="compass-text" transform="rotate(290.0 -77.52 -28.22)">290°</text>
+  <line x1="-72.82" y1="-27.95" x2="-73.94" y2="-28.38" class="laser-engrave" />
+  <line x1="-72.32" y1="-29.22" x2="-73.43" y2="-29.67" class="laser-engrave" />
+  <line x1="-71.80" y1="-30.48" x2="-72.90" y2="-30.95" class="laser-engrave" />
+  <line x1="-71.26" y1="-31.73" x2="-72.35" y2="-32.21" class="laser-engrave" />
+  <line x1="-69.79" y1="-32.54" x2="-71.78" y2="-33.47" class="laser-engrave" />
+  <line x1="-70.11" y1="-34.19" x2="-71.18" y2="-34.72" class="laser-engrave" />
+  <line x1="-69.50" y1="-35.41" x2="-70.57" y2="-35.96" class="laser-engrave" />
+  <line x1="-68.87" y1="-36.62" x2="-69.93" y2="-37.18" class="laser-engrave" />
+  <line x1="-68.22" y1="-37.82" x2="-69.27" y2="-38.40" class="laser-engrave" />
+  <line x1="-65.64" y1="-37.90" x2="-68.59" y2="-39.60" class="laser-engrave" />
+  <text x="-71.45" y="-41.25" class="compass-text" transform="rotate(300.0 -71.45 -41.25)">300°</text>
+  <line x1="-66.86" y1="-40.17" x2="-67.89" y2="-40.79" class="laser-engrave" />
+  <line x1="-66.15" y1="-41.33" x2="-67.17" y2="-41.97" class="laser-engrave" />
+  <line x1="-65.42" y1="-42.48" x2="-66.42" y2="-43.14" class="laser-engrave" />
+  <line x1="-64.66" y1="-43.62" x2="-65.66" y2="-44.29" class="laser-engrave" />
+  <line x1="-63.07" y1="-44.17" x2="-64.88" y2="-45.43" class="laser-engrave" />
+  <line x1="-63.10" y1="-45.85" x2="-64.07" y2="-46.55" class="laser-engrave" />
+  <line x1="-62.29" y1="-46.94" x2="-63.25" y2="-47.66" class="laser-engrave" />
+  <line x1="-61.46" y1="-48.02" x2="-62.41" y2="-48.76" class="laser-engrave" />
+  <line x1="-60.62" y1="-49.09" x2="-61.55" y2="-49.84" class="laser-engrave" />
+  <line x1="-58.07" y1="-48.72" x2="-60.67" y2="-50.91" class="laser-engrave" />
+  <text x="-63.20" y="-53.03" class="compass-text" transform="rotate(310.0 -63.20 -53.03)">310°</text>
+  <line x1="-58.87" y1="-51.17" x2="-59.77" y2="-51.96" class="laser-engrave" />
+  <line x1="-57.97" y1="-52.19" x2="-58.86" y2="-53.00" class="laser-engrave" />
+  <line x1="-57.05" y1="-53.20" x2="-57.92" y2="-54.01" class="laser-engrave" />
+  <line x1="-56.11" y1="-54.18" x2="-56.97" y2="-55.02" class="laser-engrave" />
+  <line x1="-54.45" y1="-54.45" x2="-56.00" y2="-56.00" class="laser-engrave" />
+  <line x1="-54.18" y1="-56.11" x2="-55.02" y2="-56.97" class="laser-engrave" />
+  <line x1="-53.20" y1="-57.05" x2="-54.01" y2="-57.92" class="laser-engrave" />
+  <line x1="-52.19" y1="-57.97" x2="-53.00" y2="-58.86" class="laser-engrave" />
+  <line x1="-51.17" y1="-58.87" x2="-51.96" y2="-59.77" class="laser-engrave" />
+  <line x1="-48.72" y1="-58.07" x2="-50.91" y2="-60.67" class="laser-engrave" />
+  <text x="-53.03" y="-63.20" class="compass-text" transform="rotate(320.0 -53.03 -63.20)">320°</text>
+  <line x1="-49.09" y1="-60.62" x2="-49.84" y2="-61.55" class="laser-engrave" />
+  <line x1="-48.02" y1="-61.46" x2="-48.76" y2="-62.41" class="laser-engrave" />
+  <line x1="-46.94" y1="-62.29" x2="-47.66" y2="-63.25" class="laser-engrave" />
+  <line x1="-45.85" y1="-63.10" x2="-46.55" y2="-64.07" class="laser-engrave" />
+  <line x1="-44.17" y1="-63.07" x2="-45.43" y2="-64.88" class="laser-engrave" />
+  <line x1="-43.62" y1="-64.66" x2="-44.29" y2="-65.66" class="laser-engrave" />
+  <line x1="-42.48" y1="-65.42" x2="-43.14" y2="-66.42" class="laser-engrave" />
+  <line x1="-41.33" y1="-66.15" x2="-41.97" y2="-67.17" class="laser-engrave" />
+  <line x1="-40.17" y1="-66.86" x2="-40.79" y2="-67.89" class="laser-engrave" />
+  <line x1="-37.90" y1="-65.64" x2="-39.60" y2="-68.59" class="laser-engrave" />
+  <text x="-41.25" y="-71.45" class="compass-text" transform="rotate(330.0 -41.25 -71.45)">330°</text>
+  <line x1="-37.82" y1="-68.22" x2="-38.40" y2="-69.27" class="laser-engrave" />
+  <line x1="-36.62" y1="-68.87" x2="-37.18" y2="-69.93" class="laser-engrave" />
+  <line x1="-35.41" y1="-69.50" x2="-35.96" y2="-70.57" class="laser-engrave" />
+  <line x1="-34.19" y1="-70.11" x2="-34.72" y2="-71.18" class="laser-engrave" />
+  <line x1="-32.54" y1="-69.79" x2="-33.47" y2="-71.78" class="laser-engrave" />
+  <line x1="-31.73" y1="-71.26" x2="-32.21" y2="-72.35" class="laser-engrave" />
+  <line x1="-30.48" y1="-71.80" x2="-30.95" y2="-72.90" class="laser-engrave" />
+  <line x1="-29.22" y1="-72.32" x2="-29.67" y2="-73.43" class="laser-engrave" />
+  <line x1="-27.95" y1="-72.82" x2="-28.38" y2="-73.94" class="laser-engrave" />
+  <line x1="-25.93" y1="-71.23" x2="-27.09" y2="-74.42" class="laser-engrave" />
+  <text x="-28.22" y="-77.52" class="compass-text" transform="rotate(340.0 -28.22 -77.52)">340°</text>
+  <line x1="-25.39" y1="-73.75" x2="-25.78" y2="-74.89" class="laser-engrave" />
+  <line x1="-24.10" y1="-74.18" x2="-24.47" y2="-75.32" class="laser-engrave" />
+  <line x1="-22.80" y1="-74.59" x2="-23.16" y2="-75.74" class="laser-engrave" />
+  <line x1="-21.50" y1="-74.98" x2="-21.83" y2="-76.13" class="laser-engrave" />
+  <line x1="-19.93" y1="-74.38" x2="-20.50" y2="-76.50" class="laser-engrave" />
+  <line x1="-18.87" y1="-75.68" x2="-19.16" y2="-76.85" class="laser-engrave" />
+  <line x1="-17.55" y1="-76.00" x2="-17.82" y2="-77.17" class="laser-engrave" />
+  <line x1="-16.22" y1="-76.30" x2="-16.47" y2="-77.47" class="laser-engrave" />
+  <line x1="-14.88" y1="-76.57" x2="-15.11" y2="-77.74" class="laser-engrave" />
+  <line x1="-13.16" y1="-74.65" x2="-13.75" y2="-78.00" class="laser-engrave" />
+  <text x="-14.33" y="-81.25" class="compass-text" transform="rotate(350.0 -14.33 -81.25)">350°</text>
+  <line x1="-12.20" y1="-77.04" x2="-12.39" y2="-78.22" class="laser-engrave" />
+  <line x1="-10.86" y1="-77.24" x2="-11.02" y2="-78.43" class="laser-engrave" />
+  <line x1="-9.51" y1="-77.42" x2="-9.65" y2="-78.61" class="laser-engrave" />
+  <line x1="-8.15" y1="-77.57" x2="-8.28" y2="-78.77" class="laser-engrave" />
+  <line x1="-6.71" y1="-76.71" x2="-6.90" y2="-78.90" class="laser-engrave" />
+  <line x1="-5.44" y1="-77.81" x2="-5.52" y2="-79.01" class="laser-engrave" />
+  <line x1="-4.08" y1="-77.89" x2="-4.15" y2="-79.09" class="laser-engrave" />
+  <line x1="-2.72" y1="-77.95" x2="-2.76" y2="-79.15" class="laser-engrave" />
+  <line x1="-1.36" y1="-77.99" x2="-1.38" y2="-79.19" class="laser-engrave" />
 </svg>

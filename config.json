@@ -1,51 +1,174 @@
 {
   "project": {
-    "title": "Nautical Rechenscheibe - JPK 1080 (GER 7447 - TRUE GRIT)",
+    "title": "Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)",
+    "version": "1.20",
     "polar_file": "data/249116.slk",
-    "output_dir": "output"
+    "output_dirs": {
+      "stl": "output/stl",
+      "svg": "output/svg",
+      "previews": "output/previews"
+    }
   },
-  "display": {
-    "render_sail_layers": false
+  "base_geometry": {
+    "rotor_radius_mm": 75.0,
+    "stator_rim_width_mm": 15.0,
+    "rotor_thickness_mm": 2.0,
+    "stator_cover_thickness_mm": 2.2,
+    "stator_base_thickness_mm": 4.0,
+    "pointer_thickness_mm": 1.4,
+    "radial_clearance_mm": 0.5,
+    "axial_clearance_mm": 0.4,
+    "axle_pin_nominal_radius_mm": 1.5,
+    "axle_hole_radius_mm": 1.6,
+    "screw_nominal_diameter_mm": 3.0,
+    "screw_head_diameter_mm": 6.0,
+    "screw_count": 6,
+    "polar_norm_ratio": 0.8533333333333334,
+    "tactical_rim_width_mm": 9.0,
+    "thumb_tabs_extension_mm": 3.0,
+    "thumb_tabs_count": 4,
+    "thumb_tabs_angles_deg": [45.0, 135.0, 225.0, 315.0],
+    "thumb_tabs_arc_deg": 15.0
   },
-  "dimensions": {
-    "outer_radius_mm": 57.5,
-    "split_radius_mm": 47.0,
-    "true_wind_scale_factor": 1.00,
-    "rotor_clearance_mm": 0.25,
-    "pocket_clearance_mm": 0.15,
-    "pin_clearance_mm": 0.10,
-    "center_hole_radius_mm": 1.60
+  "derived_rules": {
+    "stator_outer_radius_mm": "rotor_radius_mm + stator_rim_width_mm",
+    "stator_window_radius_mm": "rotor_radius_mm",
+    "screw_pcd_radius_mm": "stator_outer_radius_mm - 2.0",
+    "screw_head_inner_limit_mm": "screw_pcd_radius_mm - (screw_head_diameter_mm / 2.0)",
+    "thumb_tabs_outer_radius_mm": "stator_outer_radius_mm + thumb_tabs_extension_mm",
+    "polar_norm_length_mm": "rotor_radius_mm * polar_norm_ratio",
+    "s_scale_radius_mm": "rotor_radius_mm - 10.0",
+    "c_scale_radius_mm": "rotor_radius_mm - 0.5",
+    "d_scale_radius_mm": "rotor_radius_mm + 0.5",
+    "stator_compass_ticks_inner_mm": "rotor_radius_mm + 0.8",
+    "stator_compass_ticks_outer_mm": "rotor_radius_mm + 4.2",
+    "stator_compass_text_radius_mm": "rotor_radius_mm + 7.5",
+    "pointer_length_front_mm": "stator_outer_radius_mm - 5.0",
+    "pointer_length_back_mm": "stator_outer_radius_mm - 4.0",
+    "axle_pin_total_length_mm": "stator_base_thickness_mm + stator_cover_thickness_mm + (pointer_thickness_mm * 2.0) + (axial_clearance_mm * 2.0)"
   },
-  "thicknesses": {
-    "stator_core_wall_mm": 1.6,
-    "front_rim_height_mm": 1.8,
-    "back_rim_height_mm": 1.8,
-    "front_rotor_disc_mm": 1.8,
-    "back_rotor_disc_mm": 1.8,
-    "pointer_arm_mm": 1.2,
-    "center_pin_head_thickness_mm": 1.0
+  "laser_layers": {
+    "cut_outer": {
+      "name": "CUT_OUTER",
+      "color": "#E74C3C",
+      "stroke_width": 0.2,
+      "mode": "cut",
+      "description": "Außenkontur Stator, Rotor, Zeiger"
+    },
+    "cut_inner": {
+      "name": "CUT_INNER",
+      "color": "#C0392B",
+      "stroke_width": 0.2,
+      "mode": "cut",
+      "description": "Sichtfenster Stator und Achsbohrungen"
+    },
+    "engrave_compass": {
+      "name": "ENGRAVE_COMPASS",
+      "color": "#2C3E50",
+      "stroke_width": 0.35,
+      "mode": "engrave",
+      "description": "Stator Kompassrose Teilstriche"
+    },
+    "engrave_compass_text": {
+      "name": "ENGRAVE_COMPASS_TEXT",
+      "color": "#2C3E50",
+      "font_size_px": 2.4,
+      "mode": "engrave",
+      "description": "Stator Kompassrose Gradzahlen"
+    },
+    "engrave_grid_major": {
+      "name": "ENGRAVE_GRID_MAJOR",
+      "color": "#BDC3C7",
+      "stroke_width": 0.5,
+      "dasharray": "2.0,1.5",
+      "mode": "engrave",
+      "description": "Konzentrische BoatSPD-Hauptkreise (gerade Zehntel)"
+    },
+    "engrave_grid_minor": {
+      "name": "ENGRAVE_GRID_MINOR",
+      "color": "#E5E7E9",
+      "stroke_width": 0.3,
+      "dasharray": "1.0,1.2",
+      "mode": "engrave",
+      "description": "Konzentrische BoatSPD-Nebenkreise (ungerade Zehntel)"
+    },
+    "engrave_awa": {
+      "name": "ENGRAVE_AWA",
+      "color": "#2980B9",
+      "stroke_width": 0.4,
+      "dasharray": "2.5,1.2",
+      "mode": "engrave",
+      "description": "AWA-Fasskreisbögen"
+    },
+    "engrave_polars": {
+      "name": "ENGRAVE_POLARS",
+      "stroke_width": 0.7,
+      "mode": "engrave",
+      "description": "ORC-Geschwindigkeitspolaren JPK 1080"
+    },
+    "engrave_slide_rule": {
+      "name": "ENGRAVE_SLIDE_RULE",
+      "color": "#2C3E50",
+      "stroke_width": 0.35,
+      "mode": "engrave",
+      "description": "C- und D-Skalen des Rechenschiebers"
+    },
+    "engrave_sinus": {
+      "name": "ENGRAVE_SINUS",
+      "color": "#2980B9",
+      "stroke_width": 0.35,
+      "mode": "engrave",
+      "description": "S-Sinusskala für Winddreiecksberechnung"
+    },
+    "engrave_pointer": {
+      "name": "POINTER",
+      "color": "#E74C3C",
+      "stroke_width": 0.8,
+      "mode": "engrave",
+      "description": "Zentralzeiger Peilkante & Ratio-Skala"
+    }
   },
-  "pointer": {
-    "width_mm": 6.0,
-    "hub_radius_mm": 4.5,
-    "thumb_tab_extension_mm": 4.5,
-    "max_ratio": 1.20
+  "tactical_settings": {
+    "tack": {
+      "start_deg": 38.0,
+      "end_deg": 42.0,
+      "optimal_deg": 40.0,
+      "text_rotation_stbd_deg": 40.0,
+      "text_rotation_port_deg": -40.0
+    },
+    "gybe": {
+      "start_deg": 145.0,
+      "end_deg": 165.0,
+      "optimal_deg": 155.0,
+      "text_rotation_stbd_deg": -25.0,
+      "text_rotation_port_deg": 25.0
+    },
+    "shift_ticks_deg": [5.0, 10.0, 15.0],
+    "bias_ticks_deg": [5.0, 10.0, 15.0],
+    "awa_angles_deg": [25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0, 155.0]
   },
-  "scales_and_typography": {
-    "compass_text_h_mm": 3.2,
-    "compass_tick_maj_mm": 1.6,
-    "compass_tick_min_mm": 0.9,
-    "awa_text_h_mm": 2.8,
-    "awa_tick_maj_mm": 1.4,
-    "awa_tick_min_mm": 0.7,
-    "polar_label_height_mm": 4.5,
-    "grid_label_height_mm": 3.8,
-    "log_text_h_mm": 3.0,
-    "log_tick_maj_mm": 2.0,
-    "log_tick_min_mm": 1.0
+  "polar_settings": {
+    "ratio_steps": 10,
+    "curve_cutoff_twa_deg": 175.0,
+    "curve_colors": [
+      "#1F618D",
+      "#2980B9",
+      "#2471A3",
+      "#17A589",
+      "#138D75",
+      "#D4AC0D",
+      "#CA6F1E",
+      "#922B21"
+    ]
   },
-  "preview": {
-    "pointer_twa_deg": 110.0,
-    "dpi": 300
+  "typography": {
+    "font_family": "sans-serif",
+    "title_size_px": 2.8,
+    "sub_size_px": 1.8,
+    "compass_text_size_px": 2.4,
+    "polar_label_size_px": 2.3,
+    "grid_text_size_px": 1.9,
+    "awa_label_size_px": 2.0,
+    "tactical_label_size_px": 2.3
   }
 }

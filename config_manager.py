@@ -1,230 +1,212 @@
 #!/usr/bin/env python3
 """
-config_manager.py - Parametric Geometry & Consistency Manager
-Calculates all derived nautical and mechanical dimensions for the
-dual-sided Rechenscheibe:
-- Front Side: Polar speed diagram, AWA grid, Compass rose, Central Ratio Pointer
-- Back Side : Rotating Logarithmic Slide Rule (Stator outer ring vs Rotor inner ring)
+config_manager.py - Zentraler parametrischer Geometrie- & Konfigurationsmanager
+Projekt: Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)
+
+Aufgabe:
+- Lädt die primären Konstruktionsparameter aus `config.json`.
+- Berechnet alle abhängigen Maße (Stator, Rotor, Kompassrose, Polaren, C/D/S-Skalen, Zeiger)
+  über definierte geometrische Abhängigkeitsregeln konsistent und automatisch.
+- Stellt den Generatoren (vector_engine, stl_generator, preview_engine) ein
+  zentrales, typsicheres Geometrie- und Layer-Objekt zur Verfügung.
 """
 
 import json
 from pathlib import Path
 from dataclasses import dataclass, field
-from typing import Dict, Any, Optional
-
-from polar_parser import PolarData
+from typing import Dict, Any, List, Optional
 
 
 @dataclass
 class ResolvedGeometry:
-    # Primary Radii
-    r_max: float               # Stator outer radius (mm)
-    r_split: float             # Parting line between Stator and Rotor (mm)
-    r_rotor: float             # Rotor outer radius with running clearance (mm)
-    r_pocket: float            # Stator pocket radius with pocket clearance (mm)
-    center_hole_r: float       # Central axle hole radius (mm)
+    """
+    Vollständig aufgelöste geometrische Maße der 180-mm-Sandwich-Rechenscheibe.
+    Alle abhängigen Werte werden aus den Basisparametern berechnet.
+    """
+    # 1. Primäre Radien & Fenstermaße (in mm)
+    rotor_radius: float                  # Radius der drehbaren Mittelscheibe / Sichtfenster (z.B. 75.0 mm -> Ø 150 mm)
+    stator_rim_width: float              # Radiale Breite des Gehäuserands (z.B. 15.0 mm)
+    stator_outer_radius: float           # Gehäuse-Außenradius = rotor_radius + stator_rim_width (90.0 mm -> Ø 180 mm)
+    stator_window_radius: float          # Sichtfenster-Ausschnitt = rotor_radius (75.0 mm)
 
-    # Aerodynamic / Vector Math
-    max_norm: float            # Max boat speed / TWS ratio (e.g. 1.20)
-    mm_per_100pct: float       # Scale in mm for 100% True Wind
-    awa_offset_y: float        # Y position of the True Wind foot / AWA origin (mm)
-    awa_offset: complex        # Complex coordinate (0, -Y_AWA)
+    # 2. Befestigung & Freiräume (in mm)
+    screw_nominal_d: float               # Schrauben-Nenndurchmesser (3.0 mm für M3)
+    screw_head_d: float                  # Schraubenkopf-Durchmesser (6.0 mm für M3 Senkkopf)
+    screw_count: int                     # Anzahl Schrauben (6 Stück)
+    screw_pcd_radius: float              # Teilkreis-Radius der Schrauben (88.0 mm -> PCD Ø 176 mm)
+    screw_head_inner_limit: float        # Innenkante der Schraubenköpfe (85.0 mm)
 
-    # Pointer / Central Ruler
-    pointer_length: float      # Total length of central pointer from (0,0) (mm)
-    pointer_width: float       # Width of pointer arm (mm)
-    pointer_hub_r: float       # Hub radius at center (mm)
-    pointer_thickness: float   # Thickness of pointer (mm)
+    # 3. Ergonomie & Daumen-Bedienung (in mm)
+    thumb_tabs_extension: float          # Überstand der 4 Daumen-Tabs über Gehäuserand (3.0 mm)
+    thumb_tabs_outer_radius: float       # Außenradius der Tabs (93.0 mm -> Ø 186 mm)
+    thumb_tabs_count: int                # Anzahl Tabs (4 Stück bei 45°, 135°, 225°, 315°)
+    thumb_tabs_angles: List[float]       # Mittenwinkel der Tabs
+    thumb_tabs_arc_deg: float            # Bogenbreite der Tabs (15.0°)
 
-    # Thicknesses & 3D Layering
-    stator_core_wall: float    # Central separator floor between front and back (mm)
-    front_rim_height: float    # Depth of front pocket / rim height (mm)
-    back_rim_height: float     # Depth of back pocket / rim height (mm)
-    front_rotor_disc: float    # Thickness of front polar disc (mm)
-    back_rotor_disc: float     # Thickness of back slide rule disc (mm)
+    # 4. Polaren & Aerodynamik (Weg A, in mm)
+    polar_norm_ratio: float              # Verhältnis Basislänge L zu Rotorradius (0.85333 -> L = 64.0 mm)
+    polar_norm_length: float             # Basislänge OP1 vom Windpol zum Gegenpol P1 (64.0 mm)
 
-    # Axle Pins
-    center_pin_r: float
-    center_pin_length: float
-    center_pin_head_r: float
-    center_pin_head_thickness: float
+    # 5. Skalenradien Vorder- und Rückseite (in mm)
+    tactical_rim_width: float            # Breite des Taktikrings am Rotorrand (9.0 mm)
+    tactical_rim_inner_radius: float     # Innenradius des Taktikrings (66.0 mm)
+    stator_compass_ticks_inner: float    # Innenradius Kompassrose-Teilstriche (75.8 mm)
+    stator_compass_ticks_outer: float    # Außenradius Kompassrose-Teilstriche (79.2 mm)
+    stator_compass_text_radius: float    # Radius der Gradzahlen (AUSSEN bei 82.5 mm)
 
-    # Typography & Ticks
-    compass_text_h: float
-    compass_tick_maj: float
-    compass_tick_min: float
-    awa_text_h: float
-    awa_tick_maj: float
-    awa_tick_min: float
-    polar_label_height: float
-    grid_label_height: float
-    log_text_h: float
-    log_tick_maj: float
-    log_tick_min: float
+    c_scale_radius: float                # C-Skala auf Rotor Rückseite (74.5 mm)
+    d_scale_radius: float                # D-Skala auf Stator Boden (75.5 mm)
+    s_scale_radius: float                # S-Sinusskala auf Rotor Rückseite (65.0 mm)
 
-    # Display & Layers
-    render_sail_layers: bool = False
+    # 6. Dicken, Toleranzen & Zeiger (in mm)
+    rotor_thickness: float               # Dicke der Drehscheibe (2.0 mm)
+    stator_cover_thickness: float        # Dicke des Gehäusedeckels (2.2 mm)
+    stator_base_thickness: float         # Dicke des Gehäusebodens (4.0 mm)
+    pointer_thickness: float             # Dicke der Acryl-Zeigerarme (1.4 mm)
+    radial_clearance: float              # Laufspiel radial (0.5 mm)
+    axial_clearance: float               # Laufspiel axial (0.4 mm)
 
-    # Raw Config
-    raw_config: Dict[str, Any] = field(default_factory=dict)
+    axle_pin_nominal_radius: float       # Schaftradius Achsbolzen (1.5 mm -> Ø 3.0 mm)
+    axle_hole_radius: float              # Bohrungsradius mit Passungsspiel (1.6 mm -> Ø 3.2 mm)
+    axle_pin_total_length: float         # Gesamte Schaftlänge Achsbolzen (8.8 mm)
 
-    def as_dict(self) -> Dict[str, Any]:
-        """Provides a dictionary interface for chart and stl generators."""
-        return {
-            "R_MAX": self.r_max,
-            "R_SPLIT": self.r_split,
-            "R_MAIN": self.r_split,      # Alias for separation radius
-            "R_ROTOR": self.r_rotor,
-            "R_POCKET": self.r_pocket,
-            "HOLE_RADIUS": self.center_hole_r,
-            "MAX_NORM": self.max_norm,
-            "MM_PER_100PCT": self.mm_per_100pct,
-            "AWA_OFFSET": self.awa_offset,
-            "AWA_OFFSET_Y": self.awa_offset_y,
-            "POINTER_LENGTH": self.pointer_length,
-            "POINTER_WIDTH": self.pointer_width,
-            "POINTER_HUB_R": self.pointer_hub_r,
-            "POINTER_THICKNESS": self.pointer_thickness,
-            "STATOR_CORE_WALL": self.stator_core_wall,
-            "FRONT_RIM": self.front_rim_height,
-            "BACK_RIM": self.back_rim_height,
-            "FRONT_ROTOR_THICKNESS": self.front_rotor_disc,
-            "BACK_ROTOR_THICKNESS": self.back_rotor_disc,
-            "CENTER_PIN_R": self.center_pin_r,
-            "CENTER_PIN_LEN": self.center_pin_length,
-            "CENTER_PIN_HEAD_R": self.center_pin_head_r,
-            "CENTER_PIN_HEAD_THICKNESS": self.center_pin_head_thickness,
-            "COMPASS_TEXT_H": self.compass_text_h,
-            "COMPASS_TICK_MAJ": self.compass_tick_maj,
-            "COMPASS_TICK_MIN": self.compass_tick_min,
-            "AWA_TEXT_H": self.awa_text_h,
-            "AWA_TICK_MAJ": self.awa_tick_maj,
-            "AWA_TICK_MIN": self.awa_tick_min,
-            "POLAR_LABEL_HEIGHT": self.polar_label_height,
-            "GRID_LABEL_HEIGHT": self.grid_label_height,
-            "LOG_TEXT_H": self.log_text_h,
-            "LOG_TICK_MAJ": self.log_tick_maj,
-            "LOG_TICK_MIN": self.log_tick_min,
-            "RENDER_SAIL_LAYERS": self.render_sail_layers,
-            "RAW_CONFIG": self.raw_config
-        }
-
-    def print_summary(self):
-        print("=" * 68)
-        print("  DOPPELSEITIGE PARAMETRISCHE RECHENSCHEIBE (config.json)")
-        print("=" * 68)
-        print(f"  [1] Basiskorpus & Trennfuge:")
-        print(f"      - Außenradius (R_MAX)         : {self.r_max:.2f} mm (Ø {self.r_max * 2:.1f} mm)")
-        print(f"      - Trennfuge Stator/Rotor      : {self.r_split:.2f} mm")
-        print(f"      - Rotor-Außenradius (Laufspiel): {self.r_rotor:.2f} mm")
-        print(f"      - Stator-Taschenradius (Spiel) : {self.r_pocket:.2f} mm")
-        print(f"  [2] Vorderseite (Taktik & Polaren):")
-        print(f"      - Maßstab (100% Windachse)    : {self.mm_per_100pct:.2f} mm")
-        print(f"      - AWA/AWS-Pol (Windfußpunkt)  : Y = {self.awa_offset_y:.2f} mm")
-        print(f"      - Äußere Skala auf Stator     : 360° Kompassrose (von 0,0)")
-        print(f"      - Innere Skala auf Stator     : AWA-Winkel (vom unteren Pol)")
-        print(f"  [3] Zentraler Zeiger (Ratio V_BS / TWS):")
-        print(f"      - Länge (ab Zentrum)          : {self.pointer_length:.2f} mm")
-        print(f"      - Breite / Dicke              : {self.pointer_width:.2f} mm / {self.pointer_thickness:.2f} mm")
-        print(f"      - Gravierte Ratio-Skala       : 0.0 bis {self.max_norm:.2f}")
-        print(f"  [4] Rückseite (Logarithmischer Rechenschieber):")
-        print(f"      - Stator-Außenring (fest)     : Äußere Log-Skala (1 bis 10/100)")
-        print(f"      - Rotor-Innenscheibe (drehbar): Innere Log-Skala (1 bis 10/100)")
-        print(f"      - Trennkante                  : Genau bei R = {self.r_split:.2f} mm!")
-        print(f"  [5] 3D-Druck Stärken & Zentralachse:")
-        print(f"      - Stator Trennwand / Randhöhe : {self.stator_core_wall:.2f} mm / {self.front_rim_height:.2f} mm")
-        print(f"      - Rotor-Dicke (Front / Back)  : {self.front_rotor_disc:.2f} mm / {self.back_rotor_disc:.2f} mm")
-        print(f"      - Zentralstift                : Ø {self.center_pin_r * 2:.2f} mm x {self.center_pin_length:.2f} mm")
-        print("=" * 68)
+    pointer_length_front: float          # Länge des Vorderseiten-Zeigers (85.0 mm)
+    pointer_length_back: float           # Länge des Rückseiten-Läufers (86.0 mm)
 
 
 class ConfigManager:
-    @staticmethod
-    def load(cfg_path: Optional[Path] = None) -> Dict[str, Any]:
-        if cfg_path is None:
-            cfg_path = Path(__file__).parent / "config.json"
-        with open(cfg_path, "r", encoding="utf-8") as f:
+    """
+    Verwaltet das Laden und Auflösen der Konfiguration aus `config.json`.
+    """
+    def __init__(self, config_path: Optional[Path] = None):
+        if config_path is None:
+            config_path = Path(__file__).parent / "config.json"
+        self.config_path = Path(config_path)
+        self.data = self._load_json()
+        self.geometry = self._resolve_geometry()
+
+    def _load_json(self) -> Dict[str, Any]:
+        """Lädt die JSON-Datei mit Fallback auf Standardwerte."""
+        if not self.config_path.exists():
+            raise FileNotFoundError(f"Konfigurationsdatei nicht gefunden: {self.config_path}")
+        with open(self.config_path, "r", encoding="utf-8") as f:
             return json.load(f)
 
-    @staticmethod
-    def resolve(cfg: Dict[str, Any], polar_data: PolarData) -> ResolvedGeometry:
-        dim = cfg.get("dimensions", {})
-        thk = cfg.get("thicknesses", {})
-        ptr = cfg.get("pointer", {})
-        scl = cfg.get("scales_and_typography", {})
-        disp = cfg.get("display", {})
+    def _resolve_geometry(self) -> ResolvedGeometry:
+        """
+        Berechnet alle abhängigen Dimensionen aus den Basis-Parametern.
+        Gewährleistet mathematische Konsistenz über alle Bauteile.
+        """
+        bg = self.data["base_geometry"]
 
-        r_max = float(dim.get("outer_radius_mm", 57.5))
-        r_split = float(dim.get("split_radius_mm", 47.0))
-        rotor_clearance = float(dim.get("rotor_clearance_mm", 0.25))
-        pocket_clearance = float(dim.get("pocket_clearance_mm", 0.15))
-        pin_clearance = float(dim.get("pin_clearance_mm", 0.10))
-        center_hole_r = float(dim.get("center_hole_radius_mm", 1.60))
+        r_rotor = float(bg["rotor_radius_mm"])
+        w_stator = float(bg["stator_rim_width_mm"])
+        r_stator = r_rotor + w_stator
 
-        r_rotor = r_split - rotor_clearance
-        r_pocket = r_split + pocket_clearance
+        screw_nom_d = float(bg["screw_nominal_diameter_mm"])
+        screw_head_d = float(bg["screw_head_diameter_mm"])
+        screw_pcd_r = r_stator - 2.0
+        screw_head_in = screw_pcd_r - (screw_head_d / 2.0)
 
-        # Max Ratio & Aerodynamic Scale
-        max_norm = max(float(ptr.get("max_ratio", 1.20)), getattr(polar_data, "max_ratio", 1.20))
-        scale_fac = float(dim.get("true_wind_scale_factor", 1.00))
-        mm_per_100pct = (scale_fac * r_rotor) / max_norm
-        awa_offset_y = -mm_per_100pct
-        awa_offset = complex(0.0, awa_offset_y)
+        tabs_ext = float(bg["thumb_tabs_extension_mm"])
+        r_tabs = r_stator + tabs_ext
 
-        # Pointer (Central Ruler)
-        tab_ext = float(ptr.get("thumb_tab_extension_mm", 4.5))
-        pointer_length = r_max + tab_ext
-        pointer_width = float(ptr.get("width_mm", 6.0))
-        pointer_hub_r = float(ptr.get("hub_radius_mm", 4.5))
-        pointer_thk = float(thk.get("pointer_arm_mm", 1.2))
+        norm_ratio = float(bg["polar_norm_ratio"])
+        l_polar = r_rotor * norm_ratio
 
-        # Thicknesses
-        stator_core = float(thk.get("stator_core_wall_mm", 1.6))
-        front_rim = float(thk.get("front_rim_height_mm", 1.8))
-        back_rim = float(thk.get("back_rim_height_mm", 1.8))
-        front_rotor_thk = float(thk.get("front_rotor_disc_mm", 1.8))
-        back_rotor_thk = float(thk.get("back_rotor_disc_mm", 1.8))
+        w_tactical = float(bg["tactical_rim_width_mm"])
+        r_tactical_in = r_rotor - w_tactical
 
-        # Central Pin
-        center_pin_r = center_hole_r - pin_clearance
-        pin_len = pointer_thk + front_rotor_thk + stator_core + back_rotor_thk + 0.4
-        pin_head_r = pointer_hub_r
-        pin_head_thk = float(thk.get("center_pin_head_thickness_mm", 1.0))
+        # Stator Kompassrose (Ticks nach innen, Ziffern nach außen)
+        r_comp_in = r_rotor + 0.8       # 75.8 mm (knapp außerhalb des Sichtfensters 75.0 mm)
+        r_comp_out = r_rotor + 4.2      # 79.2 mm (Ende der 10°-Teilstriche)
+        r_comp_txt = r_rotor + 7.5      # 82.5 mm (Mittenradius der Gradbeschriftungen)
+
+        # Rechenschieber Skalen (C, D, S)
+        r_c = r_rotor - 0.5             # 74.5 mm
+        r_d = r_rotor + 0.5             # 75.5 mm
+        r_s = r_rotor - 10.0            # 65.0 mm
+
+        # Dicken & Toleranzen
+        t_rotor = float(bg["rotor_thickness_mm"])
+        t_cov = float(bg["stator_cover_thickness_mm"])
+        t_base = float(bg["stator_base_thickness_mm"])
+        t_ptr = float(bg["pointer_thickness_mm"])
+        c_rad = float(bg["radial_clearance_mm"])
+        c_ax = float(bg["axial_clearance_mm"])
+
+        r_pin = float(bg["axle_pin_nominal_radius_mm"])
+        r_hole = float(bg["axle_hole_radius_mm"])
+        # Schaftlänge = Boden + Deckel + 2x Zeiger + 2x Axialspiel
+        l_pin = t_base + t_cov + (t_ptr * 2.0) + (c_ax * 2.0)
+
+        p_len_front = r_stator - 5.0    # 85.0 mm
+        p_len_back = r_stator - 4.0     # 86.0 mm
 
         return ResolvedGeometry(
-            r_max=r_max,
-            r_split=r_split,
-            r_rotor=r_rotor,
-            r_pocket=r_pocket,
-            center_hole_r=center_hole_r,
-            max_norm=max_norm,
-            mm_per_100pct=mm_per_100pct,
-            awa_offset_y=awa_offset_y,
-            awa_offset=awa_offset,
-            pointer_length=pointer_length,
-            pointer_width=pointer_width,
-            pointer_hub_r=pointer_hub_r,
-            pointer_thickness=pointer_thk,
-            stator_core_wall=stator_core,
-            front_rim_height=front_rim,
-            back_rim_height=back_rim,
-            front_rotor_disc=front_rotor_thk,
-            back_rotor_disc=back_rotor_thk,
-            center_pin_r=center_pin_r,
-            center_pin_length=pin_len,
-            center_pin_head_r=pin_head_r,
-            center_pin_head_thickness=pin_head_thk,
-            compass_text_h=float(scl.get("compass_text_h_mm", 3.2)),
-            compass_tick_maj=float(scl.get("compass_tick_maj_mm", 1.6)),
-            compass_tick_min=float(scl.get("compass_tick_min_mm", 0.9)),
-            awa_text_h=float(scl.get("awa_text_h_mm", 2.8)),
-            awa_tick_maj=float(scl.get("awa_tick_maj_mm", 1.4)),
-            awa_tick_min=float(scl.get("awa_tick_min_mm", 0.7)),
-            polar_label_height=float(scl.get("polar_label_height_mm", 4.5)),
-            grid_label_height=float(scl.get("grid_label_height_mm", 3.8)),
-            log_text_h=float(scl.get("log_text_h_mm", 3.0)),
-            log_tick_maj=float(scl.get("log_tick_maj_mm", 2.0)),
-            log_tick_min=float(scl.get("log_tick_min_mm", 1.0)),
-            render_sail_layers=bool(disp.get("render_sail_layers", False)),
-            raw_config=cfg
+            rotor_radius=r_rotor,
+            stator_rim_width=w_stator,
+            stator_outer_radius=r_stator,
+            stator_window_radius=r_rotor,
+            screw_nominal_d=screw_nom_d,
+            screw_head_d=screw_head_d,
+            screw_count=int(bg["screw_count"]),
+            screw_pcd_radius=screw_pcd_r,
+            screw_head_inner_limit=screw_head_in,
+            thumb_tabs_extension=tabs_ext,
+            thumb_tabs_outer_radius=r_tabs,
+            thumb_tabs_count=int(bg["thumb_tabs_count"]),
+            thumb_tabs_angles=[float(a) for a in bg["thumb_tabs_angles_deg"]],
+            thumb_tabs_arc_deg=float(bg["thumb_tabs_arc_deg"]),
+            polar_norm_ratio=norm_ratio,
+            polar_norm_length=l_polar,
+            tactical_rim_width=w_tactical,
+            tactical_rim_inner_radius=r_tactical_in,
+            stator_compass_ticks_inner=r_comp_in,
+            stator_compass_ticks_outer=r_comp_out,
+            stator_compass_text_radius=r_comp_txt,
+            c_scale_radius=r_c,
+            d_scale_radius=r_d,
+            s_scale_radius=r_s,
+            rotor_thickness=t_rotor,
+            stator_cover_thickness=t_cov,
+            stator_base_thickness=t_base,
+            pointer_thickness=t_ptr,
+            radial_clearance=c_rad,
+            axial_clearance=c_ax,
+            axle_pin_nominal_radius=r_pin,
+            axle_hole_radius=r_hole,
+            axle_pin_total_length=l_pin,
+            pointer_length_front=p_len_front,
+            pointer_length_back=p_len_back,
         )
+
+    @property
+    def layers(self) -> Dict[str, Any]:
+        """Gibt alle Laser-/CAM-Layer-Konfigurationen zurück."""
+        return self.data.get("laser_layers", {})
+
+    @property
+    def tactical(self) -> Dict[str, Any]:
+        """Gibt die Taktikring-Parameter (Tack, Gybe, Shift, Bias, AWA) zurück."""
+        return self.data.get("tactical_settings", {})
+
+    @property
+    def polars(self) -> Dict[str, Any]:
+        """Gibt die Polardiagramm-Parameter (Cutoff, Farben, Ratios) zurück."""
+        return self.data.get("polar_settings", {})
+
+    @property
+    def typography(self) -> Dict[str, Any]:
+        """Gibt Schriftart- und Größendefinitionen zurück."""
+        return self.data.get("typography", {})
+
+    @property
+    def project(self) -> Dict[str, Any]:
+        """Gibt Projektmetadaten zurück."""
+        return self.data.get("project", {})
+
+
+# Globale Instanz zum bequemen Importieren
+CONFIG = ConfigManager()
+GEOM = CONFIG.geometry

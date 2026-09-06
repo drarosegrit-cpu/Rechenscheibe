@@ -1,16 +1,13 @@
-#!/usr/bin/env python3
 """
-stl_generator.py - Parametrischer Binär-STL-Generator für 180-mm-Sandwich-Kassette
-Projekt: Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)
-Version: V1.20 (Parametrisch via config_manager.GEOM)
+stl_generator.py - Procedural Binary STL Generator for 180 mm Sandwich-Kassette System
+JPK 1080 (GER 7447 - TRUE GRIT)
 
-Erzeugt wasserdichte, druckbare Binär-STL-Dateien für den 3D-Druck (FDM / SLA):
-1. gehaeuse_deckel_180mm.stl    - Oberer Statorring (Außen-Ø 180 mm, Sichtfenster-Ø 150 mm, 6x M3-Senkung)
-2. gehaeuse_boden_180mm.stl     - Unterer Statorring mit ringförmiger Führungsnut (Ø 173 mm x 2.4 mm)
-3. mittelscheibe_rotor_180mm.stl- Rotierende Scheibe (Ø 150 mm) mit Führungsfeder & 4 gerändelten Griff-Tabs
-4. zentralzeiger_lineal.stl     - Zentraler Ablesezeiger Vorderseite (mit Radialkante und Indexspitze)
-5. zentralzeiger_rueckseite.stl - Zentraler Ablesezeiger Rückseite (für C/D- und S-Skalen)
-6. achspin_mittelbolzen.stl     - Zentraler Achsbolzen mit Spreiz-/Haltekopf
+Creates watertight, 3D-printable binary STL files:
+1. gehaeuse_deckel_180mm.stl    - Top stator ring (Ø 180 mm, window Ø 150 mm, 6x M3 countersunk)
+2. gehaeuse_boden_180mm.stl     - Bottom stator ring with annular guide groove (Ø 173 mm x 2.4 mm)
+3. mittelscheibe_rotor_180mm.stl- Rotating disc (Ø 150 mm) with guide tongue (Ø 172 mm) & 4 knurled thumb tabs (Ø 186 mm)
+4. zentralzeiger_lineal.stl     - Central pointer arm (85 mm length with radial reading edge and index tip)
+5. achspin_mittelbolzen.stl     - Central axle pin with retaining head
 """
 
 import struct
@@ -19,22 +16,9 @@ import numpy as np
 from pathlib import Path
 from typing import List, Tuple, Optional
 
-# Parametrische Geometriedefinitionen aus dem zentralen Konfigurationsmanager
-from config_manager import GEOM
-
 
 def write_binary_stl(filepath: Path, triangles: np.ndarray, normals: Optional[np.ndarray] = None):
-    """
-    Schreibt ein Dreiecksnetz im standardisierten binären STL-Format.
-    
-    Format:
-    - 80 Bytes ASCII/Binary Header
-    - 4 Bytes Unsigned Integer (Anzahl Dreiecke)
-    - Pro Dreieck 50 Bytes:
-      - 3x 4 Bytes Float (Normalenvektor nx, ny, nz)
-      - 3x 3x 4 Bytes Float (Knoten v0, v1, v2)
-      - 2 Bytes Unsigned Integer (Attribute Byte Count = 0)
-    """
+    """Writes triangles to a standard binary STL file."""
     filepath = Path(filepath)
     filepath.parent.mkdir(parents=True, exist_ok=True)
     n_triangles = len(triangles)
@@ -77,10 +61,6 @@ def _gen_annulus_mesh(
     segments: int = 144,
     center_xy: Tuple[float, float] = (0.0, 0.0)
 ) -> List[List[np.ndarray]]:
-    """
-    Erzeugt ein wasserdichtes Zylinder- oder Kreisring-Netz (Annulus) zwischen r_inner und r_outer.
-    Ist r_inner == 0, wird ein voller Zylinder erzeugt.
-    """
     triangles = []
     angles = np.linspace(0, 2 * np.pi, segments, endpoint=False)
     cx, cy = center_xy
@@ -98,26 +78,26 @@ def _gen_annulus_mesh(
     for i in range(segments):
         next_i = (i + 1) % segments
 
-        # Äußere Zylinderwand (Normale zeigt nach außen)
+        # Outer wall
         triangles.append([b_out[i], t_out[i], t_out[next_i]])
         triangles.append([b_out[i], t_out[next_i], b_out[next_i]])
 
         if r_inner > 0:
-            # Innere Zylinderwand (Bohrung, Normale zeigt nach innen zum Zentrum)
+            # Inner wall
             triangles.append([b_in[i], t_in[next_i], t_in[i]])
             triangles.append([b_in[i], b_in[next_i], t_in[next_i]])
 
-            # Obere Kreisringfläche (Z = z_top, Normale nach +Z)
+            # Top annulus
             triangles.append([t_in[i], t_out[i], t_out[next_i]])
-            triangles.append([t_in[i], t_out[next_i], b_in[next_i]]) if False else triangles.append([t_in[i], t_out[next_i], t_in[next_i]])
+            triangles.append([t_in[i], t_out[next_i], t_in[next_i]])
 
-            # Untere Kreisringfläche (Z = z_bottom, Normale nach -Z)
+            # Bottom annulus
             triangles.append([b_in[i], b_out[next_i], b_out[i]])
             triangles.append([b_in[i], b_in[next_i], b_out[next_i]])
         else:
-            # Voller Zylinderdeckel (+Z)
+            # Top cap
             triangles.append([t_center, t_out[i], t_out[next_i]])
-            # Voller Zylinderboden (-Z)
+            # Bottom cap
             triangles.append([b_center, b_out[next_i], b_out[i]])
 
     return triangles
@@ -125,24 +105,20 @@ def _gen_annulus_mesh(
 
 def generate_deckel_stl(
     filepath: Path,
-    r_outer: float = GEOM.stator_outer_radius,      # 90.0 mm -> Ø 180 mm
-    r_inner: float = GEOM.stator_window_radius,    # 75.0 mm -> Ø 150 mm Fenster
-    thickness: float = GEOM.stator_cover_thickness,# 2.2 mm
-    pcd_screw: float = GEOM.screw_pcd_radius,      # 88.0 mm
-    screw_r: float = (GEOM.screw_nominal_d / 2.0) + 0.2, # M3 Spielbohrung 1.7 mm
+    r_outer: float = 90.0,      # Ø 180 mm
+    r_inner: float = 75.0,      # Ø 150 mm window
+    thickness: float = 2.5,
+    pcd_screw: float = 88.0,    # Ø 176 mm PCD
+    screw_r: float = 1.7,       # M3 clearance
     segments: int = 180
 ):
-    """
-    Erzeugt den oberen Statorring (Gehäusedeckel).
-    Enthält das zentrale Sichtfenster sowie 6 gleichmäßig verteilte M3-Bohrungen auf dem PCD.
-    """
+    """Generates Gehäusedeckel (Top Stator Ring)."""
     triangles = []
-    # Basis-Kreisring des Deckels
+    # Base annulus
     triangles.extend(_gen_annulus_mesh(r_inner, r_outer, 0.0, thickness, segments))
-    
-    # 6x M3-Schraubensenkungs-Bohrungen
-    for i in range(GEOM.screw_count):
-        ang = math.radians(i * (360.0 / GEOM.screw_count))
+    # Screw clearance holes
+    for i in range(6):
+        ang = math.radians(i * 60.0)
         sx = pcd_screw * math.cos(ang)
         sy = pcd_screw * math.sin(ang)
         hole_tris = _gen_annulus_mesh(0.0, screw_r, 0.0, thickness, segments=24, center_xy=(sx, sy))
@@ -154,24 +130,21 @@ def generate_deckel_stl(
 
 def generate_boden_stl(
     filepath: Path,
-    r_outer: float = GEOM.stator_outer_radius,      # 90.0 mm
-    r_inner: float = GEOM.stator_window_radius,    # 75.0 mm Sichtfenster
-    r_groove: float = GEOM.screw_head_inner_limit, # 85.0 mm Nutkante (vor M3 Köpfen)
-    base_thk: float = 2.0,                         # Bodenplatten-Dicke
-    groove_depth: float = GEOM.rotor_thickness + GEOM.axial_clearance, # 2.4 mm Nut
+    r_outer: float = 90.0,      # Ø 180 mm
+    r_inner: float = 75.0,      # Ø 150 mm window
+    r_groove: float = 86.5,     # Ø 173 mm groove
+    base_thk: float = 2.0,      # base plate
+    groove_depth: float = 2.4,  # groove depth in Z
     segments: int = 180
 ):
-    """
-    Erzeugt den unteren Statorring (Gehäuseboden mit ringförmiger Führungsnut).
-    Die Führungsnut nimmt die umlaufende Feder der rotierenden Mittelscheibe auf.
-    """
+    """Generates Gehäuseboden (Bottom Stator Ring with annular guide groove)."""
     triangles = []
     total_thk = base_thk + groove_depth
 
-    # 1. Bodenplatten-Ring (vom Fenster r_inner bis Nutaußenkante r_groove)
+    # 1. Base floor ring (from r_inner to r_groove, thickness = base_thk)
     triangles.extend(_gen_annulus_mesh(r_inner, r_groove, 0.0, base_thk, segments))
 
-    # 2. Äußerer Führungssteg / Randwand (von r_groove bis r_outer)
+    # 2. Outer rim wall (from r_groove to r_outer, thickness = total_thk)
     triangles.extend(_gen_annulus_mesh(r_groove, r_outer, 0.0, total_thk, segments))
 
     mesh = np.array(triangles, dtype=np.float32)
@@ -180,25 +153,22 @@ def generate_boden_stl(
 
 def generate_rotor_stl(
     filepath: Path,
-    r_window: float = GEOM.stator_window_radius,    # 75.0 mm
-    r_tongue: float = GEOM.screw_head_inner_limit - GEOM.radial_clearance, # ~84.5 mm Führungsfeder
-    r_tab: float = GEOM.thumb_tabs_outer_radius,    # 93.0 mm Griff-Tabs
-    thickness: float = GEOM.rotor_thickness,        # 2.0 mm
-    center_hole_r: float = GEOM.axle_hole_radius,   # 1.6 mm Achsbohrung
+    r_window: float = 75.0,     # Ø 150 mm visible window
+    r_tongue: float = 86.0,     # Ø 172 mm guide rim (Feder)
+    r_tab: float = 93.0,        # Ø 186 mm thumb tabs
+    thickness: float = 2.0,
+    center_hole_r: float = 1.6, # Ø 3.2 mm center hole
     segments: int = 180
 ):
-    """
-    Erzeugt die rotierende Mittelscheibe (Rotor) mit radialer Führungsfeder und
-    4 ergonomisch platzierten Daumen-Grifflaschen (Tabs) bei 45°, 135°, 225°, 315°.
-    """
+    """Generates Mittelscheibe / Rotor (Disc with guide tongue and 4 thumb tabs)."""
     triangles = []
 
-    # 1. Zentrale Drehscheibe inklusive Führungsfeder (vom Achsloch bis r_tongue)
+    # 1. Central disc + tongue (from center hole to r_tongue)
     triangles.extend(_gen_annulus_mesh(center_hole_r, r_tongue, 0.0, thickness, segments))
 
-    # 2. Vier Daumen-Bedienlaschen (extending from r_tongue to r_tab)
-    tab_half_width_deg = GEOM.thumb_tabs_arc_deg / 2.0
-    for center_deg in GEOM.thumb_tabs_angles:
+    # 2. Four knurled thumb tabs (extending from r_tongue to r_tab at 45°, 135°, 225°, 315°)
+    tab_half_width_deg = 15.0  # 30° total width
+    for center_deg in [45.0, 135.0, 225.0, 315.0]:
         ang_start = math.radians(center_deg - tab_half_width_deg)
         ang_end = math.radians(center_deg + tab_half_width_deg)
         n_tab_pts = 24
@@ -210,17 +180,17 @@ def generate_rotor_stl(
         t_out = np.column_stack([r_tab * np.cos(tab_angles), r_tab * np.sin(tab_angles), np.full(n_tab_pts, thickness)])
 
         for i in range(n_tab_pts - 1):
-            # Oberseite (+Z)
+            # Top face
             triangles.append([t_in[i], t_out[i], t_out[i+1]])
             triangles.append([t_in[i], t_out[i+1], t_in[i+1]])
-            # Unterseite (-Z)
+            # Bottom face
             triangles.append([b_in[i], b_out[i+1], b_out[i]])
-            triangles.append([b_in[i], b_in[i+1], b_out[i+1]])
-            # Äußere gekrümmte Wand
+            triangles.append([b_in[i], b_in[next_i_wrap(i)], b_out[i+1]]) if False else triangles.append([b_in[i], b_in[i+1], b_out[i+1]])
+            # Outer curved wall
             triangles.append([b_out[i], t_out[i], t_out[i+1]])
             triangles.append([b_out[i], t_out[i+1], b_out[i+1]])
 
-        # Radiale Seitenflanken der Lasche
+        # Radial side walls of the tab
         triangles.append([b_in[0], t_in[0], t_out[0]])
         triangles.append([b_in[0], t_out[0], b_out[0]])
         triangles.append([b_in[-1], t_out[-1], t_in[-1]])
@@ -232,23 +202,20 @@ def generate_rotor_stl(
 
 def generate_pointer_stl(
     filepath: Path,
-    length: float = GEOM.pointer_length_front,     # 85.0 mm (reicht exakt bis zur Stator-Kompassrose)
+    length: float = 85.0,       # reaches outer compass rose
     width: float = 7.0,
     hub_radius: float = 5.0,
-    center_hole_r: float = GEOM.axle_hole_radius, # 1.6 mm
-    thickness: float = GEOM.pointer_thickness,    # 1.4 mm
+    center_hole_r: float = 1.6,
+    thickness: float = 1.5,
     segments: int = 60
 ):
-    """
-    Erzeugt den transparenten Zentralzeiger (Läufer) mit präziser radialer Ablesekante (x=0)
-    und spitzer Indexnase zur Übertragung von Peilwerten auf den Stator.
-    """
+    """Generates Zentralzeiger / Pointer arm with reading edge and index tip."""
     triangles = []
 
-    # Naben-Ring um den zentralen Achsbolzen
+    # Hub cylinder around center axle
     triangles.extend(_gen_annulus_mesh(center_hole_r, hub_radius, 0.0, thickness, segments))
 
-    # 2D-Polygon des Zeigerkörpers entlang der +Y-Achse (Ablesekante liegt auf x = 0)
+    # 2D polygon along +Y axis (reading edge at x = 0)
     tip_len = 5.0
     tab_len = 4.0
     y_body_end = length - tip_len - tab_len
@@ -257,9 +224,9 @@ def generate_pointer_stl(
         (0.0, hub_radius * 0.8),
         (width, hub_radius * 0.8),
         (width, y_body_end),
-        (width + 2.5, y_body_end + tab_len / 2.0), # Ergonomischer Daumen-Greifnocken
+        (width + 2.5, y_body_end + tab_len / 2.0), # tactile thumb grip
         (width, y_body_end + tab_len),
-        (0.0, length)                              # Präzise Ablesespitze auf x=0
+        (0.0, length)                              # sharp reading tip at x=0
     ]
 
     n_pts = len(poly_2d)
@@ -281,29 +248,25 @@ def generate_pointer_stl(
 
 def generate_achspin_stl(
     filepath: Path,
-    shaft_radius: float = GEOM.axle_pin_nominal_radius, # 1.5 mm -> Ø 3.0 mm
-    shaft_length: float = GEOM.axle_pin_total_length,   # 8.8 mm für Sandwich + 2 Zeiger
+    shaft_radius: float = 1.5,
+    shaft_length: float = 8.8,
     head_radius: float = 4.5,
     head_thickness: float = 1.2,
     segments: int = 60
 ):
-    """
-    Erzeugt den zentralen Lagerbolzen mit flachem Haltekopf.
-    """
+    """Generates central axle pin with retaining head (shaft length 8.8 mm for dual pointers)."""
     triangles = []
-    # Zylindrischer Schaft
+    # Shaft
     triangles.extend(_gen_annulus_mesh(0.0, shaft_radius, 0.0, shaft_length, segments))
-    # Flacher Haltekopf am Schaftende
+    # Head
     triangles.extend(_gen_annulus_mesh(0.0, head_radius, shaft_length, shaft_length + head_thickness, segments))
 
     mesh = np.array(triangles, dtype=np.float32)
     write_binary_stl(filepath, mesh)
 
 
-def generate_all_stl_models(out_dir: Path) -> List[Path]:
-    """
-    Erzeugt alle 6 wasserdichten STL-Modelle für das Rechenscheiben-Sandwich V1.20.
-    """
+def generate_all_stl_models(out_dir: Path):
+    """Generates all 6 watertight STL parts for the 180 mm Rechenscheibe V1.1."""
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -311,9 +274,9 @@ def generate_all_stl_models(out_dir: Path) -> List[Path]:
         "gehaeuse_deckel_180mm.stl": lambda p: generate_deckel_stl(p),
         "gehaeuse_boden_180mm.stl": lambda p: generate_boden_stl(p),
         "mittelscheibe_rotor_180mm.stl": lambda p: generate_rotor_stl(p),
-        "zentralzeiger_lineal.stl": lambda p: generate_pointer_stl(p, length=GEOM.pointer_length_front),
-        "zentralzeiger_rueckseite.stl": lambda p: generate_pointer_stl(p, length=GEOM.pointer_length_back),
-        "achspin_mittelbolzen.stl": lambda p: generate_achspin_stl(p, shaft_length=GEOM.axle_pin_total_length),
+        "zentralzeiger_lineal.stl": lambda p: generate_pointer_stl(p, length=85.0),
+        "zentralzeiger_rueckseite.stl": lambda p: generate_pointer_stl(p, length=86.0),
+        "achspin_mittelbolzen.stl": lambda p: generate_achspin_stl(p, shaft_length=8.8),
     }
 
     generated = []
@@ -323,9 +286,3 @@ def generate_all_stl_models(out_dir: Path) -> List[Path]:
         generated.append(fpath)
 
     return generated
-
-
-if __name__ == "__main__":
-    out = Path("output/stl")
-    res = generate_all_stl_models(out)
-    print(f"Erfolgreich {len(res)} STL-Dateien generiert in {out.resolve()}")

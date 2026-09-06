@@ -1,45 +1,21 @@
-# 🧭 Nautische Rechenscheibe & Taktik-Suite V1.20 – JPK 1080 (*TRUE GRIT*, GER 7447)
+# 🧭 Nautische Rechenscheibe & Taktik-Suite V1.11 – JPK 1080 (*TRUE GRIT*, GER 7447)
 
 Professionelles, analog-digitales Regatta-, Navigations- und Taktiksystem für die Yacht **JPK 1080 (*TRUE GRIT*, GER 7447)**.  
 Dieses System verbindet die offiziellen **ORC-VPP-Polardaten** (ORC International / Club, Run-ID `249116`) mit:
 1. Einer **doppelseitigen $\varnothing 180\,\text{mm}$ Sandwich-Rechenscheibe** mit integriertem **TackingMaster-Taktikring**, normierten ORC-Polaren (Weg A), echten AWA-Fasskreisbögen und zirkularem Rechenschieber samt vergrößerter Sinusskala und beidseitigem Zeigersystem.
-2. Einer **vollständig parametrischen Architektur** (`config.json` & `config_manager.py`), in der alle Dimensionen, Toleranzen und Schichtfarben zentral gepflegt und über mathematische Abhängigkeiten konsistent abgeleitet werden.
-3. Einer **Single Source of Truth Fertigungssuite**: Die Laser-SVGs stellen die alleinige geometrische Referenz dar; hochauflösende 300-DPI-Vorschauen werden direkt via Vektor-Rendering (`librsvg` & `libcairo`) erzeugt (100% Identität von Fertigung und Ansicht).
-4. Einer modernen **Vektorgeometrie-Engine** auf Basis nativer komplexer Zahlen (`cmath`).
-5. Einem **digitalen Taktik-Bordcomputer** (`tactical_advisor.py`) mit Einzelsegelanalyse und Isochronen-Routenoptimierer (`route_optimizer.py`).
+2. Einer **vollständigen Fertigungssuite** mit 3D-Druck-Modellen (STL) und hochpräzisen Laser-CAM-Vektordateien (SVG).
+3. Einem **digitalen Taktik-Bordcomputer** (`tactical_advisor.py`) mit Einzelsegelanalyse und Isochronen-Routenoptimierer (`route_optimizer.py`).
 
 ---
 
 ## 📑 Inhaltsverzeichnis
-1. [Neuerungen in Release V1.20](#-neuerungen-in-release-v120)
-2. [Systemübersicht & Mechanische Architektur (180 mm Sandwich-Kassette)](#-systemübersicht--mechanische-architektur)
-3. [Vorderseite (Seite A): Taktikring & Normierte Polaren (Weg A)](#-vorderseite-seite-a-taktikring--normierte-polaren-weg-a)
-4. [Rückseite (Seite B): Zirkularer Rechenschieber, Vergrößerte S-Skala & Dreh-Läufer](#-rückseite-seite-b-zirkularer-rechenschieber-vergrößerte-s-skala--dreh-läufer)
-5. [Hardware-Fertigungsanleitung (3D-Druck & Lasergravur)](#-hardware-fertigungsanleitung)
-6. [Software-Suite & CLI-Bedienung](#-software-suite--cli-bedienung)
-7. [Taktisches Handbuch für den Regatta-Einsatz](#-taktisches-handbuch-für-den-regatta-einsatz)
-8. [Dateistruktur des Repositories](#-dateistruktur-des-repositories)
-
----
-
-## 🚀 Neuerungen in Release V1.20
-
-1. **Single Source of Truth (SVG $\rightarrow$ PNG):**
-   - Beseitigung redundanter Matplotlib-Plotroutinen.
-   - Alle visuellen PNG-Vorschauen (`output/previews/`) werden über `preview_engine.py` direkt aus den originalen Fertigungs-SVGs mittels Ctypes-Anbindung an `librsvg-2` und `libcairo` gerendert.
-   - Absolute 1:1-Garantie: Was in der Vorschau zu sehen ist, entspricht exakt dem Vektorpfad der Lasermaschine.
-2. **Kompaktes, modulares Konfigurationsmodell (`config.json` & `config_manager.py`):**
-   - Vollständige Eliminierung hartcodierter Geometriewerte in den Generatoren.
-   - Automatische Auflösung aller geometrischen Kopplungen (z. B. Skalierung des Rotors passt automatisch Statorring, Schrauben-PCD, Zeigerlängen und Skalenradien an).
-3. **Optimierte Stator-Kompassrose:**
-   - Die Gradzahlen (`000°` bis `350°`) wurden nach **außen** auf $R = 82.5\,\text{mm}$ verlegt.
-   - Die Skalen-Teilstriche liegen geschützt auf der Innenseite ($R = 75.8\,\text{mm}$ bis $79.2\,\text{mm}$) direkt am Sichtfenster.
-   - Garantiert $2.5\,\text{mm}$ Sicherheitsabstand zu den Senkköpfen der M3-Verschraubung bei $R = 88.0\,\text{mm}$.
-4. **Vektorgeometrie mit nativer komplexer Algebra (`cmath`):**
-   - Ersetzung schwerfälliger Koordinatentupel durch komplexe Zahlen $z = x + iy$.
-   - Kreisclipping und Bogenberechnungen basieren auf Vektor-Kreuz- und Skalarprodukten via Konjugation (`(p1 * dp.conjugate()).real`).
-5. **Korrektur der Bogenkrümmung (Port Gybe / Tack Arc Sweeps):**
-   - Korrektur der SVG-Bogenflag-Logik: Im SVG-Format mit invertierter Y-Achse erfordern Kreisbögen im Uhrzeigersinn stets `sweep-flag = 1`. Dadurch schmiegen sich die roten Segmente für Backbord-Halse und Backbord-Wende nun perfekt tangential an den Rotorrand.
+1. [Systemübersicht & Mechanische Architektur (180 mm Sandwich-Kassette)](#-systemübersicht--mechanische-architektur)
+2. [Vorderseite (Seite A): Taktikring & Normierte Polaren (Weg A)](#-vorderseite-seite-a-taktikring--normierte-polaren-weg-a)
+3. [Rückseite (Seite B): Zirkularer Rechenschieber, Vergrößerte S-Skala & Dreh-Läufer](#-rückseite-seite-b-zirkularer-rechenschieber--sinus-skala)
+4. [Hardware-Fertigungsanleitung (3D-Druck & Lasergravur)](#-hardware-fertigungsanleitung)
+5. [Software-Suite & CLI-Bedienung](#-software-suite--cli-bedienung)
+6. [Taktisches Handbuch für den Regatta-Einsatz](#-taktisches-handbuch-für-den-regatta-einsatz)
+7. [Dateistruktur des Repositories](#-dateistruktur-des-repositories)
 
 ---
 
@@ -55,7 +31,7 @@ Die Rechenscheibe basiert auf einem robusten **$\varnothing 180\,\text{mm}$ Sand
                             ▼
      ┌──────────────────────────────────────────────────────────┐
      │  GEHÄUSE-DECKEL (STATOR VORDERSEITE)                     │  Ø 180 mm
-     │  360° Kompassrose (Zahlen außen) · Sichtfenster Ø 150 mm │  Dicke: 2.2 mm
+     │  360° Kompassrose graviert · Sichtfenster Ø 150 mm       │  Dicke: 2.2 mm
      └──────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -85,8 +61,8 @@ Die Rechenscheibe basiert auf einem robusten **$\varnothing 180\,\text{mm}$ Sand
 * **Außendurchmesser:** $180.0\,\text{mm}$
 * **Sichtfenster / Drehscheiben-Durchmesser:** $150.0\,\text{mm}$
 * **Bedienung:** 4 gerändelte Daumen-Tabs an der Drehscheibe (protrudieren auf $\varnothing 186.0\,\text{mm}$, je $15^\circ$ Bogenbreite bei $45^\circ, 135^\circ, 225^\circ, 315^\circ$).
-* **Führungssystem:** Feder-Nut-Führung ($\varnothing 172.0\,\text{mm}$ Federring am Rotor greift in $\varnothing 173.0\,\text{mm} \times 2.4\,\text{mm}$ Nut im Boden) – garantiert spielfreien Lauf ohne Verkanten.
-* **Verschraubung:** 6 symmetrische $M3$-Senkkopfschrauben auf Teilkreis $\varnothing 176.0\,\text{mm}$ ($R = 88.0\,\text{mm}$).
+* **Führungssystem:** Feder-Nut-Führung ($\varnothing 172.0\,\text{mm}$ Federring am Rotor greift in $\varnothing 173.0\,\text{mm} \times 2.4\,\text{mm}$ Nut im Boden) – garantiert absolut spielfreien, seidenweichen Lauf ohne Verkanten.
+* **Verschraubung:** 6 symmetrische $M3$-Senkkopfschrauben auf Teilkreis $\varnothing 176.0\,\text{mm}$.
 * **Zentraler Zeigerarm (Vorderseite):** $85\,\text{mm}$ transparenter Acrylzeiger mit radialer roter Peilkante, gravierter Ratio-Skala ($0.0$ bis $1.2$) und Peilspitze zur äußeren Stator-Kompassrose.
 * **Zentraler Zeigerarm / Läufer (Rückseite):** $86\,\text{mm}$ transparenter Acrylläufer mit durchgehender, zentrischer roter Haarlinie zur direkten Projektion von Winkeln der S-Skala auf die C- und D-Skalen.
 * **Zentraler Achsbolzen:** Schaft $\varnothing 3.0 \times 8.8\,\text{mm}$ zur passgenauen Aufnahme beider Zeigerarme und des Sandwich-Verbunds.
@@ -101,9 +77,9 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
 
 ### 1. Der äußere Stator-Kompassring ($\varnothing 150$ bis $\varnothing 180\,\text{mm}$)
 * Vollständige **$360^\circ$-Kompassrose** mit $1^\circ$-Feinteilung, $5^\circ$-Teilung und $10^\circ$-Beschriftung.
-* **V1.20 Optimierung:** Die Gradzahlen (`000°` bis `350°`) stehen übersichtlich auf der **Außenseite** bei $R = 82.5\,\text{mm}$.
-* Die Teilstriche liegen innen zwischen $R = 75.8\,\text{mm}$ und $79.2\,\text{mm}$, unmittelbar an der $\varnothing 150\,\text{mm}$ Sichtfensterkante.
-* Die 6 M3-Befestigungsschrauben bei $R = 88.0\,\text{mm}$ bleiben mit $2.5\,\text{mm}$ radialem Sicherheitsabstand vollkommen frei.
+* **V1.11 Optimierung:** Der Skalenring wurde nach innen auf $R_{\text{außen}} = 83.5\,\text{mm}$ versetzt, sodass die 6 M3-Befestigungsschrauben bei $R = 88.0\,\text{mm}$ völlig frei und unberührt bleiben.
+* Die Gradzahlen (`000°` bis `350°`) stehen übersichtlich auf der **Innenseite** bei $R = 77.8\,\text{mm}$, unmittelbar an der $\varnothing 150\,\text{mm}$ Sichtfensterkante.
+* Bleibt starr am Gehäuse ausgerichtet; dient zur Peilung von Windrichtung ($TWD$), Kurs über Grund ($COG$) und Landmarken.
 
 ### 2. Der integrierte TackingMaster-Taktikring (Rotor-Rand $\varnothing 132$ bis $\varnothing 150\,\text{mm}$)
 * **TRUE WIND Index (12 Uhr):** Markanter roter Pfeil zum Ausrichten der Drehscheibe auf die aktuelle Wahre Windrichtung ($TWD$).
@@ -120,7 +96,7 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
 ### 3. Normierte ORC-Geschwindigkeitspolaren (Weg A, $L = 64\,\text{mm}$)
 * **Windpol im geometrischen Zentrum $(0,0)$:**  
   Der wahre Windvektor entspringt direkt im Drehpunkt der Scheibe.
-* **Basislinie & 175°-Freistellung:** Rote Vertikallinie vom Windpol $(0,0)$ nach unten zum Gegenpol $P_1(180^\circ)$ bei $(0, -64\,\text{mm})$. Polarkurven werden für $|TWA| > 175.0^\circ$ ausgespart, wodurch die Referenzlinie sauber ablesbar bleibt.
+* **Basislinie & 175°-Freistellung:** Rote Vertikallinie vom Windpol $(0,0)$ nach unten zum Gegenpol $P_1(180^\circ)$ bei $(0, -64\,\text{mm})$. In V1.11 werden die Polarkurven für $|TWA| > 175.0^\circ$ ausgespart, wodurch die rote Referenzlinie absolut sauber und ungestört bleibt.
 * **8 Windgeschwindigkeiten:** Kurven für $6, 8, 10, 12, 14, 16, 20, 24\,\text{kt}$ True Wind Speed ($TWS$).
 * **10 Konzentrische Ratio-Kreise:** Feines Koordinatengitter mit 0.1-Schrittweite ($0.1, 0.2, \dots, 1.0$) für direktes Ablesen der normierten Bootsgeschwindigkeit.
 * **Feste BoatSPD / TWS-Skala auf der Drehscheibe:** Entlang der horizontalen $90^\circ$-Steuerbordachse eingravierte Skala ($0.1$ bis $1.0$) mit Teilstrichbeschriftung und zentrierter Kennzeichnung.
@@ -150,9 +126,9 @@ Die Rückseite verwandelt die Rechenscheibe in einen hochpräzisen Navigationsre
 * **Haarfeine Trennfuge bei $R = 75.0\,\text{mm}$:**  
   C- und D-Skala gleiten unmittelbar aneinander vorbei, was parallaxenfreies Ablesen ermöglicht.
 * **S-Skala (Vergrößerte Sinusskala bei $R = 65.0\,\text{mm}$):**  
-  Radius $R_S = 65.0\,\text{mm}$ (Umfangslänge $408.4\,\text{mm}$). Logarithmische Teilung für Winkel von $6^\circ$ bis $90^\circ$ gemäss $\theta = 360^\circ \cdot \log_{10}(10 \cdot \sin\alpha)$. Die Skalenstriche weisen nach innen ($R = 65.0 \rightarrow 61.8\,\text{mm}$), die Winkelbeschriftungen liegen übersichtlich bei $R = 58.5\,\text{mm}$.
+  In Release V1.11 um weitere $2\,\text{mm}$ nach außen vergrößert auf Radius $R_S = 65.0\,\text{mm}$ (Umfangslänge $408.4\,\text{mm}$). Logarithmische Teilung für Winkel von $6^\circ$ bis $90^\circ$ gemäss $\theta = 360^\circ \cdot \log_{10}(10 \cdot \sin\alpha)$. Die Skalenstriche weisen nach innen ($R = 65.0 \rightarrow 61.8\,\text{mm}$), die Winkelbeschriftungen liegen übersichtlich bei $R = 58.5\,\text{mm}$ mit komfortablen $5.0\,\text{mm}$ Freiraum zur C-Skala.
 * **Transparenter Dreh-Läufer (Cursor):**  
-  Ein drehbar gelagerter Zeigerarm ($86\,\text{mm}$) mit feiner, durchgehender roter Haarlinie verbindet die innenliegende S-Skala direkt mit der C- und D-Skala.
+  Ein drehbar gelagerter Zeigerarm ($86\,\text{mm}$) mit feiner, durchgehender roter Haarlinie verbindet die innenliegende S-Skala direkt mit der C- und D-Skala – unverzichtbar für trigonometrische Berechnungen und Peilungsübertragungen ohne Parallaxenfehler.
 * **Performance-Nonius (bei der $1.0$-Marke):**  
   Farbige Marken für $-15\%, -10\%, -5\%$ (Rot) und $+5\%$ (Grün) erlauben den schnellen Soll/Ist-Vergleich der Bootsgeschwindigkeit.
 
@@ -162,7 +138,7 @@ Die Rückseite verwandelt die Rechenscheibe in einen hochpräzisen Navigationsre
 1. Lies auf Seite A an der Zeigerkante die Ratio ab (z. B. **$0.54$** bei $16\,\text{kt}$ Wind auf $TWA = 110^\circ$).
 2. Drehe die Scheibe um: Stelle die **$1.0$** der C-Skala (Rotor) auf die **$0.54$** (bzw. $5.4$) der D-Skala (Stator).
 3. Suche auf der C-Skala den Windwert **$1.6$** ($16\,\text{kt}$).
-4. Lies auf der D-Skala direkt das Ergebnis ab: **$8.64\,\text{kt}$** Target-Speed!
+4. Lies auf der D-Skala direkt das Ergebnis ab: **$8.64\,\text{kt}$** Targets-Speed!
 
 #### B. Distanz- und Fahrzeitberechnung ($\text{Distanz} = \text{Speed} \times \text{Zeit}$)
 * Stelle die $1.0$ auf die Bootsgeschwindigkeit in Knoten.
@@ -186,8 +162,8 @@ Alle Fertigungsdateien wurden mit sub-millimetergenauen Toleranzen erzeugt.
 | [`gehaeuse_deckel_180mm.stl`](output/stl/gehaeuse_deckel_180mm.stl) | Gehäuse-Deckel (Stator A) | $\varnothing 180 \times 2.2\,\text{mm}$, Fenster $\varnothing 150\,\text{mm}$ | PETG / ASA / PLA-CF |
 | [`gehaeuse_boden_180mm.stl`](output/stl/gehaeuse_boden_180mm.stl) | Gehäuse-Boden (Stator B) | $\varnothing 180 \times 4.0\,\text{mm}$, Nut $\varnothing 173 \times 2.4\,\text{mm}$ | PETG / ASA / PLA-CF |
 | [`mittelscheibe_rotor_180mm.stl`](output/stl/mittelscheibe_rotor_180mm.stl) | Rotor-Drehscheibe | $\varnothing 150/\varnothing 172/\varnothing 186 \times 2.0\,\text{mm}$ | PETG / Weiß matt |
-| [`zentralzeiger_lineal.stl`](output/stl/zentralzeiger_lineal.stl) | Peilzeiger Vorderseite | Länge $85\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.4\,\text{mm}$ | Transparentes PETG / Resin |
-| [`zentralzeiger_rueckseite.stl`](output/stl/zentralzeiger_rueckseite.stl) | Läufer / Zeiger Rückseite | Länge $86\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.4\,\text{mm}$ | Transparentes PETG / Resin |
+| [`zentralzeiger_lineal.stl`](output/stl/zentralzeiger_lineal.stl) | Peilzeiger Vorderseite | Länge $85\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.5\,\text{mm}$ | Transparentes PETG / Resin |
+| [`zentralzeiger_rueckseite.stl`](output/stl/zentralzeiger_rueckseite.stl) | Läufer / Zeiger Rückseite | Länge $86\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.5\,\text{mm}$ | Transparentes PETG / Resin |
 | [`achspin_mittelbolzen.stl`](output/stl/achspin_mittelbolzen.stl) | Zentraler Achsbolzen | Schaft $\varnothing 3.0 \times 8.8\,\text{mm}$, Kopf $\varnothing 9.0\,\text{mm}$ | PETG / Nylon / Messing |
 
 #### Druckparameter-Empfehlung
@@ -208,13 +184,11 @@ Die SVG-Dateien sind 1:1 im Millimeter-Maßstab für moderne CAM- und Lasersoftw
 | [`laser_seite_b_boden_d_skala.svg`](output/svg/laser_seite_b_boden_d_skala.svg) | Stator Boden (D-Skala) | Rot = Schnitt (Ring & 6x M3), Schwarz = Gravur |
 | [`laser_zentralzeiger.svg`](output/svg/laser_zentralzeiger.svg) | Acryl-Zeigerarm Vorderseite (Ratio) | Rot = Konturschnitt, Schwarz = Ratio-Teilung |
 | [`laser_zentralzeiger_rueckseite.svg`](output/svg/laser_zentralzeiger_rueckseite.svg) | Acryl-Läufer Rückseite (Peillinie) | Rot = Konturschnitt, Schwarz/Rot = Haarlinie |
-| [`laser_seite_a_montiert.svg`](output/svg/laser_seite_a_montiert.svg) | Gesamt-Montage Vektoransicht Seite A | Zusammengesetzte Vektorgrafik aller Layer |
-| [`laser_seite_b_montiert.svg`](output/svg/laser_seite_b_montiert.svg) | Gesamt-Montage Vektoransicht Seite B | Zusammengesetzte Vektorgrafik aller Layer |
 
-#### Laser-Farbstandard (konfigurierbar in `config.json`)
-* **Rot (`#E74C3C`, Strichstärke $0.20\,\text{mm}$):** Vektorschnitt (Cut Lines).
-* **Dunkelgrau/Schwarz (`#2C3E50`, Strichstärke $0.35\,\text{mm}$):** Kompassrose und Hauptskalen.
-* **Buntfarben:** Taktische Zonen (Grün `#27AE60`, Rot `#C0392B`, Blau `#2980B9`, Violett `#8E44AD`).
+#### Laser-Farbstandard
+* **Rot (`#FF0000`, Strichstärke $0.15\,\text{mm}$):** Vektorschnitt (Cut Lines).
+* **Schwarz (`#000000`, Strichstärke $0.25\,\text{mm}$):** Feine Vektorgravur (Skalenstriche & Beschriftungen).
+* **Buntfarben:** Akzent-Gravuren (Grün `#27AE60`, Rot `#C0392B`, Blau `#2980B9`, Violett `#8E44AD`).
 
 ---
 
@@ -224,7 +198,7 @@ Die SVG-Dateien sind 1:1 im Millimeter-Maßstab für moderne CAM- und Lasersoftw
 ```bash
 python3 rechenscheibe.py --all
 ```
-Erzeugt alle 6 STL-Dateien, alle 8 SVG-Laserdateien und alle hochauflösenden 300-DPI-PNG-Vorschauen in einem einzigen Durchlauf.
+Erzeugt alle 6 STL-Dateien, alle 6 SVG-Laserdateien und alle hochauflösenden 300-DPI-PNG-Vorschauen in einem einzigen Durchlauf.
 
 ### 2. Gezielte Einzelausführung
 ```bash
@@ -234,7 +208,7 @@ python3 rechenscheibe.py --stl
 # Nur Laser-SVG-Dateien erzeugen
 python3 rechenscheibe.py --svg
 
-# Vorschau direkt aus den SVGs rendern (z. B. TWA 65° bei 300 DPI)
+# Vorschau mit benutzerdefiniertem Zeigerwinkel rendern (z. B. TWA 65°)
 python3 rechenscheibe.py --preview --twa 65.0 --dpi 300
 ```
 
@@ -273,8 +247,8 @@ python3 route_optimizer.py --gpx data/Kursdaten.gpx --twd 340 --tws 14
 ### Phase 3: Segelwechsel am Crossover
 * Am Wind und auf leichtem Raumkurs führt der Zeiger über die Polaren.
 * Sobald der Zeiger die **violette Crossover-Linie** überschreitet, überholt das asymmetrische Spi-Polare die Genua-Kurve:
-   * Unterhalb der Crossover-Linie: Fock/Genua fahren.
-   * Oberhalb der Crossover-Linie: Gennaker setzen!
+  * Unterhalb der Crossover-Linie: Fock/Genua fahren.
+  * Oberhalb der Crossover-Linie: Gennaker setzen!
 
 ### Phase 4: Vorwind-Schenkel (Downwind VMG)
 * Auf dem Spikurs liegt das optimale Ziel nicht auf direktem Vorwindkurs ($180^\circ$), sondern in den **GYBE Sectors ($145^\circ$ bis $165^\circ$)**, markiert durch die grünen VMG-Rauten.
@@ -286,16 +260,16 @@ python3 route_optimizer.py --gpx data/Kursdaten.gpx --twd 340 --tws 14
 
 ```
 Rechenscheibe/
-├── rechenscheibe.py             # Master CLI Orchestrator (V1.20 Software Suite)
-├── config.json                  # Zentrale Parameter- & Toleranzdatei (Single Source of Config)
-├── config_manager.py            # Parametrischer Geometrie- & Toleranzmanager
-├── vector_engine.py             # CAM / Laser SVG Vektorgrafik-Generator (1:1 CAD via cmath)
-├── preview_engine.py            # Single Source of Truth Vektor-Previewer (librsvg + libcairo)
-├── stl_generator.py             # 3D-Druck STL Mesh Generator (Parametrisch via GEOM)
+├── rechenscheibe.py             # Master CLI Orchestrator (V1.1 Software Suite)
+├── vector_engine.py             # CAM / Laser SVG Vektorgrafik-Generator (1:1 CAD)
+├── stl_generator.py             # 3D-Druck STL Mesh Generator (Wasserdichte Volumenkörper)
+├── preview_engine.py            # 300 DPI High-Resolution Visual Rendering Engine
 ├── polar_parser.py              # ORC SLK/CSV Parser & Catmull-Rom Spline Interpolator
 ├── tactical_advisor.py          # Taktischer Digital-Bordcomputer für die JPK 1080
 ├── route_optimizer.py           # Regattakurs- und Isochronen-Routenplaner
 ├── orc_extractor.py             # PDF/Text Extrahierung für ORC Speed Guides
+├── config_manager.py            # Geometrie- & Toleranzmanager
+├── config.json                  # Zentrale Parameter- & Toleranzdatei
 │
 ├── data/
 │   ├── 249116.slk               # Offizielle ORC VPP Polardaten JPK 1080 (TRUE GRIT)
@@ -309,16 +283,14 @@ Rechenscheibe/
 │   │   ├── zentralzeiger_lineal.stl
 │   │   ├── zentralzeiger_rueckseite.stl
 │   │   └── achspin_mittelbolzen.stl
-│   ├── svg/                     # Fertigungsgerechte Laser-Zuschnitt- & Gravurdateien (8 SVGs)
+│   ├── svg/                     # Fertigungsgerechte Laser-Zuschnitt- & Gravurdateien (6 SVGs)
 │   │   ├── laser_seite_a_rotor_vorderseite.svg
 │   │   ├── laser_seite_a_deckel_kompassrose.svg
 │   │   ├── laser_seite_b_rotor_rueckseite.svg
 │   │   ├── laser_seite_b_boden_d_skala.svg
 │   │   ├── laser_zentralzeiger.svg
-│   │   ├── laser_zentralzeiger_rueckseite.svg
-│   │   ├── laser_seite_a_montiert.svg
-│   │   └── laser_seite_b_montiert.svg
-│   └── previews/                # 300 DPI hochauflösende Visualisierungen (aus SVG gerendert)
+│   │   └── laser_zentralzeiger_rueckseite.svg
+│   └── previews/                # 300 DPI hochauflösende Visualisierungen
 │       ├── gesamtansicht_seite_a_montiert.png
 │       ├── gesamtansicht_seite_b_montiert.png
 │       └── rotor_vorderseite_weg_a.png
@@ -331,5 +303,6 @@ Rechenscheibe/
 ## 🏆 Projektdaten & Impressum
 * **Yacht:** JPK 1080 *TRUE GRIT* (GER 7447)
 * **ORC Zertifikat:** 2025 / 2026 (VPP Run 249116)
-* **Version:** 1.20 (Parametrisches Release V1.20)
+* **Version:** 1.1 (Release V1.1 implementiert)
 * **Lizenz:** Open Source für die Hochsee-Regatta-Community
+
