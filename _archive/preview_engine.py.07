@@ -186,11 +186,8 @@ def render_all_previews(
     dpi: int = 300
 ) -> List[Path]:
     """
-    Rendert alle hochauflösenden 300-DPI-Vorschauen direkt aus den SVGs (Single Source of Truth).
-    Erzeugt zudem versionierte V3-Dateien zur Umgehung von Web- und Camo-Caches auf GitHub.
+    Rendert alle 3 hochauflösenden 300-DPI-Vorschauen direkt aus den SVGs (Single Source of Truth).
     """
-    import shutil
-
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -203,14 +200,4 @@ def render_all_previews(
     f_rotor = out_dir / "rotor_vorderseite_weg_a.png"
     render_rotor_face(polar, f_rotor, dpi=dpi)
 
-    # Versionierte V3-Dateien (Cache-Busting für GitHub README)
-    f_seite_a_v3 = out_dir / "gesamtansicht_seite_a_montiert_v3.png"
-    shutil.copy2(f_seite_a, f_seite_a_v3)
-
-    f_seite_b_v3 = out_dir / "gesamtansicht_seite_b_montiert_v3.png"
-    shutil.copy2(f_seite_b, f_seite_b_v3)
-
-    f_rotor_v3 = out_dir / "rotor_vorderseite_v3.png"
-    shutil.copy2(f_rotor, f_rotor_v3)
-
-    return [f_seite_a, f_seite_b, f_rotor, f_seite_a_v3, f_seite_b_v3, f_rotor_v3]
+    return [f_seite_a, f_seite_b, f_rotor]

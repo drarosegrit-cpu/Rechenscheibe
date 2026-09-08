@@ -952,12 +952,13 @@ def generate_laser_seite_a_montiert(output_file: Path, polar: PolarData, twa_poi
         )
         parts.append(f'  <path d="{tab_path}" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
 
-    # 6x Zentrierbohrungen Ø 1.0 mm (r = 0.5 mm) für M3-Schrauben auf Teilkreis R = 88.0 mm
+    # M3-Schrauben
     for i in range(GEOM.screw_count):
         ang_deg = i * (360.0 / GEOM.screw_count)
         p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />')
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
+        parts.append(f'  <line x1="{p_screw.real - 1.2:.2f}" y1="{p_screw.imag:.2f}" x2="{p_screw.real + 1.2:.2f}" y2="{p_screw.imag:.2f}" stroke="#2C3E50" stroke-width="0.4" />')
+        parts.append(f'  <line x1="{p_screw.real:.2f}" y1="{p_screw.imag - 1.2:.2f}" x2="{p_screw.real:.2f}" y2="{p_screw.imag + 1.2:.2f}" stroke="#2C3E50" stroke-width="0.4" />')
 
     # 360° Kompassrose auf Stator
     t_in = GEOM.stator_compass_ticks_inner
@@ -1190,12 +1191,13 @@ def generate_laser_seite_b_montiert(output_file: Path, cursor_angle_deg: float =
         )
         parts.append(f'  <path d="{tab_path}" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
 
-    # 6x Zentrierbohrungen Ø 1.0 mm (r = 0.5 mm) für M3-Schrauben auf Teilkreis R = 88.0 mm
+    # M3-Schrauben
     for i in range(GEOM.screw_count):
         ang_deg = i * (360.0 / GEOM.screw_count)
         p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />')
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
+        parts.append(f'  <line x1="{p_screw.real - 1.2:.2f}" y1="{p_screw.imag:.2f}" x2="{p_screw.real + 1.2:.2f}" y2="{p_screw.imag:.2f}" stroke="#2C3E50" stroke-width="0.4" />')
+        parts.append(f'  <line x1="{p_screw.real:.2f}" y1="{p_screw.imag - 1.2:.2f}" x2="{p_screw.real:.2f}" y2="{p_screw.imag + 1.2:.2f}" stroke="#2C3E50" stroke-width="0.4" />')
 
     # D-Skala auf Stator
     r_d = GEOM.d_scale_radius

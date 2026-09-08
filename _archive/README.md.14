@@ -8,11 +8,6 @@ Dieses System verbindet die offiziellen **ORC-VPP-Polardaten** (ORC Internationa
 4. Einer modernen **Vektorgeometrie-Engine** auf Basis nativer komplexer Zahlen (`cmath`).
 5. Einem **digitalen Taktik-Bordcomputer** (`tactical_advisor.py`) mit Einzelsegelanalyse und Isochronen-Routenoptimierer (`route_optimizer.py`).
 
-<p align="center">
-  <img src="output/previews/gesamtansicht_seite_a_montiert_v3.png" width="48%" alt="Rechenscheibe Seite A - 1:1 ORC Polaren & Taktikring" />
-  <img src="output/previews/gesamtansicht_seite_b_montiert_v3.png" width="48%" alt="Rechenscheibe Seite B - Rechenschieber & Radiale S-Skala" />
-</p>
-
 ---
 
 ## 📑 Inhaltsverzeichnis
@@ -119,13 +114,13 @@ Die Rechenscheibe basiert auf einem robusten **Ø 180 mm Sandwich-Kassettensyste
 
 Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regattarechners** mit den hochpräzisen **1:1 ORC-Geschwindigkeitspolaren** der JPK 1080.
 
-![Montierte Gesamtansicht Seite A (V3.0)](output/previews/gesamtansicht_seite_a_montiert_v3.png)
+![Montierte Gesamtansicht Seite A](output/previews/gesamtansicht_seite_a_montiert.png)
 
 ### 1. Der äußere Stator-Kompassring (Ø 150 bis Ø 180 mm)
 * Vollständige **360°-Kompassrose** mit 1°-Feinteilung, 5°-Teilung und 10°-Beschriftung.
 * Die Gradzahlen (`000°` bis `350°`) stehen übersichtlich auf der **Außenseite** bei R = 82.5 mm.
 * Die Teilstriche liegen innen zwischen R = 75.8 mm und 79.2 mm, unmittelbar an der Ø 150 mm Sichtfensterkante.
-* Die 6 M3-Befestigungsschrauben bei R = 88.0 mm besitzen jeweils präzise **1.0 mm Zentrierbohrungen** für fehlerfreie Montage.
+* Die 6 M3-Befestigungsschrauben bei R = 88.0 mm bleiben mit 2.5 mm radialem Sicherheitsabstand vollkommen frei.
 
 ### 2. Der integrierte TackingMaster-Taktikring (Rotor-Rand Ø 132 bis Ø 150 mm)
 * **Symmetrische Gradskala (0° bis 180°):** Identische 1°/5°/10°-Skalierung auf Steuerbord und Backbord für taktisches Rechnen und Peilen.
@@ -141,9 +136,6 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
   Farbcodierte Zonen für Vorwind-Kurse von **145° bis 165°** (Target VMG Gybe Angle bei 155°).
 
 ### 3. 1:1 ORC-Geschwindigkeitspolaren (5.0 mm pro Knoten)
-
-![Detailansicht Rotor-Drehscheibe Seite A (1:1 ORC-Polaren & Taktikring)](output/previews/rotor_vorderseite_v3.png)
-
 * **Windpol im geometrischen Zentrum (0,0):**  
   Der Windvektor entspringt direkt im Drehpunkt der Scheibe.
 * **Konzentrische Geschwindigkeitsringe:** Feines 2-Knoten-Koordinatengitter bei 2, 4, 6, 8, 10 und 12 kn mit Beschriftung auf der 90°-Querachse.
@@ -164,7 +156,7 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
 
 Die Rückseite verwandelt die Rechenscheibe in einen hochpräzisen Navigationsrechner zur Lösung von Multiplikation, Division, Weg-Zeit-Geschwindigkeit und Winddreiecks-Trigonometrie.
 
-![Montierte Gesamtansicht Seite B (V3.0)](output/previews/gesamtansicht_seite_b_montiert_v3.png)
+![Montierte Gesamtansicht Seite B](output/previews/gesamtansicht_seite_b_montiert.png)
 
 ### 1. Die Skalenanordnung
 * **D-Skala (Stator / Fester Außenring):**  

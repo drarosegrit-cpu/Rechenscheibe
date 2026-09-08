@@ -44,24 +44,18 @@
   <path d="M 71.40 54.79 L 73.78 56.61 A 93.0 93.0 0 0 1 56.61 73.78 L 54.79 71.40 Z" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
   <path d="M -54.79 71.40 L -56.61 73.78 A 93.0 93.0 0 0 1 -73.78 56.61 L -71.40 54.79 Z" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
   <path d="M -71.40 -54.79 L -73.78 -56.61 A 93.0 93.0 0 0 1 -56.61 -73.78 L -54.79 -71.40 Z" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <circle cx="0.00" cy="-88.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="-1.20" y1="-88.00" x2="1.20" y2="-88.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="0.00" y1="-89.20" x2="0.00" y2="-86.80" stroke="#2C3E50" stroke-width="0.4" />
-  <circle cx="76.21" cy="-44.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="75.01" y1="-44.00" x2="77.41" y2="-44.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="76.21" y1="-45.20" x2="76.21" y2="-42.80" stroke="#2C3E50" stroke-width="0.4" />
-  <circle cx="76.21" cy="44.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="75.01" y1="44.00" x2="77.41" y2="44.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="76.21" y1="42.80" x2="76.21" y2="45.20" stroke="#2C3E50" stroke-width="0.4" />
-  <circle cx="0.00" cy="88.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="-1.20" y1="88.00" x2="1.20" y2="88.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="0.00" y1="86.80" x2="0.00" y2="89.20" stroke="#2C3E50" stroke-width="0.4" />
-  <circle cx="-76.21" cy="44.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="-77.41" y1="44.00" x2="-75.01" y2="44.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="-76.21" y1="42.80" x2="-76.21" y2="45.20" stroke="#2C3E50" stroke-width="0.4" />
-  <circle cx="-76.21" cy="-44.00" r="3.0" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />
-  <line x1="-77.41" y1="-44.00" x2="-75.01" y2="-44.00" stroke="#2C3E50" stroke-width="0.4" />
-  <line x1="-76.21" y1="-45.20" x2="-76.21" y2="-42.80" stroke="#2C3E50" stroke-width="0.4" />
+  <circle cx="0.00" cy="-88.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="0.00" cy="-88.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
+  <circle cx="76.21" cy="-44.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="76.21" cy="-44.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
+  <circle cx="76.21" cy="44.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="76.21" cy="44.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
+  <circle cx="0.00" cy="88.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="0.00" cy="88.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
+  <circle cx="-76.21" cy="44.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="-76.21" cy="44.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
+  <circle cx="-76.21" cy="-44.00" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />
+  <circle cx="-76.21" cy="-44.00" r="0.50" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />
   <line x1="0.00" y1="-75.80" x2="0.00" y2="-79.20" stroke="#2C3E50" stroke-width="0.35" />
   <text x="0.00" y="-82.50" class="compass-text" transform="rotate(0.0 0.00 -82.50)">000°</text>
   <line x1="1.36" y1="-77.99" x2="1.38" y2="-79.19" stroke="#2C3E50" stroke-width="0.35" />
