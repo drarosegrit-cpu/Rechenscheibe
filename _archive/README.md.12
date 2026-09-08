@@ -46,18 +46,6 @@ Dieses System verbindet die offiziellen **ORC-VPP-Polardaten** (ORC Internationa
 5. **Zentralzeiger mit 1:1 Knotenskala:**
    - Der transparente Acrylzeiger auf Seite A trägt nun Teilstriche von 0 bis 12 Knoten im 5.0 mm/kn-Raster samt 0.5 kn Zwischenstrichen.
 
-6. **1,0 mm Zentrierbohrungen für M3-Verschraubung (3D-Druck & Laser):**
-   - Im Gehäusedeckel und Gehäuseboden sind auf dem Teilkreis R = 88.0 mm (Ø 176.0 mm) jeweils 6x 1.0 mm Zentrierbohrungen integriert.
-   - Dienen als hochpräzise Pilotbohrungen für 3D-Druck (Bambu Lab) und Laserschneider zum Vorbohren und exakten Ausrichten der Schrauben.
-
-7. **Bambu Lab 3D-Drucker Optimierung (100% 2-Manifold Meshes):**
-   - Vollständig wasserdichte STL-Geometrien ohne Selbstüberschneidungen und mit 0 Non-Manifold-Kanten.
-   - Fehlerfreies Slicing in Bambu Studio / OrcaSlicer ohne Modellreparaturhinweise.
-
-8. **Zentralisierte Konfiguration (Labels & Speed Guide Pfad):**
-   - Sämtliche Titel, Untertitel und Skalenbezeichnungen werden aus `config.json` (`labels`) geladen – befreit von Entwicklungsrelikten.
-   - Der Dateipfad des ORC Speed Guides (`speedguide_file`) wird zentral über `config.json` verwaltet.
-
 ---
 
 ## 📐 Systemübersicht & Mechanische Architektur
@@ -203,22 +191,18 @@ Alle Fertigungsdateien wurden mit sub-millimetergenauen Toleranzen erzeugt.
 
 | Dateiname | Bauteil | Abmessungen | Empfohlenes Material |
 | :--- | :--- | :--- | :--- |
-| [`gehaeuse_deckel_180mm.stl`](output/stl/gehaeuse_deckel_180mm.stl) | Gehäuse-Deckel (Stator A) | Ø 180 x 2.2 mm, Fenster Ø 150 mm, 6x 1.0 mm Zentrierlöcher | PETG / ASA / PLA-CF |
-| [`gehaeuse_boden_180mm.stl`](output/stl/gehaeuse_boden_180mm.stl) | Gehäuse-Boden (Stator B) | Ø 180 x 4.0 mm, Nut Ø 173 x 2.4 mm, 6x 1.0 mm Zentrierlöcher | PETG / ASA / PLA-CF |
-| [`mittelscheibe_rotor_180mm.stl`](output/stl/mittelscheibe_rotor_180mm.stl) | Rotor-Drehscheibe | Ø 150 / Ø 172 / Ø 186 x 2.0 mm | PETG / Weiß matt |
-| [`zentralzeiger_lineal.stl`](output/stl/zentralzeiger_lineal.stl) | Peilzeiger Vorderseite | Länge 85 mm, Breite 7 mm, Dicke 1.4 mm | Transparentes PETG / Resin |
-| [`zentralzeiger_rueckseite.stl`](output/stl/zentralzeiger_rueckseite.stl) | Läufer / Zeiger Rückseite | Länge 86 mm, Breite 7 mm, Dicke 1.4 mm | Transparentes PETG / Resin |
-| [`achspin_mittelbolzen.stl`](output/stl/achspin_mittelbolzen.stl) | Zentraler Achsbolzen | Schaft Ø 3.0 x 8.8 mm, Kopf Ø 9.0 mm | PETG / Nylon / Messing |
+| [`gehaeuse_deckel_180mm.stl`](output/stl/gehaeuse_deckel_180mm.stl) | Gehäuse-Deckel (Stator A) | $\varnothing 180 \times 2.2\,\text{mm}$, Fenster $\varnothing 150\,\text{mm}$ | PETG / ASA / PLA-CF |
+| [`gehaeuse_boden_180mm.stl`](output/stl/gehaeuse_boden_180mm.stl) | Gehäuse-Boden (Stator B) | $\varnothing 180 \times 4.0\,\text{mm}$, Nut $\varnothing 173 \times 2.4\,\text{mm}$ | PETG / ASA / PLA-CF |
+| [`mittelscheibe_rotor_180mm.stl`](output/stl/mittelscheibe_rotor_180mm.stl) | Rotor-Drehscheibe | $\varnothing 150/\varnothing 172/\varnothing 186 \times 2.0\,\text{mm}$ | PETG / Weiß matt |
+| [`zentralzeiger_lineal.stl`](output/stl/zentralzeiger_lineal.stl) | Peilzeiger Vorderseite | Länge $85\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.4\,\text{mm}$ | Transparentes PETG / Resin |
+| [`zentralzeiger_rueckseite.stl`](output/stl/zentralzeiger_rueckseite.stl) | Läufer / Zeiger Rückseite | Länge $86\,\text{mm}$, Breite $7\,\text{mm}$, Dicke $1.4\,\text{mm}$ | Transparentes PETG / Resin |
+| [`achspin_mittelbolzen.stl`](output/stl/achspin_mittelbolzen.stl) | Zentraler Achsbolzen | Schaft $\varnothing 3.0 \times 8.8\,\text{mm}$, Kopf $\varnothing 9.0\,\text{mm}$ | PETG / Nylon / Messing |
 
-#### Druckparameter & Slicing-Empfehlung (Bambu Studio / OrcaSlicer)
-* **Wasserdichte 2-Manifold-Meshes:** Alle STLs sind mathematisch exakt bereinigt (0 Non-Manifold-Kanten) und werden in Bambu Studio fehlerfrei ohne Reparaturmeldung geladen.
-* **Düse:** 0.4 mm Standarddüse (optimal kompatibel zu den 1.0 mm Zentrierbohrungen).
-* **Wandlinien-Generator:** **Arachne** aktivieren (erzeugt variable Linienbreiten für perfekte Rundungen der 1.0 mm Bohrungen).
-* **Wandlinien (Perimeter):** Mindestens 4 bis 5 Linien (damit die Wandungen der 1.0 mm Zentrierlöcher vollständig massiv gedruckt werden).
-* **Schichthöhe:** 0.12 mm bis 0.16 mm (feine Z-Auflösung für präzise Skalenoberflächen und Führungsnut).
-* **Infill:** 100% (für absolut verzugsfreie Planlage und UV-/Witterungsstabilität auf See).
-* **Oberflächen-Glätten (Ironing):** Auf allen oberen Deckschichten (Top Surfaces) aktivieren für eine spiegelglatte Gleitfläche zwischen Stator und Rotor.
-* **Druckbett:** Textured PEI Plate oder Smooth PEI Plate; bei ASA/PETG ggf. leichten Brim (Rand) zur Vermeidung von Warping an den Außenkanten verwenden.
+#### Druckparameter-Empfehlung
+* **Schichthöhe:** $0.12\,\text{mm}$ bis $0.16\,\text{mm}$
+* **Wandlinien (Perimeters):** Mindestens 4 Linien
+* **Infill:** $100\%$ für verzugsfreie Planlage
+* **Oberflächen-Glätten (Ironing):** Auf allen Deckschichten aktivieren, um eine spiegelglatte Basis für die Skalengravur zu erhalten.
 
 ### 2. Laserschneiden & Vektorgravur (Dateien in `output/svg/`)
 
@@ -227,17 +211,17 @@ Die SVG-Dateien sind 1:1 im Millimeter-Maßstab für moderne CAM- und Lasersoftw
 | Dateiname | Funktion | Farben & Ebenen |
 | :--- | :--- | :--- |
 | [`laser_seite_a_rotor_vorderseite.svg`](output/svg/laser_seite_a_rotor_vorderseite.svg) | Front Rotor (Polaren & Taktik) | Rot = Schnitt, Schwarz/Farbig = Gravur |
-| [`laser_seite_a_deckel_kompassrose.svg`](output/svg/laser_seite_a_deckel_kompassrose.svg) | Stator Deckel (360° Rose) | Rot = Schnitt (Ring & 6x 1.0 mm Zentrierlöcher), Schwarz = Gravur |
+| [`laser_seite_a_deckel_kompassrose.svg`](output/svg/laser_seite_a_deckel_kompassrose.svg) | Stator Deckel ($360^\circ$ Rose) | Rot = Schnitt (Ring & 6x M3), Schwarz = Gravur |
 | [`laser_seite_b_rotor_rueckseite.svg`](output/svg/laser_seite_b_rotor_rueckseite.svg) | Back Rotor (C- & vergrößerte S-Skala) | Rot = Schnitt, Schwarz = Gravur |
-| [`laser_seite_b_boden_d_skala.svg`](output/svg/laser_seite_b_boden_d_skala.svg) | Stator Boden (D-Skala) | Rot = Schnitt (Ring & 6x 1.0 mm Zentrierlöcher), Schwarz = Gravur |
+| [`laser_seite_b_boden_d_skala.svg`](output/svg/laser_seite_b_boden_d_skala.svg) | Stator Boden (D-Skala) | Rot = Schnitt (Ring & 6x M3), Schwarz = Gravur |
 | [`laser_zentralzeiger.svg`](output/svg/laser_zentralzeiger.svg) | Acryl-Zeigerarm Vorderseite (Knoten) | Rot = Konturschnitt, Schwarz = 1:1 Knotenteilung |
 | [`laser_zentralzeiger_rueckseite.svg`](output/svg/laser_zentralzeiger_rueckseite.svg) | Acryl-Läufer Rückseite (Peillinie) | Rot = Konturschnitt, Schwarz/Rot = Haarlinie |
 | [`laser_seite_a_montiert.svg`](output/svg/laser_seite_a_montiert.svg) | Gesamt-Montage Vektoransicht Seite A | Zusammengesetzte Vektorgrafik aller Layer |
 | [`laser_seite_b_montiert.svg`](output/svg/laser_seite_b_montiert.svg) | Gesamt-Montage Vektoransicht Seite B | Zusammengesetzte Vektorgrafik aller Layer |
 
 #### Laser-Farbstandard (konfigurierbar in `config.json`)
-* **Rot (`#E74C3C`, Strichstärke 0.20 mm):** Vektorschnitt (Cut Lines).
-* **Dunkelgrau/Schwarz (`#2C3E50`, Strichstärke 0.35 mm):** Kompassrose und Hauptskalen.
+* **Rot (`#E74C3C`, Strichstärke $0.20\,\text{mm}$):** Vektorschnitt (Cut Lines).
+* **Dunkelgrau/Schwarz (`#2C3E50`, Strichstärke $0.35\,\text{mm}$):** Kompassrose und Hauptskalen.
 * **Buntfarben:** Taktische Zonen (Grün `#27AE60`, Rot `#C0392B`, Blau `#2980B9`, Violett `#8E44AD`).
 
 ---
@@ -278,21 +262,21 @@ python3 route_optimizer.py --gpx data/Kursdaten.gpx --twd 340 --tws 14
 ## 🏁 Taktisches Handbuch für den Regatta-Einsatz
 
 ### Phase 1: Vor dem Start (Startlinien-Bias)
-1. Fahre die Startlinie entlang oder peile die Linie mit dem Handpeilkompass (z. B. Kurs 075° von Pin zu Schiff).
-2. Drehe den Rotor so, dass der rote **TRUE WIND Pfeil** auf die vor dem Start gemessene mittlere Windrichtung (TWD, z. B. 345°) auf der Gehäuse-Kompassrose zeigt.
-3. Blicke auf die Markierungen **BOAT END** (+90°) und **PIN END** (-90°):
-   * Liegt die gepeilte Startlinie im Bereich **▲ BOAT FAV**, ist das Startschiff bevorteilt → Start am Schiff bringt einen Luv-Vorsprung.
-   * Liegt sie im Bereich **PIN FAV ▲**, ist die Starttonne bevorteilt → Start an der Tonne bringt sofortigen Raumgewinn.
-   * Die Skala (5°, 10°, 15°) quantifiziert den Längen-Vorteil direkt in Metern pro 100 m Linienlänge!
+1. Fahre die Startlinie entlang oder peile die Linie mit dem Handpeilkompass (z. B. Kurs $075^\circ$ von Pin zu Schiff).
+2. Drehe den Rotor so, dass der rote **TRUE WIND Pfeil** auf die vor dem Start gemessene mittlere Windrichtung ($TWD$, z. B. $345^\circ$) auf der Gehäuse-Kompassrose zeigt.
+3. Blicke auf die Markierungen **BOAT END** ($+90^\circ$) und **PIN END** ($-90^\circ$):
+   * Liegt die gepeilte Startlinie im Bereich **▲ BOAT FAV**, ist das Startschiff bevorteilt $\rightarrow$ Start am Schiff bringt einen Luv-Vorsprung.
+   * Liegt sie im Bereich **PIN FAV ▲**, ist die Starttonne bevorteilt $\rightarrow$ Start an der Tonne bringt sofortigen Raumgewinn.
+   * Die Skala ($5^\circ, 10^\circ, 15^\circ$) quantifiziert den Längen-Vorteil direkt in Metern pro 100 m Linienlänge!
 
 ### Phase 2: Am-Wind-Schlag (Upwind Beat & Shifts)
 1. Richte die Scheibe auf den gemittelten Grundwind aus.
-2. Der optimale Am-Wind-Winkel liegt in den grünen/roten **TACK Sectors (38° bis 42°)**.
+2. Der optimale Am-Wind-Winkel liegt in den grünen/roten **TACK Sectors ($38^\circ$ bis $42^\circ$)**.
 3. **Winddreher ausnutzen:**
-   * Dreht der Wind nach rechts → Auf Steuerbordbug zeigt die Skala **STBD LIFT** → Du kannst höher anluven!
-   * Dreht der Wind nach links → Auf Steuerbordbug zeigt die Skala **HEADER** → Wendesignal! Nach der Wende auf Backbordbug bist du im **PORT LIFT**.
+   * Dreht der Wind nach rechts $\rightarrow$ Auf Steuerbordbug zeigt die Skala **STBD LIFT** $\rightarrow$ Du kannst höher anluven!
+   * Dreht der Wind nach links $\rightarrow$ Auf Steuerbordbug zeigt die Skala **HEADER** $\rightarrow$ Wendesignal! Nach der Wende auf Backbordbug bist du im **PORT LIFT**.
 4. **Target Speed kontrollieren:**  
-   Lege den Zeiger auf 40°. Lies an der roten Raute der aktuellen Windstärke deine Soll-Geschwindigkeit ab. Erreichst du sie nicht, trimme die Segel oder kontrolliere den Rudergänger!
+   Lege den Zeiger auf $40^\circ$. Lies an der roten Raute der aktuellen Windstärke deine Soll-Geschwindigkeit ab. Erreichst du sie nicht, trimme die Segel oder kontrolliere den Rudergänger!
 
 ### Phase 3: Segelwechsel am Crossover
 * Am Wind und auf leichtem Raumkurs führt der Zeiger über die Polaren.
@@ -323,7 +307,6 @@ Rechenscheibe/
 │
 ├── data/
 │   ├── 249116.slk               # Offizielle ORC VPP Polardaten JPK 1080 (TRUE GRIT)
-│   ├── ORC_SpeedGuide_TRUE_GRIT_27.12.2025.html # Offizieller ORC Speed Guide
 │   └── Kursdaten.gpx            # Beispiel-Regattakurs (Rund Fyn / Ostsee)
 │
 ├── output/

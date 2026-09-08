@@ -2,7 +2,6 @@
 """
 config_manager.py - Zentraler parametrischer Geometrie- & Konfigurationsmanager
 Projekt: Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)
-Version: V3.0 (1:1 Knoten-Skalierung, symmetrische Gradskala, AWA/TWA-Hälften)
 
 Aufgabe:
 - Lädt die primären Konstruktionsparameter aus `config.json`.
@@ -25,16 +24,14 @@ class ResolvedGeometry:
     Alle abhängigen Werte werden aus den Basisparametern berechnet.
     """
     # 1. Primäre Radien & Fenstermaße (in mm)
-    rotor_radius: float                  # Radius der drehbaren Mittelscheibe / Sichtfenster (75.0 mm -> Ø 150 mm)
-    stator_rim_width: float              # Radiale Breite des Gehäuserands (15.0 mm)
+    rotor_radius: float                  # Radius der drehbaren Mittelscheibe / Sichtfenster (z.B. 75.0 mm -> Ø 150 mm)
+    stator_rim_width: float              # Radiale Breite des Gehäuserands (z.B. 15.0 mm)
     stator_outer_radius: float           # Gehäuse-Außenradius = rotor_radius + stator_rim_width (90.0 mm -> Ø 180 mm)
     stator_window_radius: float          # Sichtfenster-Ausschnitt = rotor_radius (75.0 mm)
 
     # 2. Befestigung & Freiräume (in mm)
     screw_nominal_d: float               # Schrauben-Nenndurchmesser (3.0 mm für M3)
     screw_head_d: float                  # Schraubenkopf-Durchmesser (6.0 mm für M3 Senkkopf)
-    screw_centering_hole_d: float        # Zentrierbohrungs-Durchmesser (1.0 mm)
-    screw_centering_hole_r: float        # Zentrierbohrungs-Radius (0.5 mm)
     screw_count: int                     # Anzahl Schrauben (6 Stück)
     screw_pcd_radius: float              # Teilkreis-Radius der Schrauben (88.0 mm -> PCD Ø 176 mm)
     screw_head_inner_limit: float        # Innenkante der Schraubenköpfe (85.0 mm)
@@ -46,11 +43,9 @@ class ResolvedGeometry:
     thumb_tabs_angles: List[float]       # Mittenwinkel der Tabs
     thumb_tabs_arc_deg: float            # Bogenbreite der Tabs (15.0°)
 
-    # 4. Polaren & Knotenskalierung (V3.0: 1:1 Knoten)
-    speed_scale_mm_per_knot: float       # Maßstab: mm pro Knoten Bootsgeschwindigkeit (5.0 mm/kn)
-    max_knot_speed: float                # Maximale Bootsgeschwindigkeit der Skala (13.0 kn)
-    polar_max_radius: float              # Maximaler Radius des Polardiagramms = max_knot_speed * speed_scale (65.0 mm)
-    knot_grid_rings: List[int]           # Konzentrische Knotenringe (z.B. [2, 4, 6, 8, 10, 12])
+    # 4. Polaren & Aerodynamik (Weg A, in mm)
+    polar_norm_ratio: float              # Verhältnis Basislänge L zu Rotorradius (0.85333 -> L = 64.0 mm)
+    polar_norm_length: float             # Basislänge OP1 vom Windpol zum Gegenpol P1 (64.0 mm)
 
     # 5. Skalenradien Vorder- und Rückseite (in mm)
     tactical_rim_width: float            # Breite des Taktikrings am Rotorrand (9.0 mm)
@@ -77,11 +72,6 @@ class ResolvedGeometry:
 
     pointer_length_front: float          # Länge des Vorderseiten-Zeigers (85.0 mm)
     pointer_length_back: float           # Länge des Rückseiten-Läufers (86.0 mm)
-
-    @property
-    def polar_norm_length(self) -> float:
-        """Rückwärtskompatibilität für STL und ältere Referenzen."""
-        return self.polar_max_radius
 
 
 class ConfigManager:
@@ -115,24 +105,17 @@ class ConfigManager:
 
         screw_nom_d = float(bg["screw_nominal_diameter_mm"])
         screw_head_d = float(bg["screw_head_diameter_mm"])
-        screw_cent_d = float(bg.get("screw_centering_hole_diameter_mm", 1.0))
-        screw_cent_r = screw_cent_d / 2.0
-        screw_pcd_r = r_stator - 2.0     # 88.0 mm
-        screw_head_in = screw_pcd_r - (screw_head_d / 2.0)  # 85.0 mm
+        screw_pcd_r = r_stator - 2.0
+        screw_head_in = screw_pcd_r - (screw_head_d / 2.0)
 
-        # Daumen-Bedienlaschen (Tabs)
         tabs_ext = float(bg["thumb_tabs_extension_mm"])
-        r_tabs = r_stator + tabs_ext     # 93.0 mm (Ø 186 mm)
+        r_tabs = r_stator + tabs_ext
 
-        # Polare & Knotenmaßstab
-        speed_scale = float(bg.get("speed_scale_mm_per_knot", 5.0))
-        max_speed = float(bg.get("max_knot_speed", 13.0))
-        r_polar_max = speed_scale * max_speed
-        grid_rings = [int(x) for x in bg.get("knot_grid_rings", [2, 4, 6, 8, 10, 12])]
+        norm_ratio = float(bg["polar_norm_ratio"])
+        l_polar = r_rotor * norm_ratio
 
-        # Taktikring
         w_tactical = float(bg["tactical_rim_width_mm"])
-        r_tactical_in = r_rotor - w_tactical  # 66.0 mm
+        r_tactical_in = r_rotor - w_tactical
 
         # Stator Kompassrose (Ticks nach innen, Ziffern nach außen)
         r_comp_in = r_rotor + 0.8       # 75.8 mm (knapp außerhalb des Sichtfensters 75.0 mm)
@@ -167,8 +150,6 @@ class ConfigManager:
             stator_window_radius=r_rotor,
             screw_nominal_d=screw_nom_d,
             screw_head_d=screw_head_d,
-            screw_centering_hole_d=screw_cent_d,
-            screw_centering_hole_r=screw_cent_r,
             screw_count=int(bg["screw_count"]),
             screw_pcd_radius=screw_pcd_r,
             screw_head_inner_limit=screw_head_in,
@@ -177,10 +158,8 @@ class ConfigManager:
             thumb_tabs_count=int(bg["thumb_tabs_count"]),
             thumb_tabs_angles=[float(a) for a in bg["thumb_tabs_angles_deg"]],
             thumb_tabs_arc_deg=float(bg["thumb_tabs_arc_deg"]),
-            speed_scale_mm_per_knot=speed_scale,
-            max_knot_speed=max_speed,
-            polar_max_radius=r_polar_max,
-            knot_grid_rings=grid_rings,
+            polar_norm_ratio=norm_ratio,
+            polar_norm_length=l_polar,
             tactical_rim_width=w_tactical,
             tactical_rim_inner_radius=r_tactical_in,
             stator_compass_ticks_inner=r_comp_in,
@@ -209,12 +188,12 @@ class ConfigManager:
 
     @property
     def tactical(self) -> Dict[str, Any]:
-        """Gibt die Taktikring-Parameter (Tack, Gybe, Shift, Bias) zurück."""
+        """Gibt die Taktikring-Parameter (Tack, Gybe, Shift, Bias, AWA) zurück."""
         return self.data.get("tactical_settings", {})
 
     @property
     def polars(self) -> Dict[str, Any]:
-        """Gibt die Polardiagramm-Parameter zurück."""
+        """Gibt die Polardiagramm-Parameter (Cutoff, Farben, Ratios) zurück."""
         return self.data.get("polar_settings", {})
 
     @property
@@ -223,19 +202,9 @@ class ConfigManager:
         return self.data.get("typography", {})
 
     @property
-    def labels(self) -> Dict[str, str]:
-        """Gibt alle zentralen Beschriftungen und Titel zurück."""
-        return self.data.get("labels", {})
-
-    @property
     def project(self) -> Dict[str, Any]:
         """Gibt Projektmetadaten zurück."""
         return self.data.get("project", {})
-
-    @property
-    def speedguide_file(self) -> Optional[str]:
-        """Gibt den Pfad zur offiziellen ORC Speed Guide HTML-Datei zurück."""
-        return self.data.get("project", {}).get("speedguide_file")
 
 
 # Globale Instanz zum bequemen Importieren

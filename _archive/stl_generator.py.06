@@ -123,142 +123,31 @@ def _gen_annulus_mesh(
     return triangles
 
 
-def _gen_annulus_with_holes_mesh(
-    r_in: float,
-    r_out: float,
-    z0: float,
-    z1: float,
-    pcd_r: float = GEOM.screw_pcd_radius,
-    r_hole: float = GEOM.screw_centering_hole_r,
-    n_screws: int = GEOM.screw_count
-) -> List[List[np.ndarray]]:
-    """
-    Erzeugt ein mathematisch exaktes, wasserdichtes 3D-Dreiecksnetz für einen Kreisring
-    mit n_screws Bohrungen auf dem Teilkreis pcd_r.
-    100% 2-mannigfaltig (0 offene Kanten), optimiert für Bambu Studio / 3D-Druck.
-    """
-    dr = min(1.2, (pcd_r - r_in) * 0.45, (r_out - pcd_r) * 0.6)
-    r1, r2 = pcd_r - dr, pcd_r + dr
-    y0 = 1.6
-    d_theta = y0 / pcd_r
-    sec_angle = 2 * np.pi / n_screws
-    
-    def pol(r, a, z):
-        return np.array([r * np.cos(a), r * np.sin(a), z], dtype=np.float32)
-        
-    tris = []
-    
-    def add_tri(p0, p1, p2):
-        tris.append([p0, p1, p2])
-        
-    for s in range(n_screws):
-        ac = s * sec_angle
-        a_left = ac - d_theta
-        a_right = ac + d_theta
-        a_start = ac - sec_angle / 2.0
-        a_end = ac + sec_angle / 2.0
-        
-        # 8 Punkte der Box in CCW-Reihenfolge
-        B_top = [
-            pol(r1, a_left, z1), pol(r1, ac, z1), pol(r1, a_right, z1),
-            pol(pcd_r, a_right, z1),
-            pol(r2, a_right, z1), pol(r2, ac, z1), pol(r2, a_left, z1),
-            pol(pcd_r, a_left, z1)
-        ]
-        B_bot = [
-            pol(r1, a_left, z0), pol(r1, ac, z0), pol(r1, a_right, z0),
-            pol(pcd_r, a_right, z0),
-            pol(r2, a_right, z0), pol(r2, ac, z0), pol(r2, a_left, z0),
-            pol(pcd_r, a_left, z0)
-        ]
-        
-        u_r = np.array([np.cos(ac), np.sin(ac), 0.0], dtype=np.float32)
-        u_t = np.array([-np.sin(ac), np.cos(ac), 0.0], dtype=np.float32)
-        C_top = np.array([pcd_r * np.cos(ac), pcd_r * np.sin(ac), z1], dtype=np.float32)
-        C_bot = np.array([pcd_r * np.cos(ac), pcd_r * np.sin(ac), z0], dtype=np.float32)
-        
-        # 8 Punkte auf dem Lochkreis in CCW-Reihenfolge
-        H_angles = [5*np.pi/4, 3*np.pi/2, 7*np.pi/4, 0.0, np.pi/4, np.pi/2, 3*np.pi/4, np.pi]
-        H_top = []
-        H_bot = []
-        for a_h in H_angles:
-            offset = r_hole * np.cos(a_h) * u_r + r_hole * np.sin(a_h) * u_t
-            H_top.append(C_top + offset)
-            H_bot.append(C_bot + offset)
-            
-        # 8 Quads zwischen Box B und Bohrung H
-        for i in range(8):
-            ni = (i + 1) % 8
-            # Top (+Z)
-            add_tri(B_top[i], B_top[ni], H_top[ni])
-            add_tri(B_top[i], H_top[ni], H_top[i])
-            # Bot (-Z)
-            add_tri(B_bot[i], H_bot[ni], B_bot[ni])
-            add_tri(B_bot[i], H_bot[i], H_bot[ni])
-            # Bohrungs-Innenwand (Zylinderwand nach innen)
-            add_tri(H_bot[i], H_top[i], H_top[ni])
-            add_tri(H_bot[i], H_top[ni], H_bot[ni])
-
-        # 1. Unterer Ring von r_in bis r1:
-        angles_in = [a_start, (a_start+a_left)/2, a_left, ac, a_right, (a_right+a_end)/2, a_end]
-        for a_idx in range(len(angles_in)-1):
-            aA, aB = angles_in[a_idx], angles_in[a_idx+1]
-            add_tri(pol(r_in, aA, z1), pol(r_in, aB, z1), pol(r1, aB, z1))
-            add_tri(pol(r_in, aA, z1), pol(r1, aB, z1), pol(r1, aA, z1))
-            add_tri(pol(r_in, aA, z0), pol(r1, aB, z0), pol(r_in, aB, z0))
-            add_tri(pol(r_in, aA, z0), pol(r1, aA, z0), pol(r1, aB, z0))
-            # Innere Zylinderwand (bei r_in nach innen gerichtet):
-            add_tri(pol(r_in, aA, z0), pol(r_in, aB, z1), pol(r_in, aB, z0))
-            add_tri(pol(r_in, aA, z0), pol(r_in, aA, z1), pol(r_in, aB, z1))
-            
-        # 2. Oberer Ring von r2 bis r_out:
-        for a_idx in range(len(angles_in)-1):
-            aA, aB = angles_in[a_idx], angles_in[a_idx+1]
-            add_tri(pol(r2, aA, z1), pol(r2, aB, z1), pol(r_out, aB, z1))
-            add_tri(pol(r2, aA, z1), pol(r_out, aB, z1), pol(r_out, aA, z1))
-            add_tri(pol(r2, aA, z0), pol(r_out, aB, z0), pol(r2, aB, z0))
-            add_tri(pol(r2, aA, z0), pol(r_out, aA, z0), pol(r_out, aB, z0))
-            # Äußere Zylinderwand (bei r_out nach außen gerichtet):
-            add_tri(pol(r_out, aA, z0), pol(r_out, aB, z0), pol(r_out, aB, z1))
-            add_tri(pol(r_out, aA, z0), pol(r_out, aB, z1), pol(r_out, aA, z1))
-            
-        # 3. Flanken zwischen r1 und r2 (MIT Teilung bei pcd_r):
-        ang_flank_l = [a_start, (a_start+a_left)/2, a_left]
-        for a_idx in range(len(ang_flank_l)-1):
-            aA, aB = ang_flank_l[a_idx], ang_flank_l[a_idx+1]
-            for rA, rB in [(r1, pcd_r), (pcd_r, r2)]:
-                add_tri(pol(rA, aA, z1), pol(rA, aB, z1), pol(rB, aB, z1))
-                add_tri(pol(rA, aA, z1), pol(rB, aB, z1), pol(rB, aA, z1))
-                add_tri(pol(rA, aA, z0), pol(rB, aB, z0), pol(rA, aB, z0))
-                add_tri(pol(rA, aA, z0), pol(rB, aA, z0), pol(rB, aB, z0))
-
-        ang_flank_r = [a_right, (a_right+a_end)/2, a_end]
-        for a_idx in range(len(ang_flank_r)-1):
-            aA, aB = ang_flank_r[a_idx], ang_flank_r[a_idx+1]
-            for rA, rB in [(r1, pcd_r), (pcd_r, r2)]:
-                add_tri(pol(rA, aA, z1), pol(rA, aB, z1), pol(rB, aB, z1))
-                add_tri(pol(rA, aA, z1), pol(rB, aB, z1), pol(rB, aA, z1))
-                add_tri(pol(rA, aA, z0), pol(rB, aB, z0), pol(rA, aB, z0))
-                add_tri(pol(rA, aA, z0), pol(rB, aA, z0), pol(rB, aB, z0))
-
-    return tris
-
-
 def generate_deckel_stl(
     filepath: Path,
     r_outer: float = GEOM.stator_outer_radius,      # 90.0 mm -> Ø 180 mm
     r_inner: float = GEOM.stator_window_radius,    # 75.0 mm -> Ø 150 mm Fenster
     thickness: float = GEOM.stator_cover_thickness,# 2.2 mm
     pcd_screw: float = GEOM.screw_pcd_radius,      # 88.0 mm
-    screw_r: float = GEOM.screw_centering_hole_r   # 0.5 mm (Ø 1.0 mm Zentrierbohrung)
+    screw_r: float = (GEOM.screw_nominal_d / 2.0) + 0.2, # M3 Spielbohrung 1.7 mm
+    segments: int = 180
 ):
     """
-    Erzeugt den oberen Statorring (Gehäusedeckel) mit 6x 1.0 mm Zentrierbohrungen
-    auf dem Teilkreis R=88.0 mm (100% wasserdicht für Bambu Studio).
+    Erzeugt den oberen Statorring (Gehäusedeckel).
+    Enthält das zentrale Sichtfenster sowie 6 gleichmäßig verteilte M3-Bohrungen auf dem PCD.
     """
-    triangles = _gen_annulus_with_holes_mesh(
-        r_inner, r_outer, 0.0, thickness, pcd_screw, screw_r, GEOM.screw_count
-    )
+    triangles = []
+    # Basis-Kreisring des Deckels
+    triangles.extend(_gen_annulus_mesh(r_inner, r_outer, 0.0, thickness, segments))
+    
+    # 6x M3-Schraubensenkungs-Bohrungen
+    for i in range(GEOM.screw_count):
+        ang = math.radians(i * (360.0 / GEOM.screw_count))
+        sx = pcd_screw * math.cos(ang)
+        sy = pcd_screw * math.sin(ang)
+        hole_tris = _gen_annulus_mesh(0.0, screw_r, 0.0, thickness, segments=24, center_xy=(sx, sy))
+        triangles.extend(hole_tris)
+
     mesh = np.array(triangles, dtype=np.float32)
     write_binary_stl(filepath, mesh)
 
@@ -270,27 +159,23 @@ def generate_boden_stl(
     r_groove: float = GEOM.screw_head_inner_limit, # 85.0 mm Nutkante (vor M3 Köpfen)
     base_thk: float = 2.0,                         # Bodenplatten-Dicke
     groove_depth: float = GEOM.rotor_thickness + GEOM.axial_clearance, # 2.4 mm Nut
-    pcd_screw: float = GEOM.screw_pcd_radius,      # 88.0 mm
-    screw_r: float = GEOM.screw_centering_hole_r   # 0.5 mm (Ø 1.0 mm Zentrierbohrung)
+    segments: int = 180
 ):
     """
-    Erzeugt den unteren Statorring (Gehäuseboden mit ringförmiger Führungsnut
-    und 6x 1.0 mm Zentrierbohrungen im äußeren Führungssteg).
+    Erzeugt den unteren Statorring (Gehäuseboden mit ringförmiger Führungsnut).
+    Die Führungsnut nimmt die umlaufende Feder der rotierenden Mittelscheibe auf.
     """
     triangles = []
-    total_thk = base_thk + groove_depth # 4.4 mm
+    total_thk = base_thk + groove_depth
 
     # 1. Bodenplatten-Ring (vom Fenster r_inner bis Nutaußenkante r_groove)
-    triangles.extend(_gen_annulus_mesh(r_inner, r_groove, 0.0, base_thk, segments=180))
+    triangles.extend(_gen_annulus_mesh(r_inner, r_groove, 0.0, base_thk, segments))
 
-    # 2. Äußerer Führungssteg / Randwand (von r_groove bis r_outer) MIT 6x 1.0 mm Zentrierbohrungen
-    triangles.extend(_gen_annulus_with_holes_mesh(
-        r_groove, r_outer, 0.0, total_thk, pcd_screw, screw_r, GEOM.screw_count
-    ))
+    # 2. Äußerer Führungssteg / Randwand (von r_groove bis r_outer)
+    triangles.extend(_gen_annulus_mesh(r_groove, r_outer, 0.0, total_thk, segments))
 
     mesh = np.array(triangles, dtype=np.float32)
     write_binary_stl(filepath, mesh)
-
 
 
 def generate_rotor_stl(

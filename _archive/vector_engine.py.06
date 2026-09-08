@@ -417,35 +417,28 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
     parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
     parts.append(f'  <circle cx="0" cy="0" r="{r_rotor:.2f}" class="laser-cut" />')
     parts.append(f'  <circle cx="0" cy="0" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut-inner" />')
+
     # Taktikring (V3.0 symmetrisch)
     parts.append('  <!-- TackingMaster Taktikring (Symmetrisch 0-180°) -->')
     parts.append(generate_tactical_rim())
 
-    # Titel & Beschriftung aus zentraler Konfiguration
-    labels = CONFIG.labels
-    f_title = labels.get("front_title", "ORC VPP PERFORMANCE-POLAREN")
-    f_sub = labels.get("front_subtitle", "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116")
-    awa_lbl = labels.get("awa_title", "◄ AWA / SPEED (kt)")
-    twa_lbl = labels.get("twa_title", "TWA / SPEED (kt) ►")
-    awa_sub = labels.get("awa_sub", "Scheinbarer Wind (Windex)")
-    twa_sub = labels.get("twa_sub", "Wahrer Wind (Instrumente)")
-
+    # Titel & Beschriftung
     parts.append('  <!-- Titel & Legende V3.0 (Variante 1 nach ORC Speed Guide) -->')
-    parts.append(f'  <text x="0" y="-50.0" class="title-text">{f_title}</text>')
-    parts.append(f'  <text x="0" y="-46.8" class="sub-text">{f_sub}</text>')
+    parts.append('  <text x="0" y="-53.0" class="title-text">ORC VPP PERFORMANCE-POLAREN (1:1 KNOTEN)</text>')
+    parts.append('  <text x="0" y="-49.5" class="sub-text">JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116</text>')
     # Segel-Legende nach ORC Speed Guide
     parts.append('  <g font-family="sans-serif" font-size="1.6px" font-weight="bold">')
-    parts.append('    <line x1="-42.0" y1="-43.8" x2="-35.0" y2="-43.8" stroke="#1B4F72" stroke-width="0.7" />')
-    parts.append('    <text x="-33.0" y="-43.8" fill="#1B4F72" dominant-baseline="central">Headsail</text>')
-    parts.append('    <line x1="-12.0" y1="-43.8" x2="-5.0" y2="-43.8" stroke="#C0392B" stroke-width="0.7" />')
-    parts.append('    <text x="-3.0" y="-43.8" fill="#C0392B" dominant-baseline="central">Asym (Gennaker)</text>')
-    parts.append('    <line x1="28.0" y1="-43.8" x2="35.0" y2="-43.8" stroke="#27AE60" stroke-width="0.7" />')
-    parts.append('    <text x="37.0" y="-43.8" fill="#27AE60" dominant-baseline="central">Sym (Spi)</text>')
+    parts.append('    <line x1="-42.0" y1="-46.2" x2="-35.0" y2="-46.2" stroke="#1B4F72" stroke-width="0.7" />')
+    parts.append('    <text x="-33.0" y="-46.2" fill="#1B4F72" dominant-baseline="central">Headsail</text>')
+    parts.append('    <line x1="-12.0" y1="-46.2" x2="-5.0" y2="-46.2" stroke="#C0392B" stroke-width="0.7" />')
+    parts.append('    <text x="-3.0" y="-46.2" fill="#C0392B" dominant-baseline="central">Asym (Gennaker)</text>')
+    parts.append('    <line x1="28.0" y1="-46.2" x2="35.0" y2="-46.2" stroke="#27AE60" stroke-width="0.7" />')
+    parts.append('    <text x="37.0" y="-46.2" fill="#27AE60" dominant-baseline="central">Sym (Spi)</text>')
     parts.append('  </g>')
-    parts.append(f'  <text x="-32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{awa_lbl}</text>')
-    parts.append(f'  <text x="32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{twa_lbl}</text>')
-    parts.append(f'  <text x="-32.0" y="-36.5" class="sub-text" font-size="1.5px">{awa_sub}</text>')
-    parts.append(f'  <text x="32.0" y="-36.5" class="sub-text" font-size="1.5px">{twa_sub}</text>')
+    parts.append('  <text x="-32.0" y="-41.5" class="awa-label" font-weight="bold" fill="#1B4F72">◄ AWA / SPEED (kt)</text>')
+    parts.append('  <text x="32.0" y="-41.5" class="awa-label" font-weight="bold" fill="#1B4F72">TWA / SPEED (kt) ►</text>')
+    parts.append('  <text x="-32.0" y="-38.2" class="sub-text" font-size="1.5px">Scheinbarer Wind (Windex)</text>')
+    parts.append('  <text x="32.0" y="-38.2" class="sub-text" font-size="1.5px">Wahrer Wind (Instrumente)</text>')
 
     # Konzentrische Knotenringe
     parts.append('  <!-- Konzentrische Bootsgeschwindigkeits-Ringe (Knoten) -->')
@@ -474,15 +467,16 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
         parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px">{k}</text>')
     parts.append(f'  <text x="{-r_max_polar/2.0:.2f}" y="-4.8" class="grid-text" font-size="2.0px" font-weight="bold">kt (AWA 90°)</text>')
 
-    # Zentrale Vertikal-Trennlinie (0° bis 180°)
+    # Zentrale Vertikal-Trennlinie
     parts.append('  <!-- Zentrale Vertikal-Trennlinie (0° bis 180°) -->')
     parts.append(f'  <line x1="0" y1="{-r_max_polar:.2f}" x2="0" y2="-4.0" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
     parts.append(f'  <line x1="0" y1="4.0" x2="0" y2="{r_max_polar:.2f}" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
     parts.append(f'  <text x="0" y="{r_max_polar - 2.5:.2f}" class="awa-label" font-size="1.9px" font-weight="bold" fill="#C0392B">DOWNWIND (180°)</text>')
 
-    # ORC-Polarkurven
-    parts.append('  <!-- ORC Performance-Polaren (Variante 1 getrennt nach Segeln) -->')
+    # ORC-Polarkurven (1:1 Knoten)
+    parts.append('  <!-- ORC-Polarkurven: Rechts TWA vs Speed | Links AWA vs Speed -->')
     spline_info_list = polar.get_spline_curves(scale_factor=speed_scale)
+
     crossover_pts_stbd = []
     crossover_pts_port = []
 
@@ -490,7 +484,7 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
         tws = s_info["tws"]
         tgt = s_info["targets"]
 
-        # 1. Steuerbord (Rechts): TWA vs. BSP getrennt nach Segeln
+        # 1. Steuerbord (TWA): Getrennte Segel-Kurven
         for seg_info in s_info.get("starboard_segments", []):
             seg_pts = seg_info["points"]
             seg_col = seg_info.get("color", "#1B4F72")
@@ -499,7 +493,7 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
                     d = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in seg])
                     parts.append(f'  <path d="{d}" class="polar-curve" stroke="{seg_col}" />')
 
-        # 2. Backbord (Links): AWA vs. BSP getrennt nach Segeln
+        # 2. Backbord (AWA): Getrennte Segel-Kurven
         for seg_info in s_info.get("port_segments", []):
             seg_pts = seg_info["points"]
             seg_col = seg_info.get("color", "#1B4F72")
@@ -516,9 +510,7 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
         parts.append(
             f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />'
         )
-        stagger_x = -2.1 if (idx % 2 == 0) else -4.2
-        stagger_y = 0.0 if (idx % 2 == 0) else -1.2
-        parts.append(f'  <text x="{bx + stagger_x:.2f}" y="{by + stagger_y:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
+        parts.append(f'  <text x="{bx - 2.1:.2f}" y="{by:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
 
         run_r = tgt["run_sog"] * speed_scale
         p_run_twa = polar_to_complex(run_r, tgt["gybe_angle"])
@@ -529,22 +521,15 @@ def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
         parts.append(f'  <text x="{rx + 2.1:.2f}" y="{ry:.2f}" class="polar-label" text-anchor="start" fill="#2C3E50">{int(tws)}</text>')
 
         # Backbord (AWA)
-        beat_awa = tgt.get("beat_awa")
-        if not beat_awa or beat_awa < 1.0:
-            from polar_parser import calc_wind_triangle_awa
-            beat_awa = calc_wind_triangle_awa(tws, tgt["beat_sog"], tgt["beat_angle"])
+        beat_awa = tgt.get("beat_awa", tgt["beat_angle"] * 0.6)
         p_beat_awa = polar_to_complex(beat_r, -beat_awa)
         bax, bay = p_beat_awa.real, p_beat_awa.imag
         parts.append(
             f'  <polygon points="{bax:.2f},{bay-1.1:.2f} {bax+1.1:.2f},{bay:.2f} {bax:.2f},{bay+1.1:.2f} {bax-1.1:.2f},{bay:.2f}" class="vmg-beat" />'
         )
-        stagger_ax = 2.1 if (idx % 2 == 0) else 4.2
-        parts.append(f'  <text x="{bax + stagger_ax:.2f}" y="{bay + stagger_y:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
+        parts.append(f'  <text x="{bax + 2.1:.2f}" y="{bay:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
 
-        run_awa = tgt.get("run_awa")
-        if not run_awa or run_awa < 1.0:
-            from polar_parser import calc_wind_triangle_awa
-            run_awa = calc_wind_triangle_awa(tws, tgt["run_sog"], tgt["gybe_angle"])
+        run_awa = tgt.get("run_awa", tgt["gybe_angle"] * 0.6)
         p_run_awa = polar_to_complex(run_r, -run_awa)
         rax, ray = p_run_awa.real, p_run_awa.imag
         parts.append(
@@ -614,11 +599,11 @@ def generate_laser_seite_a_deckel(output_file: Path):
     parts.append(f'  <circle cx="0" cy="0" r="{r_out:.2f}" class="laser-cut" />')
     parts.append(f'  <circle cx="0" cy="0" r="{r_win:.2f}" class="laser-cut-inner" />')
 
-    # 6 Zentrierbohrungen (Ø 1.0 mm) auf PCD Ø 176 mm
+    # 6 M3-Schraubenlöcher auf PCD Ø 176 mm
     for i in range(GEOM.screw_count):
         ang_deg = i * (360.0 / GEOM.screw_count)
         p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" class="laser-cut" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut" />')
 
     # 360° Kompassrose
     parts.append('  <!-- 360° Kompassrose auf Stator (Ticks innen, Ziffern außen) -->')
@@ -794,11 +779,11 @@ def generate_laser_seite_b_boden(output_file: Path):
     parts.append(f'  <circle cx="0" cy="0" r="{r_out:.2f}" class="laser-cut" />')
     parts.append(f'  <circle cx="0" cy="0" r="{r_win:.2f}" class="laser-cut" />')
 
-    # 6 Zentrierbohrungen (Ø 1.0 mm) auf PCD Ø 176 mm
+    # 6 M3-Schraubenlöcher
     for i in range(GEOM.screw_count):
         ang_deg = i * (360.0 / GEOM.screw_count)
         p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
-        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" class="laser-cut" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut" />')
 
     # D-Skala
     parts.append('  <!-- Logarithmische D-Skala auf Stator Boden -->')
@@ -984,31 +969,12 @@ def generate_laser_seite_a_montiert(output_file: Path, polar: PolarData, twa_poi
     # Taktikring
     parts.append(generate_tactical_rim())
 
-    # Titel & Legende aus zentraler Konfiguration
-    labels = CONFIG.labels
-    f_title = labels.get("front_title", "ORC VPP PERFORMANCE-POLAREN")
-    f_sub = labels.get("front_subtitle", "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116")
-    awa_lbl = labels.get("awa_title", "◄ AWA / SPEED (kt)")
-    twa_lbl = labels.get("twa_title", "TWA / SPEED (kt) ►")
-    awa_sub = labels.get("awa_sub", "Scheinbarer Wind (Windex)")
-    twa_sub = labels.get("twa_sub", "Wahrer Wind (Instrumente)")
-
-    parts.append('  <!-- Titel & Legende V3.0 (Variante 1 nach ORC Speed Guide) -->')
-    parts.append(f'  <text x="0" y="-50.0" class="title-text">{f_title}</text>')
-    parts.append(f'  <text x="0" y="-46.8" class="sub-text">{f_sub}</text>')
-    # Segel-Legende nach ORC Speed Guide
-    parts.append('  <g font-family="sans-serif" font-size="1.6px" font-weight="bold">')
-    parts.append('    <line x1="-42.0" y1="-43.8" x2="-35.0" y2="-43.8" stroke="#1B4F72" stroke-width="0.7" />')
-    parts.append('    <text x="-33.0" y="-43.8" fill="#1B4F72" dominant-baseline="central">Headsail</text>')
-    parts.append('    <line x1="-12.0" y1="-43.8" x2="-5.0" y2="-43.8" stroke="#C0392B" stroke-width="0.7" />')
-    parts.append('    <text x="-3.0" y="-43.8" fill="#C0392B" dominant-baseline="central">Asym (Gennaker)</text>')
-    parts.append('    <line x1="28.0" y1="-43.8" x2="35.0" y2="-43.8" stroke="#27AE60" stroke-width="0.7" />')
-    parts.append('    <text x="37.0" y="-43.8" fill="#27AE60" dominant-baseline="central">Sym (Spi)</text>')
-    parts.append('  </g>')
-    parts.append(f'  <text x="-32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{awa_lbl}</text>')
-    parts.append(f'  <text x="32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{twa_lbl}</text>')
-    parts.append(f'  <text x="-32.0" y="-36.5" class="sub-text" font-size="1.5px">{awa_sub}</text>')
-    parts.append(f'  <text x="32.0" y="-36.5" class="sub-text" font-size="1.5px">{twa_sub}</text>')
+    # Titel & Legende
+    parts.append('  <!-- Titel & Legende V3.0 -->')
+    parts.append('  <text x="0" y="-48.0" class="title-text">ORC VPP PERFORMANCE-POLAREN (1:1 KNOTEN)</text>')
+    parts.append('  <text x="0" y="-44.5" class="sub-text">JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116</text>')
+    parts.append('  <text x="-32.0" y="-40.5" class="awa-label" font-weight="bold" fill="#1B4F72">◄ AWA / SPEED (kt)</text>')
+    parts.append('  <text x="32.0" y="-40.5" class="awa-label" font-weight="bold" fill="#1B4F72">TWA / SPEED (kt) ►</text>')
 
     # Konzentrische Knotenringe
     for k in grid_rings:
@@ -1064,9 +1030,7 @@ def generate_laser_seite_a_montiert(output_file: Path, polar: PolarData, twa_poi
         p_beat_twa = polar_to_complex(beat_r, tgt["beat_angle"])
         bx, by = p_beat_twa.real, p_beat_twa.imag
         parts.append(f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />')
-        stagger_x = -2.1 if (idx % 2 == 0) else -4.2
-        stagger_y = 0.0 if (idx % 2 == 0) else -1.2
-        parts.append(f'  <text x="{bx + stagger_x:.2f}" y="{by + stagger_y:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
+        parts.append(f'  <text x="{bx - 2.1:.2f}" y="{by:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
 
         run_r = tgt["run_sog"] * speed_scale
         p_run_twa = polar_to_complex(run_r, tgt["gybe_angle"])
@@ -1074,15 +1038,11 @@ def generate_laser_seite_a_montiert(output_file: Path, polar: PolarData, twa_poi
         parts.append(f'  <polygon points="{rx:.2f},{ry-1.1:.2f} {rx+1.1:.2f},{ry:.2f} {rx:.2f},{ry+1.1:.2f} {rx-1.1:.2f},{ry:.2f}" class="vmg-run" />')
         parts.append(f'  <text x="{rx + 2.1:.2f}" y="{ry:.2f}" class="polar-label" text-anchor="start" fill="#2C3E50">{int(tws)}</text>')
 
-        beat_awa = tgt.get("beat_awa")
-        if not beat_awa or beat_awa < 1.0:
-            from polar_parser import calc_wind_triangle_awa
-            beat_awa = calc_wind_triangle_awa(tws, tgt["beat_sog"], tgt["beat_angle"])
+        beat_awa = tgt.get("beat_awa", tgt["beat_angle"] * 0.6)
         p_beat_awa = polar_to_complex(beat_r, -beat_awa)
         bax, bay = p_beat_awa.real, p_beat_awa.imag
         parts.append(f'  <polygon points="{bax:.2f},{bay-1.1:.2f} {bax+1.1:.2f},{bay:.2f} {bax:.2f},{bay+1.1:.2f} {bax-1.1:.2f},{bay:.2f}" class="vmg-beat" />')
-        stagger_ax = 2.1 if (idx % 2 == 0) else 4.2
-        parts.append(f'  <text x="{bax + stagger_ax:.2f}" y="{bay + stagger_y:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
+        parts.append(f'  <text x="{bax + 2.1:.2f}" y="{bay:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
 
         run_awa = tgt.get("run_awa", tgt["gybe_angle"] * 0.6)
         p_run_awa = polar_to_complex(run_r, -run_awa)
@@ -1305,22 +1265,14 @@ def generate_laser_seite_b_montiert(output_file: Path, cursor_angle_deg: float =
             rot = calc_readable_rotation(deg)
             parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.0px" fill="#2980B9" transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{int_val}°</text>')
 
-    # Titel & Formeln im Zentrum aus zentraler Konfiguration
-    labels = CONFIG.labels
-    b_title = labels.get("back_title", "RECHENSCHIEBER &amp; S-SKALA").replace("&", "&amp;") if "&amp;" not in labels.get("back_title", "") else labels.get("back_title", "")
-    b_sub = labels.get("back_subtitle", "JPK 1080 TRUE GRIT · GER 7447")
-    b_funcs = labels.get("back_functions", "Multiplikation · Division · Distanz/Zeit · Sinussatz")
-    b_gap = labels.get("back_c_d_gap", "Trennfuge C/D: R = 75.0 mm (Ø 150 mm)")
-    b_formula = labels.get("back_sinus_formula", "Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)")
-    b_sinus_lbl = labels.get("back_sinus_label", "S (SINUS-SKALA FÜR WINDDREIECK)")
-
+    # Titel & Formeln im Zentrum
     parts.append('  <!-- Titel & Nautische Formeln -->')
-    parts.append(f'  <text x="0" y="-45.0" class="awa-label" font-size="2.4px" font-weight="bold">{b_sinus_lbl}</text>')
-    parts.append(f'  <text x="0" y="-18.0" class="title-text" font-size="3.2px">{b_title}</text>')
-    parts.append(f'  <text x="0" y="-14.0" class="sub-text" font-size="2.2px">{b_sub}</text>')
-    parts.append(f'  <text x="0" y="-10.5" class="sub-text" font-size="2.0px" fill="#2980B9">{b_funcs}</text>')
-    parts.append(f'  <text x="0" y="12.0" class="sub-text" font-size="2.0px">{b_gap}</text>')
-    parts.append(f'  <text x="0" y="16.0" font-family="sans-serif" font-style="italic" font-size="2.0px" fill="#2C3E50" text-anchor="middle">{b_formula}</text>')
+    parts.append('  <text x="0" y="-45.0" class="awa-label" font-size="2.4px" font-weight="bold">S (SINUS-SKALA FÜR WINDDREIECK)</text>')
+    parts.append('  <text x="0" y="-18.0" class="title-text" font-size="3.2px">RÜCKSEITE: RECHENSCHIEBER &amp; S-SKALA</text>')
+    parts.append('  <text x="0" y="-14.0" class="sub-text" font-size="2.2px">JPK 1080 TRUE GRIT · GER 7447</text>')
+    parts.append('  <text x="0" y="-10.5" class="sub-text" font-size="2.0px" fill="#2980B9">Multiplikation · Division · Distanz/Zeit · Sinussatz</text>')
+    parts.append('  <text x="0" y="12.0" class="sub-text" font-size="2.0px">Trennfuge C/D: R = 75.0 mm (Ø 150 mm)</text>')
+    parts.append('  <text x="0" y="16.0" font-family="sans-serif" font-style="italic" font-size="2.0px" fill="#2C3E50" text-anchor="middle">Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)</text>')
 
     # 3. Zentraler Dreh-Läufer (Acryl mit Haarlinie)
     parts.append('  <!-- 3. Zentraler Dreh-Läufer Rückseite -->')

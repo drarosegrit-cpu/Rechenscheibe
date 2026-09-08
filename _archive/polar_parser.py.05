@@ -13,21 +13,6 @@ import cmath
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
 
-try:
-    from config_manager import CONFIG
-except ImportError:
-    CONFIG = None
-
-
-def calc_wind_triangle_awa(tws_kn: float, bsp_kn: float, twa_deg: float) -> float:
-    """Calculates Apparent Wind Angle (AWA) in degrees from TWS, BSP and TWA."""
-    twa_rad = math.radians(twa_deg)
-    aws = math.sqrt(tws_kn**2 + bsp_kn**2 + 2.0 * tws_kn * bsp_kn * math.cos(twa_rad))
-    if aws < 1e-4:
-        return twa_deg
-    sin_awa = max(-1.0, min(1.0, (tws_kn * math.sin(twa_rad)) / aws))
-    return math.degrees(math.asin(sin_awa))
-
 
 def catmull_rom_spline(points: List[complex], num_points: int = 12) -> List[complex]:
     """Smooth spline interpolation through a series of complex points."""
@@ -94,18 +79,10 @@ class PolarData:
         else:
             self._load_csv()
 
-        # Laden des offiziellen ORC Speed Guide HTML-Dokuments aus der Konfiguration
-        sg_path = None
-        if CONFIG and getattr(CONFIG, "speedguide_file", None):
-            p = Path(CONFIG.speedguide_file)
-            if p.exists():
-                sg_path = p
-        if not sg_path:
-            html_files = list(self.data_path.parent.glob("*SpeedGuide*.html"))
-            if html_files:
-                sg_path = html_files[0]
-        if sg_path:
-            self._load_speedguide_html(sg_path)
+        # Automatische Erkennung und Laden des offiziellen ORC Speed Guide HTML-Dokuments
+        html_files = list(self.data_path.parent.glob("*SpeedGuide*.html"))
+        if html_files:
+            self._load_speedguide_html(html_files[0])
 
     def _load_speedguide_html(self, html_path: Path):
         """
@@ -378,11 +355,7 @@ class PolarData:
             pts.sort(key=lambda p: p["twa"])
             self.curves_raw.append(pts)
 
-            beat_awa = calc_wind_triangle_awa(tws, beat_sog, beat_angle)
-            run_awa = calc_wind_triangle_awa(tws, run_sog, gybe_angle)
-
             for p in pts:
-                p["awa"] = calc_wind_triangle_awa(tws, p["bsp"], p["twa"])
                 ratio = p["bsp"] / tws
                 if ratio > max_ratio:
                     max_ratio = ratio
@@ -393,12 +366,12 @@ class PolarData:
                 "beat_sog": beat_sog,
                 "beat_vmg": beat_vmg,
                 "beat_heel": 0.0,
-                "beat_awa": beat_awa,
+                "beat_awa": 0.0,
                 "run_twa": gybe_angle,
                 "run_sog": run_sog,
                 "run_vmg": run_vmg,
                 "run_heel": 0.0,
-                "run_awa": run_awa,
+                "run_awa": 0.0,
             })
 
         self.max_ratio = max(max_ratio, 1.2)

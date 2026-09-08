@@ -13,21 +13,6 @@ import cmath
 from pathlib import Path
 from typing import Dict, List, Tuple, Any, Optional
 
-try:
-    from config_manager import CONFIG
-except ImportError:
-    CONFIG = None
-
-
-def calc_wind_triangle_awa(tws_kn: float, bsp_kn: float, twa_deg: float) -> float:
-    """Calculates Apparent Wind Angle (AWA) in degrees from TWS, BSP and TWA."""
-    twa_rad = math.radians(twa_deg)
-    aws = math.sqrt(tws_kn**2 + bsp_kn**2 + 2.0 * tws_kn * bsp_kn * math.cos(twa_rad))
-    if aws < 1e-4:
-        return twa_deg
-    sin_awa = max(-1.0, min(1.0, (tws_kn * math.sin(twa_rad)) / aws))
-    return math.degrees(math.asin(sin_awa))
-
 
 def catmull_rom_spline(points: List[complex], num_points: int = 12) -> List[complex]:
     """Smooth spline interpolation through a series of complex points."""
@@ -50,18 +35,6 @@ def catmull_rom_spline(points: List[complex], num_points: int = 12) -> List[comp
     return curve
 
 
-def nautical_to_svg_complex(r: float, deg_nautical: float) -> complex:
-    """
-    Konvertiert nautische Polarkoordinaten in SVG-Koordinaten als komplexe Zahl:
-    - 0° ist Nord (12 Uhr, -Y in SVG)
-    - 90° ist Ost (3 Uhr, +X in SVG)
-    - 180° ist Süd (6 Uhr, +Y in SVG)
-    - 270° / -90° ist West (9 Uhr, -X in SVG)
-    """
-    rad = math.radians(deg_nautical)
-    return complex(r * math.sin(rad), -r * math.cos(rad))
-
-
 class PolarData:
     def __init__(self, data_path: Path):
         self.data_path = Path(data_path)
@@ -78,7 +51,6 @@ class PolarData:
         self.is_json: bool = False
         self.is_slk: bool = False
         self.sail_polars: Dict[str, Dict[float, List[Dict[str, float]]]] = {}
-        self.html_segments: Dict[float, Dict[int, List[Dict[str, Any]]]] = {}
 
         self._load()
 
@@ -93,73 +65,6 @@ class PolarData:
             self._load_slk()
         else:
             self._load_csv()
-
-        # Laden des offiziellen ORC Speed Guide HTML-Dokuments aus der Konfiguration
-        sg_path = None
-        if CONFIG and getattr(CONFIG, "speedguide_file", None):
-            p = Path(CONFIG.speedguide_file)
-            if p.exists():
-                sg_path = p
-        if not sg_path:
-            html_files = list(self.data_path.parent.glob("*SpeedGuide*.html"))
-            if html_files:
-                sg_path = html_files[0]
-        if sg_path:
-            self._load_speedguide_html(sg_path)
-
-    def _load_speedguide_html(self, html_path: Path):
-        """
-        Liest Seite 1 des offiziellen ORC Speed Guides aus, um die exakt berechneten,
-        getrimmten Segelkurven (Jib, AsymCL, Sym, AsymPole) mit realen Schnittpunkten zu laden.
-        """
-        try:
-            import re
-            with open(html_path, "r", encoding="utf-8", errors="replace") as f:
-                content = f.read()
-            p2_idx = content.find('id="page2"')
-            p1_content = content[:p2_idx] if p2_idx != -1 else content
-
-            pattern = re.compile(
-                r'<g class="(Jib|Sym|AsymPole|AsymCL)" tag="0" windspeed="(\d+)" trimmed="1" bawa="(\d)">(.*?)</g>',
-                re.DOTALL
-            )
-            matches = pattern.findall(p1_content)
-            by_ws: Dict[float, Dict[int, List[Dict[str, Any]]]] = {}
-
-            # Segel-Farbstandard des offiziellen ORC Speed Guides
-            sail_colors = {
-                "Jib": "#1B4F72",      # Headsail / Jib: Dunkelblau / Navy
-                "AsymCL": "#C0392B",   # Asymmetric on Centerline: Karminrot / Rot
-                "Sym": "#27AE60",      # Symmetric: Grün
-                "AsymPole": "#16A085", # Asymmetric on Pole: Türkis / Cyan
-            }
-
-            for sail, ws_str, bawa_str, body in matches:
-                ws = float(ws_str)
-                bawa = int(bawa_str) # 0 = Steuerbord (TWA), 1 = Backbord (AWA)
-                if ws not in by_ws:
-                    by_ws[ws] = {0: [], 1: []}
-                paths = re.findall(r'M (\d+),(\d+) L (\d+),(\d+)', body)
-                if not paths:
-                    continue
-                cx = 1077 if bawa == 0 else 1023
-                cy = 675
-                # Normalisierte Knoten-Koordinaten (im HTML: 75.0 Einheiten pro Knoten)
-                pts_knots = []
-                pts_knots.append(complex((int(paths[0][0]) - cx) / 75.0, (int(paths[0][1]) - cy) / 75.0))
-                for p in paths:
-                    pts_knots.append(complex((int(p[2]) - cx) / 75.0, (int(p[3]) - cy) / 75.0))
-
-                by_ws[ws][bawa].append({
-                    "sail": sail,
-                    "color": sail_colors.get(sail, "#2C3E50"),
-                    "pts_knots": pts_knots
-                })
-
-            self.html_segments = by_ws
-        except Exception as e:
-            print(f"[HINWEIS] SpeedGuide HTML Parsing übersprungen: {e}")
-            self.html_segments = {}
 
     def _load_slk(self):
         """Loads official ORC SYLK (.slk) VPP tables (e.g. 249116.slk)."""
@@ -378,11 +283,7 @@ class PolarData:
             pts.sort(key=lambda p: p["twa"])
             self.curves_raw.append(pts)
 
-            beat_awa = calc_wind_triangle_awa(tws, beat_sog, beat_angle)
-            run_awa = calc_wind_triangle_awa(tws, run_sog, gybe_angle)
-
             for p in pts:
-                p["awa"] = calc_wind_triangle_awa(tws, p["bsp"], p["twa"])
                 ratio = p["bsp"] / tws
                 if ratio > max_ratio:
                     max_ratio = ratio
@@ -393,98 +294,45 @@ class PolarData:
                 "beat_sog": beat_sog,
                 "beat_vmg": beat_vmg,
                 "beat_heel": 0.0,
-                "beat_awa": beat_awa,
+                "beat_awa": 0.0,
                 "run_twa": gybe_angle,
                 "run_sog": run_sog,
                 "run_vmg": run_vmg,
                 "run_heel": 0.0,
-                "run_awa": run_awa,
+                "run_awa": 0.0,
             })
 
         self.max_ratio = max(max_ratio, 1.2)
 
     def get_spline_curves(self, scale_factor: float) -> List[Dict[str, Any]]:
         """
-        Returns trimmed sail curves scaled for the Rechenscheibe V3.0 (Variante 1):
-        - Separate, echte Segel-Segmente (Jib=Blau, AsymCL=Rot, Sym=Grün, AsymPole=Cyan)
-        - Echte Schnittpunkte / Kanten an den Crossover-Punkten (ohne künstliche C1-Glättung über den Sprung)
-        - Starboard (rechts): TWA vs BSP
-        - Port (links): AWA vs BSP
+        Returns Catmull-Rom smoothed spline curves scaled for the Rechenscheibe V3.0:
+        1:1 Bootsgeschwindigkeit in Knoten: radius = bsp * scale_factor
+        - Starboard (rechts): TWA vs BSP (Winkel 90° - TWA)
+        - Port (links): AWA vs BSP (Winkel 90° + AWA)
         """
         results = []
         for col_idx, tws in enumerate(self.tws_list):
-            stbd_segments = []
-            port_segments = []
+            raw_pts = self.curves_raw[col_idx]
 
-            # 1. Wenn exakte ORC Speed Guide Segmente geladen wurden (aus offizieller HTML-Vorlage):
-            if hasattr(self, "html_segments") and tws in self.html_segments:
-                for seg in self.html_segments[tws].get(0, []):
-                    pts = [p * scale_factor for p in seg["pts_knots"]]
-                    stbd_segments.append({
-                        "sail": seg["sail"],
-                        "color": seg["color"],
-                        "points": pts
-                    })
-                for seg in self.html_segments[tws].get(1, []):
-                    pts = [p * scale_factor for p in seg["pts_knots"]]
-                    port_segments.append({
-                        "sail": seg["sail"],
-                        "color": seg["color"],
-                        "points": pts
-                    })
+            # 1. Steuerbord (Rechts): TWA vs BSP
+            complex_twa = []
+            for p in raw_pts:
+                r = p["bsp"] * scale_factor
+                complex_twa.append(cmath.rect(r, math.radians(90.0 - p["twa"])))
+            smooth_twa = catmull_rom_spline(complex_twa, num_points=12)
 
-            # 2. Fallback falls kein HTML vorhanden (Segmentierung aus sail_polars / BestPerf)
-            if not stbd_segments:
-                raw_pts = self.curves_raw[col_idx]
-                sail_colors = {
-                    "jib": "#1B4F72",
-                    "spin_asym_cl": "#C0392B",
-                    "spin_sym": "#27AE60",
-                    "spin_asym_pole": "#16A085"
-                }
-                cur_sail = None
-                cur_pts = []
-                segments = []
-                for p in raw_pts:
-                    s = p.get("sail", "jib")
-                    if s != cur_sail:
-                        if cur_pts:
-                            segments.append((cur_sail, cur_pts))
-                        cur_sail = s
-                        cur_pts = [p]
-                    else:
-                        cur_pts.append(p)
-                if cur_pts:
-                    segments.append((cur_sail, cur_pts))
-
-                for s_id, s_pts in segments:
-                    c_twa = [nautical_to_svg_complex(p["bsp"] * scale_factor, p["twa"]) for p in s_pts]
-                    sm_twa = catmull_rom_spline(c_twa, num_points=8) if len(c_twa) >= 4 else c_twa
-                    stbd_segments.append({
-                        "sail": s_id,
-                        "color": sail_colors.get(s_id, "#2C3E50"),
-                        "points": sm_twa
-                    })
-                    c_awa = [nautical_to_svg_complex(p["bsp"] * scale_factor, -p.get("awa", p["twa"])) for p in s_pts]
-                    sm_awa = catmull_rom_spline(c_awa, num_points=8) if len(c_awa) >= 4 else c_awa
-                    port_segments.append({
-                        "sail": s_id,
-                        "color": sail_colors.get(s_id, "#2C3E50"),
-                        "points": sm_awa
-                    })
-
-            # Vollständige Linien für Fallback / Abwärtskompatibilität
-            smooth_twa = []
-            for seg in stbd_segments:
-                smooth_twa.extend(seg["points"])
-            smooth_awa = []
-            for seg in port_segments:
-                smooth_awa.extend(seg["points"])
+            # 2. Backbord (Links): AWA vs BSP
+            raw_awa_sorted = sorted(raw_pts, key=lambda p: p.get("awa", p["twa"]))
+            complex_awa = []
+            for p in raw_awa_sorted:
+                r = p["bsp"] * scale_factor
+                awa_val = p.get("awa", p["twa"])
+                complex_awa.append(cmath.rect(r, math.radians(90.0 + awa_val)))
+            smooth_awa = catmull_rom_spline(complex_awa, num_points=12)
 
             results.append({
                 "tws": tws,
-                "starboard_segments": stbd_segments,
-                "port_segments": port_segments,
                 "starboard": smooth_twa,
                 "port": smooth_awa,
                 "targets": self.vmg_targets[col_idx]
@@ -506,12 +354,12 @@ class PolarData:
             raw_pts = sorted(sail_data[tws], key=lambda p: p["twa"])
 
             # Starboard: TWA
-            complex_twa = [nautical_to_svg_complex(p["bsp"] * scale_factor, p["twa"]) for p in raw_pts]
+            complex_twa = [cmath.rect(p["bsp"] * scale_factor, math.radians(90.0 - p["twa"])) for p in raw_pts]
             smooth_twa = catmull_rom_spline(complex_twa, num_points=10)
 
             # Port: AWA
             raw_awa_sorted = sorted(raw_pts, key=lambda p: p.get("awa", p["twa"]))
-            complex_awa = [nautical_to_svg_complex(p["bsp"] * scale_factor, -p.get("awa", p["twa"])) for p in raw_awa_sorted]
+            complex_awa = [cmath.rect(p["bsp"] * scale_factor, math.radians(90.0 + p.get("awa", p["twa"]))) for p in raw_awa_sorted]
             smooth_awa = catmull_rom_spline(complex_awa, num_points=10)
 
             results.append({

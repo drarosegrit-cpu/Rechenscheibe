@@ -1,9 +1,8 @@
 {
   "project": {
     "title": "Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)",
-    "version": "3.0",
+    "version": "1.20",
     "polar_file": "data/249116.slk",
-    "speedguide_file": "data/ORC_SpeedGuide_TRUE_GRIT_27.12.2025.html",
     "output_dirs": {
       "stl": "output/stl",
       "svg": "output/svg",
@@ -22,12 +21,9 @@
     "axle_pin_nominal_radius_mm": 1.5,
     "axle_hole_radius_mm": 1.6,
     "screw_nominal_diameter_mm": 3.0,
-    "screw_centering_hole_diameter_mm": 1.0,
     "screw_head_diameter_mm": 6.0,
     "screw_count": 6,
-    "speed_scale_mm_per_knot": 5.0,
-    "max_knot_speed": 13.0,
-    "knot_grid_rings": [2, 4, 6, 8, 10, 12],
+    "polar_norm_ratio": 0.8533333333333334,
     "tactical_rim_width_mm": 9.0,
     "thumb_tabs_extension_mm": 3.0,
     "thumb_tabs_count": 4,
@@ -39,9 +35,8 @@
     "stator_window_radius_mm": "rotor_radius_mm",
     "screw_pcd_radius_mm": "stator_outer_radius_mm - 2.0",
     "screw_head_inner_limit_mm": "screw_pcd_radius_mm - (screw_head_diameter_mm / 2.0)",
-    "screw_centering_hole_radius_mm": "screw_centering_hole_diameter_mm / 2.0",
     "thumb_tabs_outer_radius_mm": "stator_outer_radius_mm + thumb_tabs_extension_mm",
-    "polar_max_radius_mm": "max_knot_speed * speed_scale_mm_per_knot",
+    "polar_norm_length_mm": "rotor_radius_mm * polar_norm_ratio",
     "s_scale_radius_mm": "rotor_radius_mm - 10.0",
     "c_scale_radius_mm": "rotor_radius_mm - 0.5",
     "d_scale_radius_mm": "rotor_radius_mm + 0.5",
@@ -87,7 +82,7 @@
       "stroke_width": 0.5,
       "dasharray": "2.0,1.5",
       "mode": "engrave",
-      "description": "Konzentrische Bootsgeschwindigkeits-Knotenkreise (gerade Knoten)"
+      "description": "Konzentrische BoatSPD-Hauptkreise (gerade Zehntel)"
     },
     "engrave_grid_minor": {
       "name": "ENGRAVE_GRID_MINOR",
@@ -95,13 +90,21 @@
       "stroke_width": 0.3,
       "dasharray": "1.0,1.2",
       "mode": "engrave",
-      "description": "Konzentrische Bootsgeschwindigkeits-Knotenkreise (ungerade Knoten)"
+      "description": "Konzentrische BoatSPD-Nebenkreise (ungerade Zehntel)"
+    },
+    "engrave_awa": {
+      "name": "ENGRAVE_AWA",
+      "color": "#2980B9",
+      "stroke_width": 0.4,
+      "dasharray": "2.5,1.2",
+      "mode": "engrave",
+      "description": "AWA-Fasskreisbögen"
     },
     "engrave_polars": {
       "name": "ENGRAVE_POLARS",
       "stroke_width": 0.7,
       "mode": "engrave",
-      "description": "ORC-Geschwindigkeitspolaren JPK 1080 (1:1 Knoten)"
+      "description": "ORC-Geschwindigkeitspolaren JPK 1080"
     },
     "engrave_slide_rule": {
       "name": "ENGRAVE_SLIDE_RULE",
@@ -122,7 +125,7 @@
       "color": "#E74C3C",
       "stroke_width": 0.8,
       "mode": "engrave",
-      "description": "Zentralzeiger Peilkante & Knoten-Skala"
+      "description": "Zentralzeiger Peilkante & Ratio-Skala"
     }
   },
   "tactical_settings": {
@@ -141,13 +144,12 @@
       "text_rotation_port_deg": 25.0
     },
     "shift_ticks_deg": [5.0, 10.0, 15.0],
-    "bias_ticks_deg": [5.0, 10.0, 15.0]
+    "bias_ticks_deg": [5.0, 10.0, 15.0],
+    "awa_angles_deg": [25.0, 30.0, 35.0, 40.0, 45.0, 50.0, 60.0, 75.0, 90.0, 110.0, 135.0, 155.0]
   },
   "polar_settings": {
-    "speed_scale_mm_per_knot": 5.0,
-    "max_knot_speed": 13.0,
-    "knot_grid_rings": [2, 4, 6, 8, 10, 12],
-    "curve_cutoff_twa_deg": 178.0,
+    "ratio_steps": 10,
+    "curve_cutoff_twa_deg": 175.0,
     "curve_colors": [
       "#1F618D",
       "#2980B9",
@@ -166,21 +168,7 @@
     "compass_text_size_px": 2.4,
     "polar_label_size_px": 2.3,
     "grid_text_size_px": 1.9,
+    "awa_label_size_px": 2.0,
     "tactical_label_size_px": 2.3
-  },
-  "labels": {
-    "front_title": "ORC VPP PERFORMANCE-POLAREN",
-    "front_subtitle": "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116",
-    "awa_title": "◄ AWA / SPEED (kt)",
-    "twa_title": "TWA / SPEED (kt) ►",
-    "awa_sub": "Scheinbarer Wind (Windex)",
-    "twa_sub": "Wahrer Wind (Instrumente)",
-    "back_title": "RECHENSCHIEBER & S-SKALA",
-    "back_subtitle": "JPK 1080 TRUE GRIT · GER 7447",
-    "back_functions": "Multiplikation · Division · Distanz/Zeit · Sinussatz",
-    "back_c_d_gap": "Trennfuge C/D: R = 75.0 mm (Ø 150 mm)",
-    "back_sinus_formula": "Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)",
-    "back_sinus_label": "S (SINUS-SKALA FÜR WINDDREIECK)"
   }
 }
-

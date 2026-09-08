@@ -3,7 +3,6 @@
     "title": "Nautische Rechenscheibe JPK 1080 (GER 7447 - TRUE GRIT)",
     "version": "3.0",
     "polar_file": "data/249116.slk",
-    "speedguide_file": "data/ORC_SpeedGuide_TRUE_GRIT_27.12.2025.html",
     "output_dirs": {
       "stl": "output/stl",
       "svg": "output/svg",
@@ -22,7 +21,6 @@
     "axle_pin_nominal_radius_mm": 1.5,
     "axle_hole_radius_mm": 1.6,
     "screw_nominal_diameter_mm": 3.0,
-    "screw_centering_hole_diameter_mm": 1.0,
     "screw_head_diameter_mm": 6.0,
     "screw_count": 6,
     "speed_scale_mm_per_knot": 5.0,
@@ -39,7 +37,6 @@
     "stator_window_radius_mm": "rotor_radius_mm",
     "screw_pcd_radius_mm": "stator_outer_radius_mm - 2.0",
     "screw_head_inner_limit_mm": "screw_pcd_radius_mm - (screw_head_diameter_mm / 2.0)",
-    "screw_centering_hole_radius_mm": "screw_centering_hole_diameter_mm / 2.0",
     "thumb_tabs_outer_radius_mm": "stator_outer_radius_mm + thumb_tabs_extension_mm",
     "polar_max_radius_mm": "max_knot_speed * speed_scale_mm_per_knot",
     "s_scale_radius_mm": "rotor_radius_mm - 10.0",
@@ -167,20 +164,5 @@
     "polar_label_size_px": 2.3,
     "grid_text_size_px": 1.9,
     "tactical_label_size_px": 2.3
-  },
-  "labels": {
-    "front_title": "ORC VPP PERFORMANCE-POLAREN",
-    "front_subtitle": "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116",
-    "awa_title": "◄ AWA / SPEED (kt)",
-    "twa_title": "TWA / SPEED (kt) ►",
-    "awa_sub": "Scheinbarer Wind (Windex)",
-    "twa_sub": "Wahrer Wind (Instrumente)",
-    "back_title": "RECHENSCHIEBER & S-SKALA",
-    "back_subtitle": "JPK 1080 TRUE GRIT · GER 7447",
-    "back_functions": "Multiplikation · Division · Distanz/Zeit · Sinussatz",
-    "back_c_d_gap": "Trennfuge C/D: R = 75.0 mm (Ø 150 mm)",
-    "back_sinus_formula": "Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)",
-    "back_sinus_label": "S (SINUS-SKALA FÜR WINDDREIECK)"
   }
 }
-
