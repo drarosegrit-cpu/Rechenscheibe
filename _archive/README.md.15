@@ -63,12 +63,6 @@ Dieses System verbindet die offiziellen **ORC-VPP-Polardaten** (ORC Internationa
    - Sämtliche Titel, Untertitel und Skalenbezeichnungen werden aus `config.json` (`labels`) geladen – befreit von Entwicklungsrelikten.
    - Der Dateipfad des ORC Speed Guides (`speedguide_file`) wird zentral über `config.json` verwaltet.
 
-9. **Nahtloser 180°-Polarenübergang & Behebung des Speed-Guide-Versatzes:**
-   - Im Original des ORC Speed Guides sind die Diagrammhälften für AWA (links, Port) und TWA (rechts, Stbd) durch eine Druck-/Falzlücke von 54 px (ca. 0,72 kn) getrennt und enden vorzeitig bei ca. 145° bis 165°.
-   - Auf der Rechenscheibe ist dieser Versatz vollständig eliminiert: Beide Hälften teilen sich das exakt identische Zentrum (0,0).
-   - Die tiefsten Vorwind-Segmente werden über die realen ORC-VPP-Stützstellen (150°, 165°, 180°) bis zum theoretischen Vorwindkurs (180° / Downwind) weitergeführt.
-   - Bei 180° treffen sich TWA- und AWA-Kurven auf der Mittellinie im identischen VPP-Geschwindigkeitspunkt mit horizontaler Tangente (stetiger C1-Übergang ohne Knick).
-
 ---
 
 ## 📐 Systemübersicht & Mechanische Architektur
@@ -161,8 +155,6 @@ Die Vorderseite vereint die Funktionalität des bekannten **TackingMaster-Regatt
   * Rote Rauten: Optimale Am-Wind-Punkte (Upwind Beat Targets) auf beiden Seiten.
   * Grüne Rauten: Optimale Vorwind-Punkte (Downwind Run Targets) auf beiden Seiten.
   * Symmetrische TWS-Beschriftung der Windstärken (6 bis 24 kn) neben den VMG-Rauten.
-* **Nahtloser 180°-Übergang (Vorwind / Downwind):**  
-  TWA- und AWA-Polarkurven gehen bei 180° auf der Mittellinie stetig und mit horizontaler Tangente nahtlos ineinander über (exakte VPP-Vorwindwerte von 3,33 kn bei 6 kn TWS bis 9,42 kn bei 24 kn TWS).
 * **Segel-Crossover (Jib vs. Asymmetrischer Gennaker):**  
   Violette Dreiecke und gestrichelte Grenzlinie markieren exakt den Winkelbereich, ab dem der Gennaker schneller ist als die Fock.
 

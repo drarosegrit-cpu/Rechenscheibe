@@ -20,12 +20,13 @@ except ImportError:
 
 
 def calc_wind_triangle_awa(tws_kn: float, bsp_kn: float, twa_deg: float) -> float:
-    """Calculates Apparent Wind Angle (AWA) in degrees from TWS, BSP and TWA using exact vector atan2."""
+    """Calculates Apparent Wind Angle (AWA) in degrees from TWS, BSP and TWA."""
     twa_rad = math.radians(twa_deg)
-    x = tws_kn * math.sin(twa_rad)
-    y = tws_kn * math.cos(twa_rad) + bsp_kn
-    awa = math.degrees(math.atan2(x, y))
-    return (awa + 360.0) % 360.0 if awa < 0 else awa
+    aws = math.sqrt(tws_kn**2 + bsp_kn**2 + 2.0 * tws_kn * bsp_kn * math.cos(twa_rad))
+    if aws < 1e-4:
+        return twa_deg
+    sin_awa = max(-1.0, min(1.0, (tws_kn * math.sin(twa_rad)) / aws))
+    return math.degrees(math.asin(sin_awa))
 
 
 def catmull_rom_spline(points: List[complex], num_points: int = 12) -> List[complex]:
@@ -155,73 +156,10 @@ class PolarData:
                     "pts_knots": pts_knots
                 })
 
-            # Korrektur der Diagrammteilung: Nahtloser Übergang bei 180°
-            self._extend_downwind_to_180(by_ws)
-
             self.html_segments = by_ws
         except Exception as e:
             print(f"[HINWEIS] SpeedGuide HTML Parsing übersprungen: {e}")
             self.html_segments = {}
-
-    def _extend_downwind_to_180(self, by_ws: Dict[float, Dict[int, List[Dict[str, Any]]]]):
-        """
-        Korrigiert die Trennung und Auswärtsverschiebung der TWA/AWA-Hälften im ORC Speed Guide:
-        Führt die tiefsten Vorwind-Segmente auf Steuerbord (TWA) und Backbord (AWA)
-        über die exakten VPP-Zwischenwerte aus der SLK-Datei bis zum gemeinsamen 180°-Punkt
-        (complex(0, bsp_180)) stetig und mit horizontaler Tangente nahtlos zusammen.
-        """
-        for ws, side_dict in by_ws.items():
-            pts_slk = self.sail_polars.get("BestPerf", {}).get(ws, [])
-            if not pts_slk:
-                continue
-            p180_pt = next((pt for pt in pts_slk if pt["twa"] == 180.0), None)
-            if not p180_pt:
-                continue
-            bsp_180 = p180_pt["bsp"]
-            p_180 = complex(0.0, bsp_180)
-
-            # 1. Steuerbord (TWA, bawa=0)
-            stbd_segs = side_dict.get(0, [])
-            if stbd_segs:
-                deepest_stbd = max(stbd_segs, key=lambda s: s["pts_knots"][-1].imag)
-                pts_stbd = list(deepest_stbd["pts_knots"])
-                last_p = pts_stbd[-1]
-                deg_last = math.degrees(math.atan2(last_p.real, -last_p.imag))
-
-                ext_stbd = [pts_stbd[-2], pts_stbd[-1]]
-                for pt in pts_slk:
-                    if pt["twa"] > deg_last + 2.0:
-                        ext_stbd.append(nautical_to_svg_complex(pt["bsp"], pt["twa"]))
-                if abs(ext_stbd[-1] - p_180) > 0.05:
-                    ext_stbd.append(p_180)
-                # Virtueller Spiegelpunkt für horizontale Tangente bei 180°
-                mirror_stbd = complex(-ext_stbd[-2].real, ext_stbd[-2].imag)
-                spline_ext = catmull_rom_spline(ext_stbd + [mirror_stbd], num_points=10)
-                idx_180 = min(range(len(spline_ext)), key=lambda i: abs(spline_ext[i] - p_180))
-                deepest_stbd["pts_knots"].extend(spline_ext[10:idx_180 + 1])
-
-            # 2. Backbord (AWA, bawa=1)
-            port_segs = side_dict.get(1, [])
-            if port_segs:
-                deepest_port = max(port_segs, key=lambda s: s["pts_knots"][-1].imag)
-                pts_port = list(deepest_port["pts_knots"])
-                last_p_port = pts_port[-1]
-                deg_last_port = abs(math.degrees(math.atan2(last_p_port.real, -last_p_port.imag)))
-
-                ext_port = [pts_port[-2], pts_port[-1]]
-                for pt in pts_slk:
-                    awa = pt.get("awa", 0.0)
-                    if awa == 0.0 or awa < 1.0:
-                        awa = calc_wind_triangle_awa(ws, pt["bsp"], pt["twa"])
-                    if awa > deg_last_port + 2.0:
-                        ext_port.append(nautical_to_svg_complex(pt["bsp"], -awa))
-                if abs(ext_port[-1] - p_180) > 0.05:
-                    ext_port.append(p_180)
-                # Virtueller Spiegelpunkt für horizontale Tangente bei 180°
-                mirror_port = complex(-ext_port[-2].real, ext_port[-2].imag)
-                spline_port_ext = catmull_rom_spline(ext_port + [mirror_port], num_points=10)
-                idx_port_180 = min(range(len(spline_port_ext)), key=lambda i: abs(spline_port_ext[i] - p_180))
-                deepest_port["pts_knots"].extend(spline_port_ext[10:idx_port_180 + 1])
 
     def _load_slk(self):
         """Loads official ORC SYLK (.slk) VPP tables (e.g. 249116.slk)."""

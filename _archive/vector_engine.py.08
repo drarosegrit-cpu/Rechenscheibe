@@ -1,0 +1,1385 @@
+#!/usr/bin/env python3
+"""
+vector_engine.py - Parametrische CAM- / Laser-Vektorengine (SVG) für die Rechenscheibe
+Yacht: JPK 1080 (GER 7447 - TRUE GRIT)
+Version: V3.0 (1:1 Knoten-Polaren, AWA/TWA-Hälften, Symmetrische Gradskala, Radial-Bugfix S-Skala)
+
+Architektur & Standards:
+- Zentrale Geometrie und Layerkonfiguration über `config_manager.py` (Single Source of Truth).
+- 1:1 Knoten-Skalierung: Radius entspricht direkt der Bootsgeschwindigkeit in Knoten (5.0 mm/kn).
+- Asymmetrische Vorderseite:
+  * Rechts (0° bis 180°): TWA vs. Speed (kn) für Steuern nach Bordinstrumenten / Kompass.
+  * Links (0° bis 180°): AWA vs. Speed (kn) für Steuern nach Windex / Windfahne.
+- Symmetrische Rotor-Gradskala (0° bis 180° beidseitig) für den TackingMaster-Taktikrechner.
+- Rückseite: S-Sinusskala mit strikt radialen Teilstrichen und 1/10°- bzw. 1/4°-Feinteilung.
+- Mathematisch konsistente Vektoralgebra mit `cmath` (komplexe Zahlen für 2D-Punkte, Vektorclipping und Schnittpunkte).
+- Laser-Fertigungsstandards:
+  * Schneidlinien (Cut):   stroke="#E74C3C", stroke-width="0.20"
+  * Gravurlinien (Engrave): stroke-width="0.30" bis "0.70" je nach Layer
+  * Gravurtext:            dominant-baseline="central", exakte Tangenten- und Radialausrichtung
+"""
+
+import math
+import cmath
+from pathlib import Path
+from typing import Tuple, List, Dict, Any, Optional
+
+from config_manager import CONFIG, GEOM
+from polar_parser import PolarData, catmull_rom_spline
+
+
+# ==============================================================================
+# 1. VEKTOR- & KOMPLEXE MATHEMATIK (cmath)
+# ==============================================================================
+
+def polar_to_complex(r: float, deg_nautical: float) -> complex:
+    """
+    Konvertiert nautische Polarkoordinaten in kartesische SVG-Koordinaten als komplexe Zahl:
+    - 0° ist Nord (12 Uhr, -Y in SVG)
+    - 90° ist Ost (3 Uhr, +X in SVG)
+    - 180° ist Süd (6 Uhr, +Y in SVG)
+    - 270° ist West (9 Uhr, -X in SVG)
+    Drehung erfolgt im Uhrzeigersinn (bzw. bei negativen Winkeln gegen den Uhrzeigersinn).
+    """
+    rad = math.radians(deg_nautical)
+    return complex(r * math.sin(rad), -r * math.cos(rad))
+
+
+def calc_readable_rotation(deg: float) -> float:
+    """
+    Standard-Nautik-Konvention für lesbaren Text auf Zifferblättern:
+    Verhindert, dass Zahlen in der unteren Scheibenhälfte auf dem Kopf stehen.
+    """
+    deg_norm = deg % 360.0
+    if 90.0 < deg_norm < 270.0:
+        return deg_norm - 180.0
+    else:
+        return deg_norm
+
+
+def find_circle_intersection(p1: complex, p2: complex, r_max: float) -> Optional[complex]:
+    """
+    Berechnet den Schnittpunkt des Geradensegments p1 -> p2 mit dem Begrenzungskreis |z| = r_max
+    unter Verwendung nativer komplexer Algebra:
+      |p1 + t * dp|^2 = r_max^2
+      => |dp|^2 * t^2 + 2 * Re(p1 * dp*) * t + (|p1|^2 - r_max^2) = 0
+    """
+    dp = p2 - p1
+    a = abs(dp)**2
+    if a < 1e-9:
+        return None
+    b = 2.0 * (p1 * dp.conjugate()).real
+    c = abs(p1)**2 - r_max**2
+    disc = b**2 - 4.0 * a * c
+    if disc < 0:
+        return None
+    sqrt_disc = math.sqrt(disc)
+    t1 = (-b - sqrt_disc) / (2.0 * a)
+    t2 = (-b + sqrt_disc) / (2.0 * a)
+    valid_t = [t for t in (t1, t2) if 0.0 <= t <= 1.0]
+    if not valid_t:
+        return None
+    return p1 + valid_t[0] * dp
+
+
+def clip_polyline_to_circle(pts: List[complex], r_max: float) -> List[List[complex]]:
+    """
+    Schneidet einen Polygonzug (z. B. Polarkurven) am Kreis r_max ab.
+    Gibt eine Liste zusammenhängender Segmente zurück, die vollständig innerhalb des Kreises liegen.
+    """
+    lines = []
+    current_line = []
+    for i in range(len(pts) - 1):
+        p1, p2 = pts[i], pts[i + 1]
+        d1 = abs(p1)
+        d2 = abs(p2)
+
+        if d1 <= r_max and d2 <= r_max:
+            if not current_line:
+                current_line.append(p1)
+            current_line.append(p2)
+        elif d1 <= r_max and d2 > r_max:
+            p_inter = find_circle_intersection(p1, p2, r_max)
+            if not current_line:
+                current_line.append(p1)
+            if p_inter:
+                current_line.append(p_inter)
+            lines.append(current_line)
+            current_line = []
+        elif d1 > r_max and d2 <= r_max:
+            p_inter = find_circle_intersection(p1, p2, r_max)
+            current_line = []
+            if p_inter:
+                current_line.append(p_inter)
+            current_line.append(p2)
+        else:
+            pass
+
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+
+# ==============================================================================
+# 2. SVG-HEADER & DYNAMISCHE STIL-DEFINITIONEN
+# ==============================================================================
+
+def svg_header(width_mm: float = 190.0, height_mm: float = 190.0) -> str:
+    """
+    Erzeugt den W3C-konformen SVG-Header mit millimetergenauer Skalierung
+    und dynamischer Einbindung aller Laser-/CAM-Klassen aus config.json.
+    """
+    layers = CONFIG.layers
+    cut_col = layers.get("cut_outer", {}).get("color", "#E74C3C")
+    cut_in_col = layers.get("cut_inner", {}).get("color", "#C0392B")
+    eng_comp_col = layers.get("engrave_compass", {}).get("color", "#2C3E50")
+    grid_maj_col = layers.get("engrave_grid_major", {}).get("color", "#BDC3C7")
+    grid_min_col = layers.get("engrave_grid_minor", {}).get("color", "#E5E7E9")
+
+    half_w = width_mm / 2.0
+    half_h = height_mm / 2.0
+
+    return (
+        f'<svg xmlns="http://www.w3.org/2000/svg" '
+        f'width="{width_mm:.1f}mm" height="{height_mm:.1f}mm" '
+        f'viewBox="{-half_w:.2f} {-half_h:.2f} {width_mm:.2f} {height_mm:.2f}">\n'
+        f'  <defs>\n'
+        f'    <style>\n'
+        f'      .laser-cut {{ fill: none; stroke: {cut_col}; stroke-width: 0.2; stroke-linecap: round; }}\n'
+        f'      .laser-cut-inner {{ fill: none; stroke: {cut_in_col}; stroke-width: 0.2; stroke-linecap: round; }}\n'
+        f'      .laser-engrave {{ fill: none; stroke: {eng_comp_col}; stroke-width: 0.35; }}\n'
+        f'      .grid-line {{ fill: none; stroke: {grid_maj_col}; stroke-width: 0.22; stroke-dasharray: 2.0,1.5; }}\n'
+        f'      .grid-line-minor {{ fill: none; stroke: {grid_min_col}; stroke-width: 0.12; stroke-dasharray: 1.0,1.2; }}\n'
+        f'      .grid-text {{ font-family: sans-serif; font-size: 1.9px; fill: #2C3E50; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .compass-tick {{ stroke: {eng_comp_col}; stroke-width: 0.35; }}\n'
+        f'      .compass-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.4px; fill: {eng_comp_col}; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .polar-curve {{ fill: none; stroke-width: 0.28; stroke-linecap: round; stroke-linejoin: round; }}\n'
+        f'      .polar-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.2px; dominant-baseline: central; }}\n'
+        f'      .awa-label {{ font-family: sans-serif; font-size: 2.0px; fill: #1B4F72; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .title-text {{ font-family: sans-serif; font-weight: bold; font-size: 2.8px; fill: #2C3E50; text-anchor: middle; }}\n'
+        f'      .sub-text {{ font-family: sans-serif; font-size: 1.8px; fill: #7F8C8D; text-anchor: middle; }}\n'
+        f'      .shift-indicator {{ font-family: sans-serif; font-weight: bold; font-size: 2.2px; dominant-baseline: central; text-anchor: middle; }}\n'
+        f'      .sector-beat-stbd {{ fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }}\n'
+        f'      .sector-beat-port {{ fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }}\n'
+        f'      .sector-gybe-stbd {{ fill: #2ECC71; fill-opacity: 0.22; stroke: #27AE60; stroke-width: 0.45; }}\n'
+        f'      .sector-gybe-port {{ fill: #E74C3C; fill-opacity: 0.22; stroke: #C0392B; stroke-width: 0.45; }}\n'
+        f'      .start-line {{ stroke: #2980B9; stroke-width: 1.2; }}\n'
+        f'      .bias-tick {{ stroke: #2980B9; stroke-width: 0.4; }}\n'
+        f'      .bias-text {{ font-family: sans-serif; font-size: 1.9px; fill: #2980B9; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .bias-subtext-green {{ font-family: sans-serif; font-weight: bold; font-size: 1.9px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .bias-subtext-red {{ font-family: sans-serif; font-weight: bold; font-size: 1.9px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .tack-label-stbd {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .tack-label-port {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .gybe-label-stbd {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #27AE60; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .gybe-label-port {{ font-family: sans-serif; font-weight: bold; font-size: 2.3px; fill: #C0392B; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .line-label {{ font-family: sans-serif; font-weight: bold; font-size: 2.2px; fill: #2980B9; text-anchor: middle; dominant-baseline: central; }}\n'
+        f'      .vmg-beat {{ fill: #E74C3C; stroke: #962D22; stroke-width: 0.25; }}\n'
+        f'      .vmg-run {{ fill: #2ECC71; stroke: #27AE60; stroke-width: 0.25; }}\n'
+        f'      .crossover-marker {{ fill: #9B59B6; stroke: #8E44AD; stroke-width: 0.25; }}\n'
+        f'      .crossover-line {{ fill: none; stroke: #8E44AD; stroke-width: 0.30; stroke-dasharray: 2.0,1.4; }}\n'
+        f'      .crossover-text {{ font-family: sans-serif; font-weight: bold; font-size: 1.9px; fill: #8E44AD; }}\n'
+        f'      .stator-rim {{ fill: #F8F9F9; stroke: #2C3E50; stroke-width: 0.6; }}\n'
+        f'    </style>\n'
+        f'  </defs>\n'
+    )
+
+
+# ==============================================================================
+# 3. ROTOR TAKTIKRING (V3.0: 100% SYMMETRISCHE GRADSKALA)
+# ==============================================================================
+
+def generate_tactical_rim() -> str:
+    """
+    Generiert alle TackingMaster-Taktikelemente für den Rotor (Radius r in [66.0, 75.0]):
+    V3.0: Absolut symmetrische 0° bis 180° Gradskala auf Steuerbord (rechts) und Backbord (links).
+    1. TRUE WIND Pfeil & Winddreher-Skalen (Shift / Lift ±15°)
+    2. TACK-Wendekorridore (38° bis 42° beidseitig)
+    3. START LINE BIAS System (±90° mit Boat End / Pin End Badges)
+    4. GYBE-Halsenkorridore (145° bis 165° beidseitig)
+    5. Feine, symmetrische 1°-, 5°- und 10°-Gradskalierung über den gesamten Umfang.
+    """
+    elements = []
+    r_outer = GEOM.rotor_radius                # 75.0 mm
+    r_inner = GEOM.tactical_rim_inner_radius   # 66.0 mm
+
+    # 1. TRUE WIND Pfeil (12 Uhr) & Lift/Header
+    p_tip = polar_to_complex(r_outer - 0.4, 0.0)
+    p_l = polar_to_complex(r_outer - 6.2, -2.0)
+    p_r = polar_to_complex(r_outer - 6.2, 2.0)
+    p_c = polar_to_complex(r_outer - 4.8, 0.0)
+
+    elements.append(
+        f'  <polygon points="{p_tip.real:.2f},{p_tip.imag:.2f} {p_l.real:.2f},{p_l.imag:.2f} '
+        f'{p_c.real:.2f},{p_c.imag:.2f} {p_r.real:.2f},{p_r.imag:.2f}" '
+        f'fill="#C0392B" stroke="#962D22" stroke-width="0.3" />'
+    )
+    elements.append(
+        f'  <text x="0" y="{-r_outer + 8.2:.2f}" font-family="sans-serif" font-weight="bold" '
+        f'font-size="2.6px" fill="#C0392B" text-anchor="middle">TRUE WIND</text>'
+    )
+    elements.append(
+        f'  <text x="0" y="{-r_inner + 0.8:.2f}" font-family="sans-serif" font-weight="bold" '
+        f'font-size="1.9px" fill="#27AE60" text-anchor="middle">◄ PORT LIFT | STBD LIFT ►</text>'
+    )
+
+    # Shift / Lift Teilstriche
+    for side in [1, -1]:
+        for shift_deg in [5.0, 10.0, 15.0]:
+            d = shift_deg * side
+            p1 = polar_to_complex(r_outer, d)
+            p2 = polar_to_complex(r_outer - 2.2, d)
+            elements.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" class="compass-tick" />')
+            pt = polar_to_complex(r_outer - 3.8, d)
+            elements.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="bias-text">{int(shift_deg)}°</text>')
+
+        p_lbl = polar_to_complex(r_inner + 1.8, 11.5 * side)
+        rot = 11.5 if side > 0 else -11.5
+        txt = "LIFT ▶" if side > 0 else "◀ LIFT"
+        elements.append(
+            f'  <text x="{p_lbl.real:.2f}" y="{p_lbl.imag:.2f}" class="shift-indicator" fill="#27AE60" '
+            f'transform="rotate({rot:.1f} {p_lbl.real:.2f} {p_lbl.imag:.2f})">{txt}</text>'
+        )
+
+    # 2. TACK-Wendekorridore (38° bis 42°)
+    for side in [1, -1]:
+        a1, a2 = 38.0 * side, 42.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+
+        p1_in = polar_to_complex(r_inner, a1)
+        p2_in = polar_to_complex(r_inner, a2)
+        p1_out = polar_to_complex(r_outer, a1)
+        p2_out = polar_to_complex(r_outer, a2)
+
+        path = (
+            f"M {p1_in.real:.2f} {p1_in.imag:.2f} "
+            f"L {p1_out.real:.2f} {p1_out.imag:.2f} "
+            f"A {r_outer} {r_outer} 0 0 1 {p2_out.real:.2f} {p2_out.imag:.2f} "
+            f"L {p2_in.real:.2f} {p2_in.imag:.2f} "
+            f"A {r_inner} {r_inner} 0 0 0 {p1_in.real:.2f} {p1_in.imag:.2f} Z"
+        )
+        sector_cls = "sector-beat-stbd" if side > 0 else "sector-beat-port"
+        elements.append(f'  <path d="{path}" class="{sector_cls}" />')
+
+        p_lbl = polar_to_complex(r_inner + 4.5, 40.0 * side)
+        rot = 40.0 if side > 0 else -40.0
+        lbl_txt = "STBD TACK 40°" if side > 0 else "PORT TACK 40°"
+        lbl_cls = "tack-label-stbd" if side > 0 else "tack-label-port"
+        elements.append(
+            f'  <text x="{p_lbl.real:.2f}" y="{p_lbl.imag:.2f}" class="{lbl_cls}" '
+            f'transform="rotate({rot:.1f} {p_lbl.real:.2f} {p_lbl.imag:.2f})">{lbl_txt}</text>'
+        )
+
+    # 3. Start Line Bias System (±90°)
+    for side in [1, -1]:
+        base_angle = 90.0 * side
+        p_in = polar_to_complex(r_inner, base_angle)
+        p_out = polar_to_complex(r_outer, base_angle)
+        elements.append(f'  <line x1="{p_in.real:.2f}" y1="{p_in.imag:.2f}" x2="{p_out.real:.2f}" y2="{p_out.imag:.2f}" class="start-line" />')
+
+        for b_deg in [5.0, 10.0, 15.0]:
+            for s_sgn in [1, -1]:
+                b_ang = base_angle + (b_deg * s_sgn)
+                pt1 = polar_to_complex(r_outer, b_ang)
+                pt2 = polar_to_complex(r_outer - 2.2, b_ang)
+                elements.append(f'  <line x1="{pt1.real:.2f}" y1="{pt1.imag:.2f}" x2="{pt2.real:.2f}" y2="{pt2.imag:.2f}" class="bias-tick" />')
+                pt_txt = polar_to_complex(r_outer - 3.8, b_ang)
+                elements.append(f'  <text x="{pt_txt.real:.2f}" y="{pt_txt.imag:.2f}" class="bias-text">{int(b_deg)}°</text>')
+
+        p_center = polar_to_complex(r_inner + 4.5, base_angle)
+        badge_w = 4.8
+        badge_h = 19.0 if side > 0 else 13.5
+        rot_main = 90.0 if side > 0 else -90.0
+        line_name = "BOAT END (RC)" if side > 0 else "PIN END"
+
+        elements.append(
+            f'  <rect x="{p_center.real - badge_w/2:.2f}" y="{p_center.imag - badge_h/2:.2f}" '
+            f'width="{badge_w}" height="{badge_h}" rx="1.2" fill="#FFFFFF" stroke="#2980B9" stroke-width="0.5" '
+            f'transform="rotate({rot_main} {p_center.real:.2f} {p_center.imag:.2f})" />'
+        )
+        elements.append(
+            f'  <text x="{p_center.real:.2f}" y="{p_center.imag:.2f}" class="line-label" '
+            f'transform="rotate({rot_main} {p_center.real:.2f} {p_center.imag:.2f})">{line_name}</text>'
+        )
+
+        upwind_ang = base_angle - (9.5 * side)
+        p_up = polar_to_complex(r_inner + 1.8, upwind_ang)
+        fav_up_txt = "▲ BOAT FAV" if side > 0 else "PIN FAV ▲"
+        rot_up = calc_readable_rotation(upwind_ang)
+        elements.append(
+            f'  <text x="{p_up.real:.2f}" y="{p_up.imag:.2f}" class="bias-subtext-green" '
+            f'transform="rotate({rot_up:.1f} {p_up.real:.2f} {p_up.imag:.2f})">{fav_up_txt}</text>'
+        )
+
+        downwind_ang = base_angle + (9.5 * side)
+        p_down = polar_to_complex(r_inner + 1.8, downwind_ang)
+        fav_down_txt = "PIN FAV ▼" if side > 0 else "▼ BOAT FAV"
+        rot_down = calc_readable_rotation(downwind_ang)
+        elements.append(
+            f'  <text x="{p_down.real:.2f}" y="{p_down.imag:.2f}" class="bias-subtext-red" '
+            f'transform="rotate({rot_down:.1f} {p_down.real:.2f} {p_down.imag:.2f})">{fav_down_txt}</text>'
+        )
+
+    # 4. GYBE-Halsenkorridore (145° bis 165°)
+    for side in [1, -1]:
+        a1, a2 = 145.0 * side, 165.0 * side
+        if side < 0:
+            a1, a2 = a2, a1
+
+        p1_in = polar_to_complex(r_inner, a1)
+        p2_in = polar_to_complex(r_inner, a2)
+        p1_out = polar_to_complex(r_outer, a1)
+        p2_out = polar_to_complex(r_outer, a2)
+
+        path = (
+            f"M {p1_in.real:.2f} {p1_in.imag:.2f} "
+            f"L {p1_out.real:.2f} {p1_out.imag:.2f} "
+            f"A {r_outer} {r_outer} 0 0 1 {p2_out.real:.2f} {p2_out.imag:.2f} "
+            f"L {p2_in.real:.2f} {p2_in.imag:.2f} "
+            f"A {r_inner} {r_inner} 0 0 0 {p1_in.real:.2f} {p1_in.imag:.2f} Z"
+        )
+        sector_cls = "sector-gybe-stbd" if side > 0 else "sector-gybe-port"
+        elements.append(f'  <path d="{path}" class="{sector_cls}" />')
+
+        p_lbl = polar_to_complex(r_inner + 4.5, 155.0 * side)
+        rot = -25.0 if side > 0 else 25.0
+        lbl_txt = "STBD GYBE 155°" if side > 0 else "PORT GYBE 155°"
+        lbl_cls = "gybe-label-stbd" if side > 0 else "gybe-label-port"
+        elements.append(
+            f'  <text x="{p_lbl.real:.2f}" y="{p_lbl.imag:.2f}" class="{lbl_cls}" '
+            f'transform="rotate({rot:.1f} {p_lbl.real:.2f} {p_lbl.imag:.2f})">{lbl_txt}</text>'
+        )
+
+    # 5. Symmetrische Gradskala auf Rotor (1°-, 5°-Teilung und 10°/30°-Ziffern beidseitig)
+    for deg in range(1, 180):
+        # Aussparungen bei Badges und Texten
+        in_arrow = (deg <= 3)
+        in_tack = (37.5 <= deg <= 42.5)
+        in_line = (81.0 <= deg <= 99.0)
+        in_gybe = (144.5 <= deg <= 165.5)
+
+        is_10 = (deg % 10 == 0)
+        is_5 = (deg % 5 == 0)
+
+        for side in [1, -1]:
+            d = deg * side
+            if not (in_arrow or in_tack or in_line or in_gybe):
+                t_len = 3.2 if is_10 else (2.0 if is_5 else 1.0)
+                p1 = polar_to_complex(r_outer, d)
+                p2 = polar_to_complex(r_outer - t_len, d)
+                elements.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" class="compass-tick" />')
+
+                # Ziffernbeschriftung alle 10° bzw. 30°
+                if is_10 and deg not in [40, 90, 150, 160]:
+                    pt = polar_to_complex(r_outer - 4.5, d)
+                    rot = calc_readable_rotation(d)
+                    elements.append(
+                        f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.2px" '
+                        f'transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{deg}°</text>'
+                    )
+
+    # 180° Downwind-Marke
+    p1_180 = polar_to_complex(r_outer, 180.0)
+    p2_180 = polar_to_complex(r_outer - 3.5, 180.0)
+    elements.append(f'  <line x1="{p1_180.real:.2f}" y1="{p1_180.imag:.2f}" x2="{p2_180.real:.2f}" y2="{p2_180.imag:.2f}" stroke="#C0392B" stroke-width="0.5" />')
+    pt_180 = polar_to_complex(r_outer - 5.0, 180.0)
+    elements.append(f'  <text x="{pt_180.real:.2f}" y="{pt_180.imag:.2f}" class="compass-text" font-size="2.3px" fill="#C0392B">180°</text>')
+
+    return "\n".join(elements)
+
+
+# ==============================================================================
+# 4. EINZELDATEI-GENERATOREN (CAM / LASER)
+# ==============================================================================
+
+def generate_laser_seite_a_rotor(output_file: Path, polar: PolarData):
+    """
+    Generiert die Laser-CAM-Vektordatei für die Mittelscheibe Vorderseite (Ø 150 mm) in V3.0:
+    - 1:1 Bootsgeschwindigkeit in Knoten (5.0 mm/kn).
+    - Asymmetrische Zweiteilung:
+      * Rechts (Steuerbord): TWA vs. Speed (kn) für Steuern nach Instrumenten.
+      * Links (Backbord):    AWA vs. Speed (kn) für Steuern nach Windex / Windfahne.
+    - Symmetrische 0° bis 180° Gradskala am Rotorrand für den Taktikrechner.
+    - Feste konzentrische Knotenringe (2, 4, 6, 8, 10, 12 kn).
+    - VMG Targets (Beat/Run) und Segel-Crossover auf beiden Hälften.
+    """
+    r_rotor = GEOM.rotor_radius                # 75.0 mm
+    speed_scale = GEOM.speed_scale_mm_per_knot # 5.0 mm / kn
+    grid_rings = GEOM.knot_grid_rings          # [2, 4, 6, 8, 10, 12]
+    r_max_polar = GEOM.polar_max_radius        # 65.0 mm
+    cutoff_deg = CONFIG.polars.get("curve_cutoff_twa_deg", 178.0)
+    colors = CONFIG.polars.get("curve_colors", [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ])
+
+    parts = [svg_header(180.0, 180.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_rotor:.2f}" class="laser-cut" />')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut-inner" />')
+    # Taktikring (V3.0 symmetrisch)
+    parts.append('  <!-- TackingMaster Taktikring (Symmetrisch 0-180°) -->')
+    parts.append(generate_tactical_rim())
+
+    # Titel & Beschriftung aus zentraler Konfiguration
+    labels = CONFIG.labels
+    f_title = labels.get("front_title", "ORC VPP PERFORMANCE-POLAREN")
+    f_sub = labels.get("front_subtitle", "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116")
+    awa_lbl = labels.get("awa_title", "◄ AWA / SPEED (kt)")
+    twa_lbl = labels.get("twa_title", "TWA / SPEED (kt) ►")
+    awa_sub = labels.get("awa_sub", "Scheinbarer Wind (Windex)")
+    twa_sub = labels.get("twa_sub", "Wahrer Wind (Instrumente)")
+
+    parts.append('  <!-- Titel & Legende V3.0 (Variante 1 nach ORC Speed Guide) -->')
+    parts.append(f'  <text x="0" y="-50.0" class="title-text">{f_title}</text>')
+    parts.append(f'  <text x="0" y="-46.8" class="sub-text">{f_sub}</text>')
+    # Segel-Legende nach ORC Speed Guide
+    parts.append('  <g font-family="sans-serif" font-size="1.6px" font-weight="bold">')
+    parts.append('    <line x1="-42.0" y1="-43.8" x2="-35.0" y2="-43.8" stroke="#1B4F72" stroke-width="0.7" />')
+    parts.append('    <text x="-33.0" y="-43.8" fill="#1B4F72" dominant-baseline="central">Headsail</text>')
+    parts.append('    <line x1="-12.0" y1="-43.8" x2="-5.0" y2="-43.8" stroke="#C0392B" stroke-width="0.7" />')
+    parts.append('    <text x="-3.0" y="-43.8" fill="#C0392B" dominant-baseline="central">Asym (Gennaker)</text>')
+    parts.append('    <line x1="28.0" y1="-43.8" x2="35.0" y2="-43.8" stroke="#27AE60" stroke-width="0.7" />')
+    parts.append('    <text x="37.0" y="-43.8" fill="#27AE60" dominant-baseline="central">Sym (Spi)</text>')
+    parts.append('  </g>')
+    parts.append(f'  <text x="-32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{awa_lbl}</text>')
+    parts.append(f'  <text x="32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{twa_lbl}</text>')
+    parts.append(f'  <text x="-32.0" y="-36.5" class="sub-text" font-size="1.5px">{awa_sub}</text>')
+    parts.append(f'  <text x="32.0" y="-36.5" class="sub-text" font-size="1.5px">{twa_sub}</text>')
+
+    # Konzentrische Knotenringe
+    parts.append('  <!-- Konzentrische Bootsgeschwindigkeits-Ringe (Knoten) -->')
+    for k in grid_rings:
+        r_val = k * speed_scale
+        cls_name = "grid-line" if (k % 4 == 0) else "grid-line-minor"
+        parts.append(f'  <circle cx="0" cy="0" r="{r_val:.2f}" class="{cls_name}" />')
+
+    # Geschwindigkeits-Skalen auf den 90°-Achsen
+    parts.append('  <!-- Feste Knotenskalen auf 90° Steuerbord (TWA) und 90° Backbord (AWA) -->')
+    # Steuerbord (+90°)
+    parts.append(f'  <line x1="4.0" y1="0" x2="{r_max_polar:.2f}" y2="0" stroke="#2C3E50" stroke-width="0.4" />')
+    for k in grid_rings:
+        rx = k * speed_scale
+        tick_len = 2.0 if (k % 4 == 0) else 1.2
+        parts.append(f'  <line x1="{rx:.2f}" y1="{-tick_len:.2f}" x2="{rx:.2f}" y2="{tick_len:.2f}" stroke="#2C3E50" stroke-width="0.3" />')
+        parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px">{k}</text>')
+    parts.append(f'  <text x="{r_max_polar/2.0:.2f}" y="-4.8" class="grid-text" font-size="2.0px" font-weight="bold">kt (TWA 90°)</text>')
+
+    # Backbord (-90°)
+    parts.append(f'  <line x1="-4.0" y1="0" x2="{-r_max_polar:.2f}" y2="0" stroke="#2C3E50" stroke-width="0.4" />')
+    for k in grid_rings:
+        rx = -k * speed_scale
+        tick_len = 2.0 if (k % 4 == 0) else 1.2
+        parts.append(f'  <line x1="{rx:.2f}" y1="{-tick_len:.2f}" x2="{rx:.2f}" y2="{tick_len:.2f}" stroke="#2C3E50" stroke-width="0.3" />')
+        parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px">{k}</text>')
+    parts.append(f'  <text x="{-r_max_polar/2.0:.2f}" y="-4.8" class="grid-text" font-size="2.0px" font-weight="bold">kt (AWA 90°)</text>')
+
+    # Zentrale Vertikal-Trennlinie (0° bis 180°)
+    parts.append('  <!-- Zentrale Vertikal-Trennlinie (0° bis 180°) -->')
+    parts.append(f'  <line x1="0" y1="{-r_max_polar:.2f}" x2="0" y2="-4.0" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
+    parts.append(f'  <line x1="0" y1="4.0" x2="0" y2="{r_max_polar:.2f}" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
+    parts.append(f'  <text x="0" y="{r_max_polar - 2.5:.2f}" class="awa-label" font-size="1.9px" font-weight="bold" fill="#C0392B">DOWNWIND (180°)</text>')
+
+    # ORC-Polarkurven
+    parts.append('  <!-- ORC Performance-Polaren (Variante 1 getrennt nach Segeln) -->')
+    spline_info_list = polar.get_spline_curves(scale_factor=speed_scale)
+    crossover_pts_stbd = []
+    crossover_pts_port = []
+
+    for idx, s_info in enumerate(spline_info_list):
+        tws = s_info["tws"]
+        tgt = s_info["targets"]
+
+        # 1. Steuerbord (Rechts): TWA vs. BSP getrennt nach Segeln
+        for seg_info in s_info.get("starboard_segments", []):
+            seg_pts = seg_info["points"]
+            seg_col = seg_info.get("color", "#1B4F72")
+            for seg in clip_polyline_to_circle(seg_pts, r_max_polar):
+                if len(seg) > 1:
+                    d = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in seg])
+                    parts.append(f'  <path d="{d}" class="polar-curve" stroke="{seg_col}" />')
+
+        # 2. Backbord (Links): AWA vs. BSP getrennt nach Segeln
+        for seg_info in s_info.get("port_segments", []):
+            seg_pts = seg_info["points"]
+            seg_col = seg_info.get("color", "#1B4F72")
+            for seg in clip_polyline_to_circle(seg_pts, r_max_polar):
+                if len(seg) > 1:
+                    d = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in seg])
+                    parts.append(f'  <path d="{d}" class="polar-curve" stroke="{seg_col}" />')
+
+        # 3. VMG TARGETS: Beat & Run
+        # Steuerbord (TWA)
+        beat_r = tgt["beat_sog"] * speed_scale
+        p_beat_twa = polar_to_complex(beat_r, tgt["beat_angle"])
+        bx, by = p_beat_twa.real, p_beat_twa.imag
+        parts.append(
+            f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />'
+        )
+        stagger_x = -2.1 if (idx % 2 == 0) else -4.2
+        stagger_y = 0.0 if (idx % 2 == 0) else -1.2
+        parts.append(f'  <text x="{bx + stagger_x:.2f}" y="{by + stagger_y:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
+
+        run_r = tgt["run_sog"] * speed_scale
+        p_run_twa = polar_to_complex(run_r, tgt["gybe_angle"])
+        rx, ry = p_run_twa.real, p_run_twa.imag
+        parts.append(
+            f'  <polygon points="{rx:.2f},{ry-1.1:.2f} {rx+1.1:.2f},{ry:.2f} {rx:.2f},{ry+1.1:.2f} {rx-1.1:.2f},{ry:.2f}" class="vmg-run" />'
+        )
+        parts.append(f'  <text x="{rx + 2.1:.2f}" y="{ry:.2f}" class="polar-label" text-anchor="start" fill="#2C3E50">{int(tws)}</text>')
+
+        # Backbord (AWA)
+        beat_awa = tgt.get("beat_awa")
+        if not beat_awa or beat_awa < 1.0:
+            from polar_parser import calc_wind_triangle_awa
+            beat_awa = calc_wind_triangle_awa(tws, tgt["beat_sog"], tgt["beat_angle"])
+        p_beat_awa = polar_to_complex(beat_r, -beat_awa)
+        bax, bay = p_beat_awa.real, p_beat_awa.imag
+        parts.append(
+            f'  <polygon points="{bax:.2f},{bay-1.1:.2f} {bax+1.1:.2f},{bay:.2f} {bax:.2f},{bay+1.1:.2f} {bax-1.1:.2f},{bay:.2f}" class="vmg-beat" />'
+        )
+        stagger_ax = 2.1 if (idx % 2 == 0) else 4.2
+        parts.append(f'  <text x="{bax + stagger_ax:.2f}" y="{bay + stagger_y:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
+
+        run_awa = tgt.get("run_awa")
+        if not run_awa or run_awa < 1.0:
+            from polar_parser import calc_wind_triangle_awa
+            run_awa = calc_wind_triangle_awa(tws, tgt["run_sog"], tgt["gybe_angle"])
+        p_run_awa = polar_to_complex(run_r, -run_awa)
+        rax, ray = p_run_awa.real, p_run_awa.imag
+        parts.append(
+            f'  <polygon points="{rax:.2f},{ray-1.1:.2f} {rax+1.1:.2f},{ray:.2f} {rax:.2f},{ray+1.1:.2f} {rax-1.1:.2f},{ray:.2f}" class="vmg-run" />'
+        )
+        parts.append(f'  <text x="{rax - 2.1:.2f}" y="{ray:.2f}" class="polar-label" text-anchor="end" fill="#2C3E50">{int(tws)}</text>')
+
+        # Segel-Crossover Punkte sammeln
+        cross_twa = polar.crossover_angles.get(tws)
+        cross_awa = polar.crossover_angles_awa.get(tws)
+        if cross_twa:
+            curve = polar.curves_raw[idx]
+            match_pt = next((p for p in curve if abs(p["twa"] - cross_twa) < 2.0), None)
+            bsp_cross = match_pt["bsp"] if match_pt else tgt["beat_sog"]
+            p_c_stbd = polar_to_complex(bsp_cross * speed_scale, cross_twa)
+            crossover_pts_stbd.append(p_c_stbd)
+            if cross_awa:
+                p_c_port = polar_to_complex(bsp_cross * speed_scale, -cross_awa)
+                crossover_pts_port.append(p_c_port)
+
+    # Crossover-Linien & Dreiecke einzeichnen
+    parts.append('  <!-- Segel-Crossover (Jib vs. AsymCL) -->')
+    if crossover_pts_stbd:
+        d_cross_stbd = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in crossover_pts_stbd])
+        parts.append(f'  <path d="{d_cross_stbd}" class="crossover-line" />')
+        for p in crossover_pts_stbd:
+            parts.append(
+                f'  <polygon points="{p.real:.2f},{p.imag-1.2:.2f} {p.real+1.2:.2f},{p.imag+1.2:.2f} {p.real-1.2:.2f},{p.imag+1.2:.2f}" class="crossover-marker" />'
+            )
+        p_last = crossover_pts_stbd[-1]
+        parts.append(f'  <text x="{p_last.real + 2.0:.2f}" y="{p_last.imag:.2f}" class="crossover-text">CROSSOVER</text>')
+
+    if crossover_pts_port:
+        d_cross_port = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in crossover_pts_port])
+        parts.append(f'  <path d="{d_cross_port}" class="crossover-line" />')
+        for p in crossover_pts_port:
+            parts.append(
+                f'  <polygon points="{p.real:.2f},{p.imag-1.2:.2f} {p.real+1.2:.2f},{p.imag+1.2:.2f} {p.real-1.2:.2f},{p.imag+1.2:.2f}" class="crossover-marker" />'
+            )
+        p_last = crossover_pts_port[-1]
+        parts.append(f'  <text x="{p_last.real - 2.0:.2f}" y="{p_last.imag:.2f}" class="crossover-text" text-anchor="end">CROSSOVER</text>')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_seite_a_deckel(output_file: Path):
+    """
+    Generiert die Laser-CAM-Vektordatei für den Gehäusedeckel (Stator Vorderseite Ø 180 mm).
+    Features:
+    - Außenkontur Ø 180 mm (R = 90.0 mm), Sichtfenster Ø 150 mm (R = 75.0 mm).
+    - 6 M3-Senkungsbohrungen auf Teilkreis PCD Ø 176 mm (R = 88.0 mm).
+    - 360°-Kompassrose:
+      * Teilstriche nach INNEN gerückt (R = 75.8 bis 79.2 mm).
+      * Gradbeschriftung ('000°' bis '350°') nach AUSSEN verlegt bei R = 82.5 mm.
+    """
+    r_out = GEOM.stator_outer_radius
+    r_win = GEOM.stator_window_radius
+    t_in = GEOM.stator_compass_ticks_inner   # 75.8 mm
+    t_out = GEOM.stator_compass_ticks_outer  # 79.2 mm
+    r_txt = GEOM.stator_compass_text_radius  # 82.5 mm
+
+    parts = [svg_header(190.0, 190.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_out:.2f}" class="laser-cut" />')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_win:.2f}" class="laser-cut-inner" />')
+
+    # 6 Zentrierbohrungen (Ø 1.0 mm) auf PCD Ø 176 mm
+    for i in range(GEOM.screw_count):
+        ang_deg = i * (360.0 / GEOM.screw_count)
+        p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" class="laser-cut" />')
+
+    # 360° Kompassrose
+    parts.append('  <!-- 360° Kompassrose auf Stator (Ticks innen, Ziffern außen) -->')
+    for deg in range(360):
+        is_10 = (deg % 10 == 0)
+        is_5 = (deg % 5 == 0)
+        tick_start_r = t_in if is_10 else (t_in + 1.2 if is_5 else t_in + 2.2)
+
+        p1 = polar_to_complex(tick_start_r, deg)
+        p2 = polar_to_complex(t_out, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" class="laser-engrave" />')
+
+        if is_10:
+            pt = polar_to_complex(r_txt, deg)
+            lbl = f"{deg:03d}°" if deg > 0 else "000°"
+            rot = calc_readable_rotation(deg)
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{lbl}</text>')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_seite_b_rotor(output_file: Path):
+    """
+    Generiert die Laser-CAM-Vektordatei für die Mittelscheibe Rückseite (Ø 150 mm).
+    Features:
+    - Schnittlinien: Außenrand R = 75.0 mm und zentrale Achsbohrung r = 1.6 mm.
+    - Logarithmische C-Skala (1.0 bis 10.0) am Außenrand (R = 74.5 mm, Teilstriche nach innen).
+    - Vergrößerte S-Sinusskala (R = 65.0 mm):
+      * BUGFIX V3.0: Alle Teilstriche strikt RADIAL zum Drehzentrum (0,0).
+      * Hierarchische Feinteilung:
+        - 6.0° bis 20.0°: 1/10°-Schritte (0.1°)
+        - 20.0° bis 40.0°: 1/4°-Schritte (0.25°)
+        - 40.0° bis 70.0°: 0.5°-Schritte
+        - 70.0° bis 90.0°: 1.0°-Schritte
+    - Performance-Nonius bei 1.0 (-15%, -10%, -5%, +5%).
+    """
+    r_rotor = GEOM.rotor_radius
+    r_c = GEOM.c_scale_radius
+    r_s = GEOM.s_scale_radius
+    dash = 0.8
+
+    parts = [svg_header(180.0, 180.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_rotor:.2f}" class="laser-cut" />')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut-inner" />')
+
+    # 1. Logarithmische C-Skala (1.0 bis 10.0)
+    parts.append('  <!-- Logarithmische C-Skala auf Rotor Rückseite -->')
+    for x in range(100, 1001):
+        if x < 200:
+            valid = (x % 1 == 0)
+        elif x < 500:
+            valid = (x % 2 == 0)
+        else:
+            valid = (x % 5 == 0)
+        if not valid:
+            continue
+
+        deg = math.log10(x / 100.0) * 360.0
+        f_len = 4.0 if (x in [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]) else (2.5 if x % 10 == 0 else 1.5)
+
+        p1 = polar_to_complex(r_c, deg)
+        p2 = polar_to_complex(r_c - f_len * dash, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" class="laser-engrave" />')
+
+        if f_len >= 4.0:
+            pt = polar_to_complex(r_c - 4.5, deg)
+            txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
+
+    # 2. Vergrößerte Logarithmische S-Skala (Sinus) bei R = 65.0 mm mit Feinteilung (Radial-Bugfix)
+    parts.append('  <!-- Vergrößerte S-Sinusskala (R = 65.0 mm) mit Feinteilung (strikt radial) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_s:.2f}" class="grid-line" stroke="#2980B9" stroke-width="0.3" />')
+
+    # Winkel-Definitionsliste für 6° bis 90° mit 1/10°- und 1/4°-Teilung
+    angles_6_to_20 = [round(6.0 + i * 0.1, 2) for i in range(141)]          # 6.0° bis 20.0° in 0.1°
+    angles_20_to_40 = [round(20.0 + i * 0.25, 2) for i in range(1, 81)]      # 20.25° bis 40.0° in 0.25°
+    angles_40_to_70 = [round(40.0 + i * 0.5, 2) for i in range(1, 61)]       # 40.5° bis 70.0° in 0.5°
+    angles_70_to_90 = [round(70.0 + i * 1.0, 2) for i in range(1, 21)]       # 71.0° bis 90.0° in 1.0°
+
+    all_sin_angles = angles_6_to_20 + angles_20_to_40 + angles_40_to_70 + angles_70_to_90
+    labeled_angles = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90}
+
+    for alpha in all_sin_angles:
+        deg = math.log10(10.0 * math.sin(math.radians(alpha))) * 360.0
+
+        # Hierarchische Strichlängen
+        is_int = (round(alpha * 10) % 10 == 0)
+        int_val = int(round(alpha))
+        is_labeled = is_int and (int_val in labeled_angles)
+
+        if alpha <= 20.0:
+            if is_int:
+                tick_len = 3.5
+                sw = 0.35
+            elif round(alpha * 10) % 5 == 0:  # 0.5°
+                tick_len = 2.4
+                sw = 0.28
+            else:                             # 0.1°
+                tick_len = 1.3
+                sw = 0.20
+        elif alpha <= 40.0:
+            if is_int:
+                tick_len = 3.5
+                sw = 0.35
+            elif round(alpha * 100) % 50 == 0: # 0.5°
+                tick_len = 2.4
+                sw = 0.28
+            else:                              # 0.25°
+                tick_len = 1.3
+                sw = 0.20
+        elif alpha <= 70.0:
+            if is_int:
+                tick_len = 3.5
+                sw = 0.35
+            else:                              # 0.5°
+                tick_len = 1.8
+                sw = 0.24
+        else:
+            if is_int and (int_val % 5 == 0):
+                tick_len = 3.5
+                sw = 0.35
+            else:                              # 1.0°
+                tick_len = 1.8
+                sw = 0.24
+
+        # Mathematisch strikt RADIALER Strich: gleicher Polarwinkel deg für Start- und Endpunkt!
+        p1 = polar_to_complex(r_s, deg)
+        p2 = polar_to_complex(r_s - tick_len, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="#2980B9" stroke-width="{sw:.2f}" />')
+
+        if is_labeled:
+            pt = polar_to_complex(r_s - 5.5, deg)
+            rot = calc_readable_rotation(deg)
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.0px" fill="#2980B9" transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{int_val}°</text>')
+
+    # 3. Performance-Nonius bei 1.0 (0°)
+    for pct in [-15, -10, -5, 5]:
+        val = 1.0 + (pct / 100.0)
+        deg = math.log10(val) * 360.0
+        p1 = polar_to_complex(r_c, deg)
+        p2 = polar_to_complex(r_c - 3.0, deg)
+        col = "#27AE60" if pct > 0 else "#C0392B"
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="{col}" stroke-width="0.5" />')
+        pt = polar_to_complex(r_c - 4.5, deg)
+        lbl = f"{pct:+d}%"
+        parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" font-family="sans-serif" font-size="1.8px" font-weight="bold" fill="{col}" text-anchor="middle">{lbl}</text>')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_seite_b_boden(output_file: Path):
+    """
+    Generiert die Laser-CAM-Vektordatei für den Gehäuseboden (Stator Rückseite Ø 180 mm).
+    Features:
+    - Schnittlinien: Außenrand R = 90.0 mm, Innenöffnung R = 75.0 mm.
+    - 6 M3-Bohrungen auf Teilkreis PCD Ø 176 mm.
+    - Logarithmische D-Skala (1.0 bis 10.0) entlang R = 75.5 mm (Teilstriche weisen nach außen).
+    """
+    r_out = GEOM.stator_outer_radius
+    r_win = GEOM.stator_window_radius
+    r_d = GEOM.d_scale_radius
+    dash = 0.8
+
+    parts = [svg_header(190.0, 190.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_out:.2f}" class="laser-cut" />')
+    parts.append(f'  <circle cx="0" cy="0" r="{r_win:.2f}" class="laser-cut" />')
+
+    # 6 Zentrierbohrungen (Ø 1.0 mm) auf PCD Ø 176 mm
+    for i in range(GEOM.screw_count):
+        ang_deg = i * (360.0 / GEOM.screw_count)
+        p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" class="laser-cut" />')
+
+    # D-Skala
+    parts.append('  <!-- Logarithmische D-Skala auf Stator Boden -->')
+    for x in range(100, 1001):
+        if x < 200:
+            valid = (x % 1 == 0)
+        elif x < 500:
+            valid = (x % 2 == 0)
+        else:
+            valid = (x % 5 == 0)
+        if not valid:
+            continue
+
+        deg = math.log10(x / 100.0) * 360.0
+        f_len = 4.0 if (x in [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]) else (2.5 if x % 10 == 0 else 1.5)
+
+        p1 = polar_to_complex(r_d, deg)
+        p2 = polar_to_complex(r_d + f_len * dash, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" class="laser-engrave" />')
+
+        if f_len >= 4.0:
+            pt = polar_to_complex(r_d + 5.5, deg)
+            txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_zentralzeiger(output_file: Path):
+    """
+    Generiert die Laser-CAM-Vektordatei für den Acryl-Peilzeiger der Vorderseite (Länge 85.0 mm).
+    Features V3.0:
+    - Konturschnitt mit Nabe R = 5.0 mm, Armbreite 6.0 mm und Zeigerspitze bis R = 85.0 mm.
+    - Zentrische Achsbohrung r = 1.6 mm.
+    - Gravierte 1:1 KNOTEN-Skala (0 bis 12 kn) entlang der Peilkante (5.0 mm/kn).
+    """
+    p_len = GEOM.pointer_length_front
+    speed_scale = GEOM.speed_scale_mm_per_knot # 5.0 mm / kn
+    w_ptr = 6.0
+    hub_r = 5.0
+
+    parts = [svg_header(190.0, 190.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut" />')
+
+    path_arm = (
+        f"M 0 {-hub_r} "
+        f"L 0 {-p_len + 3.0} "
+        f"L {-w_ptr/2:.2f} {-p_len} "
+        f"L {-w_ptr:.2f} {-p_len + 3.0} "
+        f"L {-w_ptr:.2f} {-hub_r} "
+        f"A {hub_r} {hub_r} 0 1 0 0 {-hub_r} Z"
+    )
+    parts.append(f'  <path d="{path_arm}" class="laser-cut" />')
+
+    # Gravur: Rote Peilkante & Knotenteilung
+    parts.append(f'  <line x1="0" y1="{-hub_r:.2f}" x2="0" y2="{-p_len:.2f}" stroke="#E74C3C" stroke-width="0.35" />')
+
+    for k_half in range(2, 25): # 1.0 bis 12.0 in 0.5 kn Schritten
+        k = k_half * 0.5
+        y_pos = -k * speed_scale
+        if -y_pos <= p_len - 5.0:
+            is_even = (k % 2.0 == 0)
+            is_whole = (k % 1.0 == 0)
+            t_w = 2.8 if is_even else (2.0 if is_whole else 1.2)
+            parts.append(f'  <line x1="0" y1="{y_pos:.2f}" x2="{-t_w:.2f}" y2="{y_pos:.2f}" stroke="#2C3E50" stroke-width="0.3" />')
+            if is_even:
+                parts.append(f'  <text x="{-t_w - 0.8:.2f}" y="{y_pos:.2f}" class="grid-text" font-size="1.9px" text-anchor="end">{int(k)}</text>')
+
+    parts.append(f'  <text x="-4.2" y="{-12.0 * speed_scale - 3.0:.2f}" class="grid-text" font-size="1.8px" font-weight="bold" fill="#C0392B">KNOTEN</text>')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_zentralzeiger_rueckseite(output_file: Path):
+    """
+    Generiert die Laser-CAM-Vektordatei für den transparenten Läufer der Rückseite (Länge 86.0 mm).
+    Features:
+    - Acryl-Arm (86.0 mm) mit zentraler roter Peillinie zur Projektion zwischen S-, C- und D-Skala.
+    """
+    p_len = GEOM.pointer_length_back
+    w_ptr = 6.0
+    hub_r = 5.0
+
+    parts = [svg_header(190.0, 190.0)]
+    parts.append('  <!-- Schnittlinien (Laser-Cut) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.axle_hole_radius:.2f}" class="laser-cut" />')
+
+    path_arm = (
+        f"M 0 {-hub_r} "
+        f"L 0 {-p_len + 3.0} "
+        f"L {-w_ptr/2:.2f} {-p_len} "
+        f"L {-w_ptr:.2f} {-p_len + 3.0} "
+        f"L {-w_ptr:.2f} {-hub_r} "
+        f"A {hub_r} {hub_r} 0 1 0 0 {-hub_r} Z"
+    )
+    parts.append(f'  <path d="{path_arm}" class="laser-cut" />')
+    parts.append(f'  <line x1="0" y1="{-hub_r:.2f}" x2="0" y2="{-p_len:.2f}" stroke="#E74C3C" stroke-width="0.35" />')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+# ==============================================================================
+# 5. MONTIERTE KOMPOSIT-SVGS (SINGLE SOURCE OF TRUTH)
+# ==============================================================================
+
+def generate_laser_seite_a_montiert(output_file: Path, polar: PolarData, twa_pointer_deg: float = 40.0):
+    """
+    Generiert die montierte Gesamt-Vektorgrafik der Vorderseite (Seite A) in V3.0:
+    1. Gehäusedeckel mit 360°-Kompassrose
+    2. Daumen-Tabs
+    3. Rotor mit AWA/TWA-Hälften und 1:1 Knotenskalierung
+    4. Zentraler Acryl-Zeiger mit Knotenskala
+    5. Mittelbolzen
+    """
+    parts = [svg_header(200.0, 200.0)]
+    speed_scale = GEOM.speed_scale_mm_per_knot
+    grid_rings = GEOM.knot_grid_rings
+    r_max_polar = GEOM.polar_max_radius
+    colors = CONFIG.polars.get("curve_colors", [
+        "#1F618D", "#2980B9", "#2471A3", "#17A589",
+        "#138D75", "#D4AC0D", "#CA6F1E", "#922B21"
+    ])
+
+    # 1. Gehäusedeckel Stator Hintergrund (Ø 180 mm)
+    parts.append('  <!-- 1. Stator Gehäusedeckel Hintergrund -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.stator_outer_radius:.2f}" fill="#FFFFFF" stroke="#2C3E50" stroke-width="0.8" />')
+
+    # Daumen-Tabs
+    for ang in GEOM.thumb_tabs_angles:
+        d_arc = GEOM.thumb_tabs_arc_deg / 2.0
+        a1, a2 = ang - d_arc, ang + d_arc
+        p1_out = polar_to_complex(GEOM.thumb_tabs_outer_radius, a1)
+        p2_out = polar_to_complex(GEOM.thumb_tabs_outer_radius, a2)
+        p1_in = polar_to_complex(GEOM.stator_outer_radius, a1)
+        p2_in = polar_to_complex(GEOM.stator_outer_radius, a2)
+        tab_path = (
+            f"M {p1_in.real:.2f} {p1_in.imag:.2f} "
+            f"L {p1_out.real:.2f} {p1_out.imag:.2f} "
+            f"A {GEOM.thumb_tabs_outer_radius} {GEOM.thumb_tabs_outer_radius} 0 0 1 {p2_out.real:.2f} {p2_out.imag:.2f} "
+            f"L {p2_in.real:.2f} {p2_in.imag:.2f} Z"
+        )
+        parts.append(f'  <path d="{tab_path}" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
+
+    # 6x Zentrierbohrungen Ø 1.0 mm (r = 0.5 mm) für M3-Schrauben auf Teilkreis R = 88.0 mm
+    for i in range(GEOM.screw_count):
+        ang_deg = i * (360.0 / GEOM.screw_count)
+        p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />')
+
+    # 360° Kompassrose auf Stator
+    t_in = GEOM.stator_compass_ticks_inner
+    t_out = GEOM.stator_compass_ticks_outer
+    r_txt = GEOM.stator_compass_text_radius
+    for deg in range(360):
+        is_10 = (deg % 10 == 0)
+        is_5 = (deg % 5 == 0)
+        tick_start_r = t_in if is_10 else (t_in + 1.2 if is_5 else t_in + 2.2)
+        p1 = polar_to_complex(tick_start_r, deg)
+        p2 = polar_to_complex(t_out, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="#2C3E50" stroke-width="0.35" />')
+        if is_10:
+            pt = polar_to_complex(r_txt, deg)
+            lbl = f"{deg:03d}°" if deg > 0 else "000°"
+            rot = calc_readable_rotation(deg)
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{lbl}</text>')
+
+    # 2. Rotor Scheibe Hintergrund (Ø 150 mm)
+    parts.append('  <!-- 2. Rotor Scheibe (Sichtfenster Ø 150 mm) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.rotor_radius:.2f}" fill="#FFFFFF" stroke="#2C3E50" stroke-width="0.6" />')
+
+    # Taktikring
+    parts.append(generate_tactical_rim())
+
+    # Titel & Legende aus zentraler Konfiguration
+    labels = CONFIG.labels
+    f_title = labels.get("front_title", "ORC VPP PERFORMANCE-POLAREN")
+    f_sub = labels.get("front_subtitle", "JPK 1080 TRUE GRIT · GER 7447 | ORC VPP Run 249116")
+    awa_lbl = labels.get("awa_title", "◄ AWA / SPEED (kt)")
+    twa_lbl = labels.get("twa_title", "TWA / SPEED (kt) ►")
+    awa_sub = labels.get("awa_sub", "Scheinbarer Wind (Windex)")
+    twa_sub = labels.get("twa_sub", "Wahrer Wind (Instrumente)")
+
+    parts.append('  <!-- Titel & Legende V3.0 (Variante 1 nach ORC Speed Guide) -->')
+    parts.append(f'  <text x="0" y="-50.0" class="title-text">{f_title}</text>')
+    parts.append(f'  <text x="0" y="-46.8" class="sub-text">{f_sub}</text>')
+    # Segel-Legende nach ORC Speed Guide
+    parts.append('  <g font-family="sans-serif" font-size="1.6px" font-weight="bold">')
+    parts.append('    <line x1="-42.0" y1="-43.8" x2="-35.0" y2="-43.8" stroke="#1B4F72" stroke-width="0.7" />')
+    parts.append('    <text x="-33.0" y="-43.8" fill="#1B4F72" dominant-baseline="central">Headsail</text>')
+    parts.append('    <line x1="-12.0" y1="-43.8" x2="-5.0" y2="-43.8" stroke="#C0392B" stroke-width="0.7" />')
+    parts.append('    <text x="-3.0" y="-43.8" fill="#C0392B" dominant-baseline="central">Asym (Gennaker)</text>')
+    parts.append('    <line x1="28.0" y1="-43.8" x2="35.0" y2="-43.8" stroke="#27AE60" stroke-width="0.7" />')
+    parts.append('    <text x="37.0" y="-43.8" fill="#27AE60" dominant-baseline="central">Sym (Spi)</text>')
+    parts.append('  </g>')
+    parts.append(f'  <text x="-32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{awa_lbl}</text>')
+    parts.append(f'  <text x="32.0" y="-39.5" class="awa-label" font-weight="bold" fill="#1B4F72">{twa_lbl}</text>')
+    parts.append(f'  <text x="-32.0" y="-36.5" class="sub-text" font-size="1.5px">{awa_sub}</text>')
+    parts.append(f'  <text x="32.0" y="-36.5" class="sub-text" font-size="1.5px">{twa_sub}</text>')
+
+    # Konzentrische Knotenringe
+    for k in grid_rings:
+        r_val = k * speed_scale
+        cls_name = "grid-line" if (k % 4 == 0) else "grid-line-minor"
+        parts.append(f'  <circle cx="0" cy="0" r="{r_val:.2f}" class="{cls_name}" />')
+
+    # Achsen
+    parts.append(f'  <line x1="4.0" y1="0" x2="{r_max_polar:.2f}" y2="0" stroke="#2C3E50" stroke-width="0.4" />')
+    for k in grid_rings:
+        rx = k * speed_scale
+        parts.append(f'  <line x1="{rx:.2f}" y1="-1.6" x2="{rx:.2f}" y2="1.6" stroke="#2C3E50" stroke-width="0.3" />')
+        parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px">{k}</text>')
+
+    parts.append(f'  <line x1="-4.0" y1="0" x2="{-r_max_polar:.2f}" y2="0" stroke="#2C3E50" stroke-width="0.4" />')
+    for k in grid_rings:
+        rx = -k * speed_scale
+        parts.append(f'  <line x1="{rx:.2f}" y1="-1.6" x2="{rx:.2f}" y2="1.6" stroke="#2C3E50" stroke-width="0.3" />')
+        parts.append(f'  <text x="{rx:.2f}" y="-2.2" class="grid-text" font-size="1.9px">{k}</text>')
+
+    parts.append(f'  <line x1="0" y1="{-r_max_polar:.2f}" x2="0" y2="-4.0" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
+    parts.append(f'  <line x1="0" y1="4.0" x2="0" y2="{r_max_polar:.2f}" stroke="#BDC3C7" stroke-width="0.5" stroke-dasharray="2.0,1.5" />')
+
+    # Polarkurven & VMG Targets
+    spline_info_list = polar.get_spline_curves(scale_factor=speed_scale)
+    crossover_pts_stbd = []
+    crossover_pts_port = []
+
+    for idx, s_info in enumerate(spline_info_list):
+        tws = s_info["tws"]
+        tgt = s_info["targets"]
+
+        # 1. Steuerbord: TWA getrennte Segel-Kurven
+        for seg_info in s_info.get("starboard_segments", []):
+            seg_pts = seg_info["points"]
+            seg_col = seg_info.get("color", "#1B4F72")
+            for seg in clip_polyline_to_circle(seg_pts, r_max_polar):
+                if len(seg) > 1:
+                    d = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in seg])
+                    parts.append(f'  <path d="{d}" class="polar-curve" stroke="{seg_col}" />')
+
+        # 2. Backbord: AWA getrennte Segel-Kurven
+        for seg_info in s_info.get("port_segments", []):
+            seg_pts = seg_info["points"]
+            seg_col = seg_info.get("color", "#1B4F72")
+            for seg in clip_polyline_to_circle(seg_pts, r_max_polar):
+                if len(seg) > 1:
+                    d = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in seg])
+                    parts.append(f'  <path d="{d}" class="polar-curve" stroke="{seg_col}" />')
+
+        # 3. Beat & Run VMG Rauten
+        beat_r = tgt["beat_sog"] * speed_scale
+        p_beat_twa = polar_to_complex(beat_r, tgt["beat_angle"])
+        bx, by = p_beat_twa.real, p_beat_twa.imag
+        parts.append(f'  <polygon points="{bx:.2f},{by-1.1:.2f} {bx+1.1:.2f},{by:.2f} {bx:.2f},{by+1.1:.2f} {bx-1.1:.2f},{by:.2f}" class="vmg-beat" />')
+        stagger_x = -2.1 if (idx % 2 == 0) else -4.2
+        stagger_y = 0.0 if (idx % 2 == 0) else -1.2
+        parts.append(f'  <text x="{bx + stagger_x:.2f}" y="{by + stagger_y:.2f}" class="polar-label" text-anchor="end" fill="#1B4F72">{int(tws)}</text>')
+
+        run_r = tgt["run_sog"] * speed_scale
+        p_run_twa = polar_to_complex(run_r, tgt["gybe_angle"])
+        rx, ry = p_run_twa.real, p_run_twa.imag
+        parts.append(f'  <polygon points="{rx:.2f},{ry-1.1:.2f} {rx+1.1:.2f},{ry:.2f} {rx:.2f},{ry+1.1:.2f} {rx-1.1:.2f},{ry:.2f}" class="vmg-run" />')
+        parts.append(f'  <text x="{rx + 2.1:.2f}" y="{ry:.2f}" class="polar-label" text-anchor="start" fill="#2C3E50">{int(tws)}</text>')
+
+        beat_awa = tgt.get("beat_awa")
+        if not beat_awa or beat_awa < 1.0:
+            from polar_parser import calc_wind_triangle_awa
+            beat_awa = calc_wind_triangle_awa(tws, tgt["beat_sog"], tgt["beat_angle"])
+        p_beat_awa = polar_to_complex(beat_r, -beat_awa)
+        bax, bay = p_beat_awa.real, p_beat_awa.imag
+        parts.append(f'  <polygon points="{bax:.2f},{bay-1.1:.2f} {bax+1.1:.2f},{bay:.2f} {bax:.2f},{bay+1.1:.2f} {bax-1.1:.2f},{bay:.2f}" class="vmg-beat" />')
+        stagger_ax = 2.1 if (idx % 2 == 0) else 4.2
+        parts.append(f'  <text x="{bax + stagger_ax:.2f}" y="{bay + stagger_y:.2f}" class="polar-label" text-anchor="start" fill="#1B4F72">{int(tws)}</text>')
+
+        run_awa = tgt.get("run_awa", tgt["gybe_angle"] * 0.6)
+        p_run_awa = polar_to_complex(run_r, -run_awa)
+        rax, ray = p_run_awa.real, p_run_awa.imag
+        parts.append(f'  <polygon points="{rax:.2f},{ray-1.1:.2f} {rax+1.1:.2f},{ray:.2f} {rax:.2f},{ray+1.1:.2f} {rax-1.1:.2f},{ray:.2f}" class="vmg-run" />')
+        parts.append(f'  <text x="{rax - 2.1:.2f}" y="{ray:.2f}" class="polar-label" text-anchor="end" fill="#2C3E50">{int(tws)}</text>')
+
+        cross_twa = polar.crossover_angles.get(tws)
+        cross_awa = polar.crossover_angles_awa.get(tws)
+        if cross_twa:
+            curve = polar.curves_raw[idx]
+            match_pt = next((p for p in curve if abs(p["twa"] - cross_twa) < 2.0), None)
+            bsp_cross = match_pt["bsp"] if match_pt else tgt["beat_sog"]
+            crossover_pts_stbd.append(polar_to_complex(bsp_cross * speed_scale, cross_twa))
+            if cross_awa:
+                crossover_pts_port.append(polar_to_complex(bsp_cross * speed_scale, -cross_awa))
+
+    if crossover_pts_stbd:
+        d_cross_stbd = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in crossover_pts_stbd])
+        parts.append(f'  <path d="{d_cross_stbd}" class="crossover-line" />')
+        for p in crossover_pts_stbd:
+            parts.append(f'  <polygon points="{p.real:.2f},{p.imag-1.2:.2f} {p.real+1.2:.2f},{p.imag+1.2:.2f} {p.real-1.2:.2f},{p.imag+1.2:.2f}" class="crossover-marker" />')
+
+    if crossover_pts_port:
+        d_cross_port = "M " + " ".join([f"{p.real:.2f} {p.imag:.2f}" for p in crossover_pts_port])
+        parts.append(f'  <path d="{d_cross_port}" class="crossover-line" />')
+        for p in crossover_pts_port:
+            parts.append(f'  <polygon points="{p.real:.2f},{p.imag-1.2:.2f} {p.real+1.2:.2f},{p.imag+1.2:.2f} {p.real-1.2:.2f},{p.imag+1.2:.2f}" class="crossover-marker" />')
+
+    # 3. Zentraler Acryl-Zeiger (ausgerichtet auf twa_pointer_deg) mit Knotenskala
+    parts.append('  <!-- 3. Zentraler Acryl-Zeiger mit Knotenskala -->')
+    p_len = GEOM.pointer_length_front
+    w_ptr = 6.0
+    hub_r = 5.0
+
+    path_ptr_body = (
+        f"M 0 {-hub_r} "
+        f"L 0 {-p_len + 3.0} "
+        f"L {-w_ptr/2:.2f} {-p_len} "
+        f"L {-w_ptr:.2f} {-p_len + 3.0} "
+        f"L {-w_ptr:.2f} {-hub_r} "
+        f"A {hub_r} {hub_r} 0 1 0 0 {-hub_r} Z"
+    )
+    parts.append(f'  <g transform="rotate({twa_pointer_deg} 0 0)">')
+    parts.append(f'    <path d="{path_ptr_body}" fill="#EBF5FB" fill-opacity="0.6" stroke="#2980B9" stroke-width="0.5" />')
+    parts.append(f'    <line x1="0" y1="{-hub_r:.2f}" x2="0" y2="{-p_len:.2f}" stroke="#E74C3C" stroke-width="0.8" />')
+
+    # Knotenteilung auf dem Zeigerarm
+    for k_half in range(2, 25):
+        k = k_half * 0.5
+        y_pos = -k * speed_scale
+        if -y_pos <= p_len - 5.0:
+            is_even = (k % 2.0 == 0)
+            is_whole = (k % 1.0 == 0)
+            t_w = 2.8 if is_even else (2.0 if is_whole else 1.2)
+            parts.append(f'    <line x1="0" y1="{y_pos:.2f}" x2="{-t_w:.2f}" y2="{y_pos:.2f}" stroke="#2C3E50" stroke-width="0.3" />')
+            if is_even:
+                parts.append(f'    <text x="{-t_w - 0.8:.2f}" y="{y_pos:.2f}" class="grid-text" font-size="1.9px" text-anchor="end">{int(k)}</text>')
+
+    parts.append(f'    <text x="-4.2" y="{-12.0 * speed_scale - 3.0:.2f}" class="grid-text" font-size="1.8px" font-weight="bold" fill="#C0392B">KNOTEN</text>')
+    parts.append('  </g>')
+
+    # Peilungs-Annotation
+    p_annot = polar_to_complex(p_len + 5.0, twa_pointer_deg)
+    parts.append(f'  <text x="{p_annot.real:.2f}" y="{p_annot.imag:.2f}" font-family="sans-serif" font-weight="bold" font-size="3.0px" fill="#C0392B" text-anchor="middle" dominant-baseline="central">Zeiger: TWA {twa_pointer_deg:.1f}°</text>')
+
+    # 4. Mittelachse / Kappe
+    parts.append('  <!-- 4. Mittelachse / Haltekappe -->')
+    parts.append('  <circle cx="0" cy="0" r="5.0" fill="#BDC3C7" stroke="#2C3E50" stroke-width="0.8" />')
+    parts.append('  <circle cx="0" cy="0" r="2.2" fill="#E74C3C" stroke="#962D22" stroke-width="0.6" />')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+def generate_laser_seite_b_montiert(output_file: Path, cursor_angle_deg: float = 30.0):
+    """
+    Generiert die montierte Gesamt-Vektorgrafik der Rückseite (Seite B) in V3.0:
+    1. Gehäuseboden mit D-Skala (R = 75.5 bis 79.5 mm)
+    2. Daumen-Tabs an 45°, 135°, 225°, 315°
+    3. Mittelscheibe mit C-Skala (R = 74.5 mm), S-Sinusskala (R = 65.0 mm mit Feinteilung), Nonius
+    4. Zentraler Acryl-Läufer mit roter Haarlinie
+    5. Mittelbolzen
+    """
+    parts = [svg_header(200.0, 200.0)]
+
+    # Gehäuseboden Stator (Ø 180 mm)
+    parts.append('  <!-- 1. Stator Gehäuseboden Hintergrund -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.stator_outer_radius:.2f}" fill="#FFFFFF" stroke="#2C3E50" stroke-width="0.8" />')
+
+    # Daumen-Tabs
+    for ang in GEOM.thumb_tabs_angles:
+        d_arc = GEOM.thumb_tabs_arc_deg / 2.0
+        a1, a2 = ang - d_arc, ang + d_arc
+        p1_out = polar_to_complex(GEOM.thumb_tabs_outer_radius, a1)
+        p2_out = polar_to_complex(GEOM.thumb_tabs_outer_radius, a2)
+        p1_in = polar_to_complex(GEOM.stator_outer_radius, a1)
+        p2_in = polar_to_complex(GEOM.stator_outer_radius, a2)
+        tab_path = (
+            f"M {p1_in.real:.2f} {p1_in.imag:.2f} "
+            f"L {p1_out.real:.2f} {p1_out.imag:.2f} "
+            f"A {GEOM.thumb_tabs_outer_radius} {GEOM.thumb_tabs_outer_radius} 0 0 1 {p2_out.real:.2f} {p2_out.imag:.2f} "
+            f"L {p2_in.real:.2f} {p2_in.imag:.2f} Z"
+        )
+        parts.append(f'  <path d="{tab_path}" fill="#BDC3C7" stroke="#7F8C8D" stroke-width="0.5" />')
+
+    # 6x Zentrierbohrungen Ø 1.0 mm (r = 0.5 mm) für M3-Schrauben auf Teilkreis R = 88.0 mm
+    for i in range(GEOM.screw_count):
+        ang_deg = i * (360.0 / GEOM.screw_count)
+        p_screw = polar_to_complex(GEOM.screw_pcd_radius, ang_deg)
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="3.0" fill="#F4F6F6" stroke="#BDC3C7" stroke-width="0.35" stroke-dasharray="1.0,1.0" />')
+        parts.append(f'  <circle cx="{p_screw.real:.2f}" cy="{p_screw.imag:.2f}" r="{GEOM.screw_centering_hole_r:.2f}" fill="#FFFFFF" stroke="#E74C3C" stroke-width="0.3" />')
+
+    # D-Skala auf Stator
+    r_d = GEOM.d_scale_radius
+    dash = 0.8
+    for x in range(100, 1001):
+        if x < 200:
+            valid = (x % 1 == 0)
+        elif x < 500:
+            valid = (x % 2 == 0)
+        else:
+            valid = (x % 5 == 0)
+        if not valid:
+            continue
+        deg = math.log10(x / 100.0) * 360.0
+        f_len = 4.0 if (x in [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]) else (2.5 if x % 10 == 0 else 1.5)
+        p1 = polar_to_complex(r_d, deg)
+        p2 = polar_to_complex(r_d + f_len * dash, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="#2C3E50" stroke-width="0.35" />')
+        if f_len >= 4.0:
+            pt = polar_to_complex(r_d + 5.5, deg)
+            txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
+
+    p_lbl_d = polar_to_complex(r_d + 6.5, 340.0)
+    rot_d = calc_readable_rotation(340.0)
+    parts.append(f'  <text x="{p_lbl_d.real:.2f}" y="{p_lbl_d.imag:.2f}" font-family="sans-serif" font-weight="bold" font-size="2.6px" fill="#1F618D" text-anchor="middle" dominant-baseline="central" transform="rotate({rot_d:.1f} {p_lbl_d.real:.2f} {p_lbl_d.imag:.2f})">D (STATOR)</text>')
+
+    # Rotor Hintergrund (Ø 150 mm)
+    parts.append('  <!-- 2. Rotor Scheibe (Rückseite) -->')
+    parts.append(f'  <circle cx="0" cy="0" r="{GEOM.rotor_radius:.2f}" fill="#FFFFFF" stroke="#2C3E50" stroke-width="0.6" />')
+
+    # C-Skala
+    r_c = GEOM.c_scale_radius
+    for x in range(100, 1001):
+        if x < 200:
+            valid = (x % 1 == 0)
+        elif x < 500:
+            valid = (x % 2 == 0)
+        else:
+            valid = (x % 5 == 0)
+        if not valid:
+            continue
+        deg = math.log10(x / 100.0) * 360.0
+        f_len = 4.0 if (x in [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000]) else (2.5 if x % 10 == 0 else 1.5)
+        p1 = polar_to_complex(r_c, deg)
+        p2 = polar_to_complex(r_c - f_len * dash, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="#2C3E50" stroke-width="0.35" />')
+        if f_len >= 4.0:
+            pt = polar_to_complex(r_c - 4.5, deg)
+            txt = f"{x/100:.1f}" if x < 200 else f"{x//100}" if x % 100 == 0 else f"{x/100:.1f}"
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.2px">{txt}</text>')
+
+    p_lbl_c = polar_to_complex(r_c - 5.5, 340.0)
+    rot_c = calc_readable_rotation(340.0)
+    parts.append(f'  <text x="{p_lbl_c.real:.2f}" y="{p_lbl_c.imag:.2f}" font-family="sans-serif" font-weight="bold" font-size="2.6px" fill="#1F618D" text-anchor="middle" dominant-baseline="central" transform="rotate({rot_c:.1f} {p_lbl_c.real:.2f} {p_lbl_c.imag:.2f})">C (ROTOR)</text>')
+
+    # Performance-Nonius
+    for pct in [-15, -10, -5, 5]:
+        val = 1.0 + (pct / 100.0)
+        deg = math.log10(val) * 360.0
+        p1 = polar_to_complex(r_c, deg)
+        p2 = polar_to_complex(r_c - 3.0, deg)
+        col = "#27AE60" if pct > 0 else "#C0392B"
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="{col}" stroke-width="0.5" />')
+        pt = polar_to_complex(r_c - 4.5, deg)
+        parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" font-family="sans-serif" font-size="1.8px" font-weight="bold" fill="{col}" text-anchor="middle">{pct:+d}%</text>')
+
+    # S-Sinusskala mit Feinteilung (Radial-Bugfix V3.0)
+    r_s = GEOM.s_scale_radius
+    parts.append(f'  <circle cx="0" cy="0" r="{r_s:.2f}" class="grid-line" stroke="#2980B9" stroke-width="0.3" />')
+
+    angles_6_to_20 = [round(6.0 + i * 0.1, 2) for i in range(141)]
+    angles_20_to_40 = [round(20.0 + i * 0.25, 2) for i in range(1, 81)]
+    angles_40_to_70 = [round(40.0 + i * 0.5, 2) for i in range(1, 61)]
+    angles_70_to_90 = [round(70.0 + i * 1.0, 2) for i in range(1, 21)]
+
+    all_sin_angles = angles_6_to_20 + angles_20_to_40 + angles_40_to_70 + angles_70_to_90
+    labeled_angles = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90}
+
+    for alpha in all_sin_angles:
+        deg = math.log10(10.0 * math.sin(math.radians(alpha))) * 360.0
+        is_int = (round(alpha * 10) % 10 == 0)
+        int_val = int(round(alpha))
+        is_labeled = is_int and (int_val in labeled_angles)
+
+        if alpha <= 20.0:
+            tick_len = 3.5 if is_int else (2.4 if round(alpha * 10) % 5 == 0 else 1.3)
+            sw = 0.35 if is_int else (0.28 if round(alpha * 10) % 5 == 0 else 0.20)
+        elif alpha <= 40.0:
+            tick_len = 3.5 if is_int else (2.4 if round(alpha * 100) % 50 == 0 else 1.3)
+            sw = 0.35 if is_int else (0.28 if round(alpha * 100) % 50 == 0 else 0.20)
+        elif alpha <= 70.0:
+            tick_len = 3.5 if is_int else 1.8
+            sw = 0.35 if is_int else 0.24
+        else:
+            tick_len = 3.5 if (is_int and int_val % 5 == 0) else 1.8
+            sw = 0.35 if (is_int and int_val % 5 == 0) else 0.24
+
+        p1 = polar_to_complex(r_s, deg)
+        p2 = polar_to_complex(r_s - tick_len, deg)
+        parts.append(f'  <line x1="{p1.real:.2f}" y1="{p1.imag:.2f}" x2="{p2.real:.2f}" y2="{p2.imag:.2f}" stroke="#2980B9" stroke-width="{sw:.2f}" />')
+
+        if is_labeled:
+            pt = polar_to_complex(r_s - 5.5, deg)
+            rot = calc_readable_rotation(deg)
+            parts.append(f'  <text x="{pt.real:.2f}" y="{pt.imag:.2f}" class="compass-text" font-size="2.0px" fill="#2980B9" transform="rotate({rot:.1f} {pt.real:.2f} {pt.imag:.2f})">{int_val}°</text>')
+
+    # Titel & Formeln im Zentrum aus zentraler Konfiguration
+    labels = CONFIG.labels
+    b_title = labels.get("back_title", "RECHENSCHIEBER &amp; S-SKALA").replace("&", "&amp;") if "&amp;" not in labels.get("back_title", "") else labels.get("back_title", "")
+    b_sub = labels.get("back_subtitle", "JPK 1080 TRUE GRIT · GER 7447")
+    b_funcs = labels.get("back_functions", "Multiplikation · Division · Distanz/Zeit · Sinussatz")
+    b_gap = labels.get("back_c_d_gap", "Trennfuge C/D: R = 75.0 mm (Ø 150 mm)")
+    b_formula = labels.get("back_sinus_formula", "Sinussatz: a / sin(α) = b / sin(β) = c / sin(γ)")
+    b_sinus_lbl = labels.get("back_sinus_label", "S (SINUS-SKALA FÜR WINDDREIECK)")
+
+    parts.append('  <!-- Titel & Nautische Formeln -->')
+    parts.append(f'  <text x="0" y="-45.0" class="awa-label" font-size="2.4px" font-weight="bold">{b_sinus_lbl}</text>')
+    parts.append(f'  <text x="0" y="-18.0" class="title-text" font-size="3.2px">{b_title}</text>')
+    parts.append(f'  <text x="0" y="-14.0" class="sub-text" font-size="2.2px">{b_sub}</text>')
+    parts.append(f'  <text x="0" y="-10.5" class="sub-text" font-size="2.0px" fill="#2980B9">{b_funcs}</text>')
+    parts.append(f'  <text x="0" y="12.0" class="sub-text" font-size="2.0px">{b_gap}</text>')
+    parts.append(f'  <text x="0" y="16.0" font-family="sans-serif" font-style="italic" font-size="2.0px" fill="#2C3E50" text-anchor="middle">{b_formula}</text>')
+
+    # 3. Zentraler Dreh-Läufer (Acryl mit Haarlinie)
+    parts.append('  <!-- 3. Zentraler Dreh-Läufer Rückseite -->')
+    p_len = GEOM.pointer_length_back
+    w_ptr = 6.0
+    rot_cursor = math.log10(10.0 * math.sin(math.radians(cursor_angle_deg))) * 360.0
+
+    path_csr_body = (
+        f"M {-w_ptr/2} 0 "
+        f"L {-w_ptr/2} {-p_len} "
+        f"L {w_ptr/2} {-p_len} "
+        f"L {w_ptr/2} 0 Z"
+    )
+    parts.append(f'  <g transform="rotate({rot_cursor} 0 0)">')
+    parts.append(f'    <path d="{path_csr_body}" fill="#EBF5FB" fill-opacity="0.55" stroke="#2980B9" stroke-width="0.5" />')
+    parts.append(f'    <line x1="0" y1="0" x2="0" y2="{-p_len:.2f}" stroke="#E74C3C" stroke-width="0.8" />')
+    parts.append('  </g>')
+
+    p_annot = polar_to_complex(p_len + 5.0, rot_cursor)
+    parts.append(f'  <text x="{p_annot.real:.2f}" y="{p_annot.imag:.2f}" font-family="sans-serif" font-weight="bold" font-size="3.0px" fill="#C0392B" text-anchor="middle" dominant-baseline="central">Läufer: 30° S -&gt; 5.0 (C/D)</text>')
+
+    # 4. Mittelachse
+    parts.append('  <!-- 4. Mittelachse / Haltekappe -->')
+    parts.append('  <circle cx="0" cy="0" r="5.0" fill="#BDC3C7" stroke="#2C3E50" stroke-width="0.8" />')
+    parts.append('  <circle cx="0" cy="0" r="2.2" fill="#E74C3C" stroke="#962D22" stroke-width="0.6" />')
+
+    parts.append('</svg>\n')
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.write("\n".join(parts))
+
+
+# ==============================================================================
+# 6. MASTER BUILD ALL FUNCTION
+# ==============================================================================
+
+def generate_all_laser_svgs(polar: PolarData, out_dir: Path) -> List[Path]:
+    """
+    Generiert den vollständigen Satz aller CAM/Laser-SVGs sowie der
+    beiden montierten Komposit-SVGs (Single Source of Truth).
+    """
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    files = [
+        # Einzelne Laser-CAM-Dateien
+        (out_dir / "laser_seite_a_rotor_vorderseite.svg", lambda p: generate_laser_seite_a_rotor(p, polar)),
+        (out_dir / "laser_seite_a_deckel_kompassrose.svg", generate_laser_seite_a_deckel),
+        (out_dir / "laser_seite_b_rotor_rueckseite.svg", generate_laser_seite_b_rotor),
+        (out_dir / "laser_seite_b_boden_d_skala.svg", generate_laser_seite_b_boden),
+        (out_dir / "laser_zentralzeiger.svg", generate_laser_zentralzeiger),
+        (out_dir / "laser_zentralzeiger_rueckseite.svg", generate_laser_zentralzeiger_rueckseite),
+
+        # Montierte Komposit-SVGs für 100% WYSIWYG-Rendering
+        (out_dir / "laser_seite_a_montiert.svg", lambda p: generate_laser_seite_a_montiert(p, polar, twa_pointer_deg=40.0)),
+        (out_dir / "laser_seite_b_montiert.svg", lambda p: generate_laser_seite_b_montiert(p, cursor_angle_deg=30.0)),
+    ]
+
+    generated = []
+    for filepath, gen_func in files:
+        gen_func(filepath)
+        generated.append(filepath)
+
+    return generated
